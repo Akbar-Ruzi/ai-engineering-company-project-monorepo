@@ -1,6 +1,7 @@
-﻿import { filterClaims } from "./utils/collections";
-import { sampleClaims, sampleLocations } from "./data/sampleData";
-import type { Claim, ClaimStatus, ServiceType } from "./types/models";
+import { filterClaims } from "../utils/collections";
+import { sampleClaims, sampleLocations } from "../data/sampleData";
+import "./partialHtmls";
+import type { Claim, ClaimStatus, ServiceType } from "../types/models";
 
 const output = document.querySelector<HTMLPreElement>("#output");
 const outputPanel = document.querySelector<HTMLElement>("#output-panel");
