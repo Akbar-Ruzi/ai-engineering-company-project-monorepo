@@ -2,14 +2,14 @@
 
 Based on [CONTEXT-healthcore.en.md](CONTEXT-healthcore.en.md). Change `[ ]` to `[x]` when a task is complete.
 
-## 1. Models and Sample Data
+## 1. Models and Sample Data ✅
 
 - [x] Define and export the provided interfaces and types in `src/types/models.ts`, including `CMEReport` and `CMEStatus`.
 - [x] Add and export all four sample arrays in `src/data/sampleData.ts`. Keep the provided field names and values unchanged.
 
 ## 2. Collections (`src/utils/collections.ts`)
 
-- [ ] `filterClaims`: match all supplied filters.
+- [X] `filterClaims`: match all supplied filters.
 - [ ] `filterAppointmentsByStatus`: match any supplied status.
 - [ ] `sortClaimsById`: sort ascending or descending without changing the original array.
 - [ ] `sortAppointmentsByDate`: sort ascending or descending without changing the original array.

@@ -32,42 +32,85 @@
         Collection Operations
       </h2>
 
-      <div class="flex flex-wrap gap-3">
-        <button
-          id="filter-claims"
-          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Filter Claims
-        </button>
+      <section aria-labelledby="filter-claims-heading" class="mb-6">
+        <h3 id="filter-claims-heading" class="text-lg font-semibold mb-3">filterClaims</h3>
+        <p class="text-gray-600 mb-4">Choose any combination of claim filters. All selected filters must match.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+          <label for="claim-location" class="block">
+            City
+            <select id="claim-location" class="block w-full border rounded p-2 mt-1">
+              <option value="">All cities</option>
+            </select>
+          </label>
+          <label for="claim-status" class="block">
+            Status
+            <select id="claim-status" class="block w-full border rounded p-2 mt-1">
+              <option value="">All statuses</option>
+            </select>
+          </label>
+          <label for="claim-payer" class="block">
+            Payer
+            <select id="claim-payer" class="block w-full border rounded p-2 mt-1">
+              <option value="">All payers</option>
+            </select>
+          </label>
+          <label for="claim-service" class="block">
+            Service type
+            <select id="claim-service" class="block w-full border rounded p-2 mt-1">
+              <option value="">All service types</option>
+            </select>
+          </label>
+        </div>
 
-        <button
-          id="filter-appointments"
-          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Filter Appointments
-        </button>
+        <div class="flex flex-wrap gap-3">
+          <button
+            id="filter-claims"
+            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Filter Claims
+          </button>
+          <button
+            id="reset-filters"
+            type="button"
+            class="bg-gray-200 text-gray-900 px-4 py-2 rounded hover:bg-gray-300"
+          >
+            Reset Filters
+          </button>
+        </div>
+      </section>
 
-        <button
-          id="sort-claims"
-          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Sort Claims
-        </button>
+      <section aria-labelledby="other-collections-heading" class="border-t pt-5">
+        <h3 id="other-collections-heading" class="text-lg font-semibold mb-3">Other Collection Operations</h3>
+        <div class="flex flex-wrap gap-3">
+          <button
+            id="filter-appointments"
+            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Filter Appointments
+          </button>
 
-        <button
-          id="sort-appointments"
-          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Sort Appointments
-        </button>
+          <button
+            id="sort-claims"
+            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Sort Claims
+          </button>
 
-        <button
-          id="group-claims"
-          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Group Claims
-        </button>
-      </div>
+          <button
+            id="sort-appointments"
+            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Sort Appointments
+          </button>
+
+          <button
+            id="group-claims"
+            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Group Claims
+          </button>
+        </div>
+      </section>
     </section>
 
 
@@ -172,7 +215,7 @@
 
 
     <!-- Output -->
-    <section class="bg-gray-900 rounded-lg shadow-sm p-6">
+    <section id="output-panel" hidden class="bg-gray-900 rounded-lg shadow-sm p-6 my-6">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold text-white">
           Test Output
@@ -188,6 +231,7 @@
 
       <pre
         id="output"
+        aria-live="polite"
         class="text-green-400 overflow-auto whitespace-pre-wrap min-h-40"
       >Click a test button to see the result...</pre>
     </section>
