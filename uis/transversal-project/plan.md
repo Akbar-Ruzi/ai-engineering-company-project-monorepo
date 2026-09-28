@@ -10,7 +10,7 @@ Based on [CONTEXT-healthcore.en.md](CONTEXT-healthcore.en.md). Change `[ ]` to `
 ## 2. Collections (`src/utils/collections.ts`)
 
 - [X] `filterClaims`: match all supplied filters.
-- [ ] `filterAppointmentsByStatus`: match any supplied status.
+- [X] `filterAppointmentsByStatus`: match any supplied status.
 - [ ] `sortClaimsById`: sort ascending or descending without changing the original array.
 - [ ] `sortAppointmentsByDate`: sort ascending or descending without changing the original array.
 - [ ] `groupClaimsBy`: group by location, payer, status, or service type.
