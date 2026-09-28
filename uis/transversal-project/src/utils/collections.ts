@@ -1,4 +1,4 @@
-import type { Claim } from "../types/models";
+import type { Claim, AppointmentStatus, Appointment } from "../types/models";
 export function filterClaims(claims: Claim[], filters: Partial<Pick<Claim, "locationId" | "status" | "payerName" | "serviceType">>): Claim[] {
     return claims.filter(claim => {
         return (
@@ -8,4 +8,8 @@ export function filterClaims(claims: Claim[], filters: Partial<Pick<Claim, "loca
             (filters.serviceType === undefined || filters.serviceType === claim.serviceType)
         )
     })
+}
+
+export function filterAppointmentsByStatus(appointments: Appointment[], status: AppointmentStatus[]): Appointment[] {
+    return appointments.filter(appointment => status.includes(appointment.status));
 }

@@ -1,7 +1,7 @@
-import { filterClaims } from "../utils/collections";
-import { sampleClaims, sampleLocations } from "../data/sampleData";
+import { filterClaims, filterAppointmentsByStatus } from "../utils/collections";
+import { sampleClaims, sampleLocations, sampleAppointments } from "../data/sampleData";
 import "./partialHtmls";
-import type { Claim, ClaimStatus, ServiceType } from "../types/models";
+import type { AppointmentStatus, Claim, ClaimStatus, ServiceType } from "../types/models";
 
 const output = document.querySelector<HTMLPreElement>("#output");
 const outputPanel = document.querySelector<HTMLElement>("#output-panel");
@@ -19,7 +19,9 @@ function moveOutput(event: Event) {
         activeSection = section;
         section.after(outputPanel);
         outputPanel.hidden = false;
-        output.textContent = "Click a test button to see the result...";
+        output.textContent = section.contains(document.querySelector("#appointment-status"))
+            ? "Select an appointment status to see the result..."
+            : "Click a test button to see the result...";
     }
 
     const button = target.closest("button");
@@ -77,6 +79,23 @@ document.querySelector("#reset-filters")?.addEventListener("click", () => {
     if (output) output.textContent = "";
 });
 
+const appointmentStatuses: AppointmentStatus[] = ["scheduled", "confirmed", "completed", "no_show", "cancelled"];
+const appointmentStatusSelect = document.querySelector<HTMLSelectElement>("#appointment-status")!;
+
+appointmentStatusSelect.addEventListener("change", (event) => {
+    moveOutput(event);
+    const selectedStatuses = appointmentStatuses.filter((status) => status === appointmentStatusSelect.value);
+    const appointments = filterAppointmentsByStatus(sampleAppointments, selectedStatuses);
+    if (output) {
+        output.textContent = appointments.length === 0
+            ? "No appointments match the selected status."
+            : `${appointments.length} matching appointment(s)\n\n${JSON.stringify(appointments, null, 2)}`;
+    }
+});
+
 document.querySelector("#clear-output")?.addEventListener("click", () => {
+    [locationSelect, statusSelect, payerSelect, serviceSelect, appointmentStatusSelect].forEach((select) => {
+        select.value = "";
+    });
     if (output) output.textContent = "";
 });

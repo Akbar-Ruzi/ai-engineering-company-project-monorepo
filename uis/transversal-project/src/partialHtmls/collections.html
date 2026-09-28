@@ -5,7 +5,7 @@
       </h2>
 
       <section aria-labelledby="filter-claims-heading" class="mb-6">
-        <h3 id="filter-claims-heading" class="text-lg font-semibold mb-3">filterClaims</h3>
+        <h3 id="filter-claims-heading" class="text-lg font-semibold mb-3">Filter Claims</h3>
         <p class="text-gray-600 mb-4">Choose any combination of claim filters. All selected filters must match.</p>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           <label for="claim-location" class="block">
@@ -51,16 +51,25 @@
         </div>
       </section>
 
+      <section aria-labelledby="filter-appointments-heading" class="border-t pt-5 mb-6">
+        <h3 id="filter-appointments-heading" class="text-lg font-semibold mb-3">Filter Appointments By Status</h3>
+        <p class="text-gray-600 mb-4">Choose a status to find matching appointments.</p>
+        <label for="appointment-status" class="block mb-4">
+          Status
+          <select id="appointment-status" class="block w-full max-w-xs border rounded p-2 mt-1">
+            <option value="" disabled selected>Select a status</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="completed">Completed</option>
+            <option value="no_show">No show</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </label>
+      </section>
+
       <section aria-labelledby="other-collections-heading" class="border-t pt-5">
         <h3 id="other-collections-heading" class="text-lg font-semibold mb-3">Other Collection Operations</h3>
         <div class="flex flex-wrap gap-3">
-          <button
-            id="filter-appointments"
-            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Filter Appointments
-          </button>
-
           <button
             id="sort-claims"
             class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
