@@ -54,7 +54,7 @@ export function setupClaimTests({ output }: TestOutput) {
             });
             const claims = sortClaimsById(sampleClaims, direction);
             if (output) {
-                output.textContent = `${claims.length} claim(s) sorted by ID (${direction})\n\n${JSON.stringify(claims, null, 2)}`;
+                output.textContent = `${claims.length} claim(s) sorted by claim Id (${direction})\n\n${JSON.stringify(claims, null, 2)}`;
             }
         });
     });

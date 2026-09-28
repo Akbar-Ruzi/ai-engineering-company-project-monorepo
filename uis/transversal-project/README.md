@@ -23,7 +23,7 @@ transversal-project/
     ├── test/                  # Browser testing helpers
     │   ├── test.ts            # Initializes the feature helpers
     │   ├── claims.ts          # Claim filtering, sorting, and reset controls
-    │   ├── appointments.ts    # Appointment status filtering
+    │   ├── appointments.ts    # Appointment filtering, date sorting, and reset controls
     │   ├── output.ts          # Shared output panel and Clear behavior
     │   └── partialHtmls.ts    # Loads HTML sections before connecting controls
     ├── partialHtmls/           # Separate HTML sections
@@ -79,17 +79,18 @@ This order ensures the HTML controls exist before the test code tries to use the
 1. Under **Collection Operations → Filter Claims**, choose a city, status, payer, service type, or any combination.
 2. Leave a dropdown set to **All** to omit that filter. Leaving all four unchanged returns all sample claims.
 3. Click **Filter Claims**. Matching claims must satisfy every selected filter. The count and records appear in **Test Output** beneath the subsection; an empty result shows a no-matches message.
-4. Click **Reset Filters** to set the claim filter dropdowns back to **All** and clear the results. **Clear** empties the output and resets all claim filters, the appointment status dropdown, and the sort arrow selection.
+4. Click **Reset Filters** to set the claim filter dropdowns back to **All** and clear the results. **Clear** empties the output and resets all claim filters, the appointment status dropdown, and both sets of sort arrow selections.
 
 City options use the corresponding location IDs when filtering. For example, **Austin + denied** returns `CLM-000004`.
 
-**Test appointment filtering and claim sorting in the browser**
+**Test appointment filtering and sorting in the browser**
 
 - Under **Filter Appointments By Status**, select a status to display matching sample appointments immediately. The browser control selects one status at a time; `filterAppointmentsByStatus` accepts an array and matches any supplied status.
 - Under **Sort Claims By ID**, click **↑** for ascending or **↓** for descending order. Sorted sample claims appear immediately, and the selected arrow is highlighted. `sortClaimsById` compares IDs with `localeCompare()` and sorts a copy, leaving the original array unchanged.
-- These sections appear side by side on wider screens and stack on smaller screens. Their results appear below both sections.
+- Under **Sort Appointments By Date**, click **↑** for earliest first or **↓** for latest first. Sorted sample appointments appear immediately, and the selected arrow is highlighted. `sortAppointmentsByDate` compares `scheduledDate` timestamps and sorts a copy, leaving the original array unchanged.
+- All three sections appear in one row on wider screens and stack on smaller screens. Their results appear below the entire group.
 
-The output panel moves beneath the section or section pair you interact with and clears the previous section's result. The remaining collection buttons are grouped under **Other Collection Operations**. Buttons for unfinished functions display a message that the test is not connected yet.
+The output panel moves beneath the section or section group you interact with and clears the previous section's result. The remaining collection buttons are grouped under **Other Collection Operations**. Buttons for unfinished functions display a message that the test is not connected yet.
 
 **Type checking**
 
@@ -117,5 +118,6 @@ The `.gitignore` excludes dependencies, build output, local environment files, a
 - `filterClaims` is implemented and connected to the browser controls. It matches all provided criteria and ignores omitted filters, while treating empty strings as supplied values.
 - `filterAppointmentsByStatus` is implemented and connected to immediate status selection in the browser.
 - `sortClaimsById` is implemented and connected to ascending/descending arrow controls. Checks passed for both directions, preserving the original array, returning a new array, empty input, and duplicate IDs.
-- Appointment date sorting, grouping, searches, calculations, and validations remain to be implemented.
+- `sortAppointmentsByDate` is implemented and connected to earliest/latest arrow controls. Checks passed for both directions, year boundaries, equal dates, preserving the original array, returning a new array, empty input, and single-item input.
+- Grouping, searches, calculations, and validations remain to be implemented.
 - Testing currently uses the browser page. `npm test` is still a placeholder and exits with an error; no automated test suite is configured.

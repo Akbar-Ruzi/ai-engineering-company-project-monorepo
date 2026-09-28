@@ -21,3 +21,11 @@ export function sortClaimsById(claims: Claim[], direction: "asc" | "desc"): Clai
             : b.claimId.localeCompare(a.claimId)
     );
 }
+
+export function sortAppointmentsByDate(appointments: Appointment[], direction: "asc" | "desc"): Appointment[] {
+    return [...appointments].sort((a, b) =>
+        direction === 'asc'
+            ? new Date(a.scheduledDate).getTime() - new Date(b.scheduledDate).getTime()
+            : new Date(b.scheduledDate).getTime() - new Date(a.scheduledDate).getTime()
+    )
+}
