@@ -21,7 +21,10 @@ transversal-project/
 └── src/
     ├── index.html              # Browser testing page
     ├── test/                  # Browser testing helpers
-    │   ├── test.ts            # Connects the page to utilities
+    │   ├── test.ts            # Initializes the feature helpers
+    │   ├── claims.ts          # Claim filtering, sorting, and reset controls
+    │   ├── appointments.ts    # Appointment status filtering
+    │   ├── output.ts          # Shared output panel and Clear behavior
     │   └── partialHtmls.ts    # Loads HTML sections before connecting controls
     ├── partialHtmls/           # Separate HTML sections
     │   ├── collections.html
@@ -60,27 +63,33 @@ The page loads `src/test/test.ts` with `<script type="module" src="./test/test.t
 
 As `index.html` grew, its operation sections and output panel were split into smaller HTML files in `src/partialHtmls/`. Edit those files to change individual sections; `index.html` keeps the main page layout.
 
-Both TypeScript helpers live in `src/test/`; the HTML fragments remain in `src/partialHtmls/`.
+The TypeScript helpers live in `src/test/`; the HTML fragments remain in `src/partialHtmls/`.
 
 The loading dependency is `index.html` → `test/test.ts` → `test/partialHtmls.ts`:
 
 1. `index.html` loads `test.ts` as a module.
 2. `test.ts` uses `import "./partialHtmls";` to run `partialHtmls.ts` before its own setup code.
 3. `partialHtmls.ts` imports the HTML files as text and inserts them into `<main>`.
-4. The setup code in `test.ts` then finds the dropdowns and buttons and connects them to the utility functions.
+4. `test.ts` initializes the shared output handling and the claim and appointment helpers, which connect the controls to the utility functions.
 
 This order ensures the HTML controls exist before the test code tries to use them. The import needs no function call or named export: it runs the code in `partialHtmls.ts` directly.
 
 **Test claim filtering in the browser**
 
-1. Under **Collection Operations → filterClaims**, choose a city, status, payer, service type, or any combination.
+1. Under **Collection Operations → Filter Claims**, choose a city, status, payer, service type, or any combination.
 2. Leave a dropdown set to **All** to omit that filter. Leaving all four unchanged returns all sample claims.
 3. Click **Filter Claims**. Matching claims must satisfy every selected filter. The count and records appear in **Test Output** beneath the subsection; an empty result shows a no-matches message.
-4. Click **Reset Filters** to set every dropdown back to **All** and clear the results. **Clear** only clears the output.
+4. Click **Reset Filters** to set the claim filter dropdowns back to **All** and clear the results. **Clear** empties the output and resets all claim filters, the appointment status dropdown, and the sort arrow selection.
 
 City options use the corresponding location IDs when filtering. For example, **Austin + denied** returns `CLM-000004`.
 
-The output panel moves beneath the section you interact with and clears the previous section's result. The remaining collection buttons are grouped under **Other Collection Operations**. Buttons for unfinished functions display a message that the test is not connected yet.
+**Test appointment filtering and claim sorting in the browser**
+
+- Under **Filter Appointments By Status**, select a status to display matching sample appointments immediately. The browser control selects one status at a time; `filterAppointmentsByStatus` accepts an array and matches any supplied status.
+- Under **Sort Claims By ID**, click **↑** for ascending or **↓** for descending order. Sorted sample claims appear immediately, and the selected arrow is highlighted. `sortClaimsById` compares IDs with `localeCompare()` and sorts a copy, leaving the original array unchanged.
+- These sections appear side by side on wider screens and stack on smaller screens. Their results appear below both sections.
+
+The output panel moves beneath the section or section pair you interact with and clears the previous section's result. The remaining collection buttons are grouped under **Other Collection Operations**. Buttons for unfinished functions display a message that the test is not connected yet.
 
 **Type checking**
 
@@ -106,5 +115,7 @@ The `.gitignore` excludes dependencies, build output, local environment files, a
 
 - Models and sample data are defined and exported, including `CMEReport` and `CMEStatus`. The extra `Clinic` interface is retained.
 - `filterClaims` is implemented and connected to the browser controls. It matches all provided criteria and ignores omitted filters, while treating empty strings as supplied values.
-- Appointment filtering, sorting, grouping, searches, calculations, and validations remain to be implemented.
+- `filterAppointmentsByStatus` is implemented and connected to immediate status selection in the browser.
+- `sortClaimsById` is implemented and connected to ascending/descending arrow controls. Checks passed for both directions, preserving the original array, returning a new array, empty input, and duplicate IDs.
+- Appointment date sorting, grouping, searches, calculations, and validations remain to be implemented.
 - Testing currently uses the browser page. `npm test` is still a placeholder and exits with an error; no automated test suite is configured.

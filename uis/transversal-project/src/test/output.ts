@@ -13,7 +13,8 @@ export function setupOutput() {
         if (!section) return;
         if (section !== activeSection) {
             activeSection = section;
-            section.after(outputPanel);
+            const outputAnchor = section.closest("[data-output-group]") ?? section;
+            outputAnchor.after(outputPanel);
             outputPanel.hidden = false;
             output.textContent = section.contains(document.querySelector("#appointment-status"))
                 ? "Select an appointment status to see the result..."
@@ -21,7 +22,7 @@ export function setupOutput() {
         }
 
         const button = target.closest("button");
-        if (event.type === "click" && button && button.id !== "filter-claims" && button.id !== "reset-filters") {
+        if (event.type === "click" && button && button.id !== "filter-claims" && button.id !== "reset-filters" && button.id !== "sort-claims-asc" && button.id !== "sort-claims-desc") {
             output.textContent = `${button.textContent?.trim()}: this test is not connected yet.`;
         }
     }

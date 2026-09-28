@@ -13,3 +13,11 @@ export function filterClaims(claims: Claim[], filters: Partial<Pick<Claim, "loca
 export function filterAppointmentsByStatus(appointments: Appointment[], status: AppointmentStatus[]): Appointment[] {
     return appointments.filter(appointment => status.includes(appointment.status));
 }
+
+export function sortClaimsById(claims: Claim[], direction: "asc" | "desc"): Claim[] {
+    return [...claims].sort((a, b) =>
+        direction === "asc"
+            ? a.claimId.localeCompare(b.claimId)
+            : b.claimId.localeCompare(a.claimId)
+    );
+}

@@ -1,4 +1,4 @@
-import { filterClaims } from "../utils/collections";
+import { filterClaims, sortClaimsById } from "../utils/collections";
 import { sampleClaims, sampleLocations } from "../data/sampleData";
 import type { Claim, ClaimStatus, ServiceType } from "../types/models";
 import type { TestOutput } from "./output";
@@ -8,6 +8,10 @@ export function setupClaimTests({ output }: TestOutput) {
     const statusSelect = document.querySelector<HTMLSelectElement>("#claim-status")!;
     const payerSelect = document.querySelector<HTMLSelectElement>("#claim-payer")!;
     const serviceSelect = document.querySelector<HTMLSelectElement>("#claim-service")!;
+    const sortButtons = {
+        asc: document.querySelector<HTMLButtonElement>("#sort-claims-asc")!,
+        desc: document.querySelector<HTMLButtonElement>("#sort-claims-desc")!,
+    };
 
     const statuses: ClaimStatus[] = ["submitted", "approved", "denied", "pending", "appealed"];
     const services: ServiceType[] = ["primary_care", "chronic_disease", "preventive", "specialist", "womens_health", "paediatric", "mental_health"];
@@ -43,6 +47,18 @@ export function setupClaimTests({ output }: TestOutput) {
         }
     });
 
+    (["asc", "desc"] as const).forEach((direction) => {
+        sortButtons[direction].addEventListener("click", () => {
+            Object.entries(sortButtons).forEach(([value, button]) => {
+                button.setAttribute("aria-pressed", String(value === direction));
+            });
+            const claims = sortClaimsById(sampleClaims, direction);
+            if (output) {
+                output.textContent = `${claims.length} claim(s) sorted by ID (${direction})\n\n${JSON.stringify(claims, null, 2)}`;
+            }
+        });
+    });
+
     document.querySelector("#reset-filters")?.addEventListener("click", () => {
         [locationSelect, statusSelect, payerSelect, serviceSelect].forEach((select) => {
             select.value = "";
@@ -51,6 +67,7 @@ export function setupClaimTests({ output }: TestOutput) {
     });
 
     return () => {
+        Object.values(sortButtons).forEach((button) => button.setAttribute("aria-pressed", "false"));
         [locationSelect, statusSelect, payerSelect, serviceSelect].forEach((select) => {
             select.value = "";
         });
