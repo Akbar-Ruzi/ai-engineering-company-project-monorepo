@@ -7,13 +7,13 @@ Based on [CONTEXT-healthcore.en.md](CONTEXT-healthcore.en.md). Change `[ ]` to `
 - [x] Define and export the provided interfaces and types in `src/types/models.ts`, including `CMEReport` and `CMEStatus`.
 - [x] Add and export all four sample arrays in `src/data/sampleData.ts`. Keep the provided field names and values unchanged.
 
-## 2. Collections (`src/utils/collections.ts`)
+## 2. Collections (`src/utils/collections.ts`) ✅
 
 - [X] `filterClaims`: match all supplied filters.
 - [X] `filterAppointmentsByStatus`: match any supplied status.
 - [X] `sortClaimsById`: sort ascending or descending without changing the original array.
 - [X] `sortAppointmentsByDate`: sort ascending or descending without changing the original array.
-- [ ] `groupClaimsBy`: group by location, payer, status, or service type.
+- [X] `groupClaimsBy`: group by location, payer, status, or service type.
 
 ## 3. Searches (`src/utils/search.ts`)
 

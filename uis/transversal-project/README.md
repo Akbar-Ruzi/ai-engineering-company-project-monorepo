@@ -22,7 +22,7 @@ transversal-project/
     ├── index.html              # Browser testing page
     ├── test/                  # Browser testing helpers
     │   ├── test.ts            # Initializes the feature helpers
-    │   ├── claims.ts          # Claim filtering, sorting, and reset controls
+    │   ├── claims.ts          # Claim filtering, sorting, grouping, and reset controls
     │   ├── appointments.ts    # Appointment filtering, date sorting, and reset controls
     │   ├── output.ts          # Shared output panel and Clear behavior
     │   └── partialHtmls.ts    # Loads HTML sections before connecting controls
@@ -79,7 +79,7 @@ This order ensures the HTML controls exist before the test code tries to use the
 1. Under **Collection Operations → Filter Claims**, choose a city, status, payer, service type, or any combination.
 2. Leave a dropdown set to **All** to omit that filter. Leaving all four unchanged returns all sample claims.
 3. Click **Filter Claims**. Matching claims must satisfy every selected filter. The count and records appear in **Test Output** beneath the subsection; an empty result shows a no-matches message.
-4. Click **Reset Filters** to set the claim filter dropdowns back to **All** and clear the results. **Clear** empties the output and resets all claim filters, the appointment status dropdown, and both sets of sort arrow selections.
+4. Click **Reset Filters** to set the claim filter dropdowns back to **All** and clear the results. **Clear** empties the output and resets all claim filters, the appointment status and grouping dropdowns, and both sets of sort arrow selections.
 
 City options use the corresponding location IDs when filtering. For example, **Austin + denied** returns `CLM-000004`.
 
@@ -90,7 +90,11 @@ City options use the corresponding location IDs when filtering. For example, **A
 - Under **Sort Appointments By Date**, click **↑** for earliest first or **↓** for latest first. Sorted sample appointments appear immediately, and the selected arrow is highlighted. `sortAppointmentsByDate` compares `scheduledDate` timestamps and sorts a copy, leaving the original array unchanged.
 - All three sections appear in one row on wider screens and stack on smaller screens. Their results appear below the entire group.
 
-The output panel moves beneath the section or section group you interact with and clears the previous section's result. The remaining collection buttons are grouped under **Other Collection Operations**. Buttons for unfinished functions display a message that the test is not connected yet.
+**Test claim grouping in the browser**
+
+Under **Group Claims**, choose **Location**, **Payer**, **Status**, or **Service type**. The group count and grouped sample claims appear immediately. Each result key contains the claims with that field value. Only values present in the input create groups: if no claim has status `submitted`, there is no `submitted` group. An empty input array returns `{}`. **Clear** resets the dropdown to **Select a grouping** and empties the output.
+
+The output panel moves beneath the section or section group you interact with and clears the previous section's result. Buttons for unfinished functions display a message that the test is not connected yet.
 
 **Type checking**
 
@@ -119,5 +123,6 @@ The `.gitignore` excludes dependencies, build output, local environment files, a
 - `filterAppointmentsByStatus` is implemented and connected to immediate status selection in the browser.
 - `sortClaimsById` is implemented and connected to ascending/descending arrow controls. Checks passed for both directions, preserving the original array, returning a new array, empty input, and duplicate IDs.
 - `sortAppointmentsByDate` is implemented and connected to earliest/latest arrow controls. Checks passed for both directions, year boundaries, equal dates, preserving the original array, returning a new array, empty input, and single-item input.
-- Grouping, searches, calculations, and validations remain to be implemented.
+- `groupClaimsBy` is implemented and connected to the grouping dropdown for location, payer, status, and service type.
+- Searches, calculations, and validations remain to be implemented.
 - Testing currently uses the browser page. `npm test` is still a placeholder and exits with an error; no automated test suite is configured.

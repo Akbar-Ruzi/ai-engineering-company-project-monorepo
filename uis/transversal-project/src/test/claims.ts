@@ -1,13 +1,25 @@
-import { filterClaims, sortClaimsById } from "../utils/collections";
+import { filterClaims, sortClaimsById, groupClaimsBy } from "../utils/collections";
 import { sampleClaims, sampleLocations } from "../data/sampleData";
 import type { Claim, ClaimStatus, ServiceType } from "../types/models";
 import type { TestOutput } from "./output";
 
-export function setupClaimTests({ output }: TestOutput) {
+export function setupClaimTests({ output, moveOutput }: TestOutput) {
     const locationSelect = document.querySelector<HTMLSelectElement>("#claim-location")!;
     const statusSelect = document.querySelector<HTMLSelectElement>("#claim-status")!;
     const payerSelect = document.querySelector<HTMLSelectElement>("#claim-payer")!;
     const serviceSelect = document.querySelector<HTMLSelectElement>("#claim-service")!;
+    const groupSelect = document.querySelector<HTMLSelectElement>("#claim-group-key")!;
+    const groupKeys = ["locationId", "payerName", "status", "serviceType"] as const;
+
+    groupSelect.addEventListener("change", (event) => {
+        moveOutput(event);
+        const key = groupKeys.find((value) => value === groupSelect.value);
+        if (!key) return;
+        const groups = groupClaimsBy(sampleClaims, key);
+        if (output) {
+            output.textContent = `${Object.keys(groups).length} group(s) by ${groupSelect.selectedOptions[0]?.textContent}\n\n${JSON.stringify(groups, null, 2)}`;
+        }
+    });
     const sortButtons = {
         asc: document.querySelector<HTMLButtonElement>("#sort-claims-asc")!,
         desc: document.querySelector<HTMLButtonElement>("#sort-claims-desc")!,
@@ -67,6 +79,7 @@ export function setupClaimTests({ output }: TestOutput) {
     });
 
     return () => {
+        groupSelect.value = "";
         Object.values(sortButtons).forEach((button) => button.setAttribute("aria-pressed", "false"));
         [locationSelect, statusSelect, payerSelect, serviceSelect].forEach((select) => {
             select.value = "";

@@ -18,6 +18,8 @@ export function setupOutput() {
             outputPanel.hidden = false;
             output.textContent = section.contains(document.querySelector("#appointment-status"))
                 ? "Select an appointment status to see the result..."
+                : section.querySelector("#claim-group-key")
+                ? "Select a grouping to see the result..."
                 : "Click a test button to see the result...";
         }
 

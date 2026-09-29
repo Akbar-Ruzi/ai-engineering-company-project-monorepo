@@ -29,3 +29,31 @@ export function sortAppointmentsByDate(appointments: Appointment[], direction: "
             : new Date(b.scheduledDate).getTime() - new Date(a.scheduledDate).getTime()
     )
 }
+
+
+/**
+ *  groupClaimsBy(claims, "locationId")
+ * Conceptually, the result would be:
+    * {
+        "LOC-1": [
+            { claimId: "CLM-001", locationId: "LOC-1", status: "Paid" },
+            { claimId: "CLM-003", locationId: "LOC-1", status: "Pending" }
+        ],
+
+        "LOC-2": [
+            { claimId: "CLM-002", locationId: "LOC-2", status: "Pending" }
+        ]
+    }
+ */
+
+export function groupClaimsBy(claims: Claim[], key: "locationId" | "payerName" | "status" | "serviceType"): Record<string, Claim[]> {
+    const result: Record<string, Claim[]> = {}
+    return claims.reduce((acc, claim) => {
+        const groupKey = claim[key]
+        if (!acc[groupKey]) {
+            acc[groupKey] = []
+        }
+        acc[groupKey].push(claim);
+        return acc;
+    }, result)
+}

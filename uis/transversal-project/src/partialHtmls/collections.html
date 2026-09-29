@@ -88,12 +88,17 @@
 
       </div>
 
-      <section aria-labelledby="other-collections-heading" class="border-t pt-5">
-        <h3 id="other-collections-heading" class="text-lg font-semibold mb-3">Other Collection Operations</h3>
-        <div class="flex flex-wrap gap-3">
-          <button id="group-claims" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            Group Claims
-          </button>
-        </div>
+      <section aria-labelledby="group-claims-heading" class="border-t pt-5">
+        <h3 id="group-claims-heading" class="text-lg font-semibold mb-3">Group Claims</h3>
+        <label for="claim-group-key" class="block mb-4">
+          Group by
+          <select id="claim-group-key" class="block w-full max-w-xs border rounded p-2 mt-1">
+            <option value="" disabled selected>Select a grouping</option>
+            <option value="locationId">Location</option>
+            <option value="payerName">Payer</option>
+            <option value="status">Status</option>
+            <option value="serviceType">Service type</option>
+          </select>
+        </label>
       </section>
     </section>
