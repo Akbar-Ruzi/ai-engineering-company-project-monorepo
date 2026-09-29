@@ -45,7 +45,7 @@
         </div>
       </section>
 
-      <div data-output-group class="grid grid-cols-1 md:grid-cols-3 gap-6 border-t pt-5 mb-6">
+      <div data-output-group class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-5 mb-6">
         <section aria-labelledby="filter-appointments-heading">
           <h3 id="filter-appointments-heading" class="text-lg font-semibold mb-3">Filter Appointments By Status</h3>
           <p class="text-gray-600 mb-4">Choose a status to find matching appointments.</p>
@@ -74,6 +74,9 @@
           </div>
         </section>
 
+      </div>
+
+      <div data-output-group class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-5 mb-6">
         <section aria-labelledby="sort-appointments-heading">
           <h3 id="sort-appointments-heading" class="text-lg font-semibold mb-3">Sort Appointments By Date</h3>
           <div role="group" aria-label="Appointment sort direction" class="flex gap-2">
@@ -86,19 +89,18 @@
           </div>
         </section>
 
+        <section aria-labelledby="group-claims-heading" class="md:order-first">
+          <h3 id="group-claims-heading" class="text-lg font-semibold mb-3">Group Claims</h3>
+          <label for="claim-group-key" class="block mb-4">
+            Group by
+            <select id="claim-group-key" class="block w-full max-w-xs border rounded p-2 mt-1">
+              <option value="" disabled selected>Select a grouping</option>
+              <option value="locationId">Location</option>
+              <option value="payerName">Payer</option>
+              <option value="status">Status</option>
+              <option value="serviceType">Service type</option>
+            </select>
+          </label>
+        </section>
       </div>
-
-      <section aria-labelledby="group-claims-heading" class="border-t pt-5">
-        <h3 id="group-claims-heading" class="text-lg font-semibold mb-3">Group Claims</h3>
-        <label for="claim-group-key" class="block mb-4">
-          Group by
-          <select id="claim-group-key" class="block w-full max-w-xs border rounded p-2 mt-1">
-            <option value="" disabled selected>Select a grouping</option>
-            <option value="locationId">Location</option>
-            <option value="payerName">Payer</option>
-            <option value="status">Status</option>
-            <option value="serviceType">Service type</option>
-          </select>
-        </label>
-      </section>
     </section>

@@ -88,7 +88,7 @@ City options use the corresponding location IDs when filtering. For example, **A
 - Under **Filter Appointments By Status**, select a status to display matching sample appointments immediately. The browser control selects one status at a time; `filterAppointmentsByStatus` accepts an array and matches any supplied status.
 - Under **Sort Claims By ID**, click **↑** for ascending or **↓** for descending order. Sorted sample claims appear immediately, and the selected arrow is highlighted. `sortClaimsById` compares IDs with `localeCompare()` and sorts a copy, leaving the original array unchanged.
 - Under **Sort Appointments By Date**, click **↑** for earliest first or **↓** for latest first. Sorted sample appointments appear immediately, and the selected arrow is highlighted. `sortAppointmentsByDate` compares `scheduledDate` timestamps and sorts a copy, leaving the original array unchanged.
-- All three sections appear in one row on wider screens and stack on smaller screens. Their results appear below the entire group.
+- On wider screens, appointment status filtering sits beside claim ID sorting, and appointment date sorting sits beside claim grouping in the next row. Sections stack on smaller screens, and results appear below the corresponding row.
 
 **Test claim grouping in the browser**
 
