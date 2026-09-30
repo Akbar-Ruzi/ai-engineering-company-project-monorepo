@@ -24,6 +24,7 @@ transversal-project/
     │   ├── test.ts            # Initializes the feature helpers
     │   ├── claims.ts          # Claim filtering, sorting, grouping, and reset controls
     │   ├── appointments.ts    # Appointment filtering, date sorting, and reset controls
+    │   ├── search.ts          # Debounced claim ID search and reset control
     │   ├── output.ts          # Shared output panel and Clear behavior
     │   └── partialHtmls.ts    # Loads HTML sections before connecting controls
     ├── partialHtmls/           # Separate HTML sections
@@ -70,7 +71,7 @@ The loading dependency is `index.html` → `test/test.ts` → `test/partialHtmls
 1. `index.html` loads `test.ts` as a module.
 2. `test.ts` uses `import "./partialHtmls";` to run `partialHtmls.ts` before its own setup code.
 3. `partialHtmls.ts` imports the HTML files as text and inserts them into `<main>`.
-4. `test.ts` initializes the shared output handling and the claim and appointment helpers, which connect the controls to the utility functions.
+4. `test.ts` initializes the shared output handling and the claim, appointment, and search helpers, which connect the controls to the utility functions.
 
 This order ensures the HTML controls exist before the test code tries to use them. The import needs no function call or named export: it runs the code in `partialHtmls.ts` directly.
 
@@ -95,6 +96,14 @@ City options use the corresponding location IDs when filtering. For example, **A
 Under **Group Claims**, choose **Location**, **Payer**, **Status**, or **Service type**. The group count and grouped sample claims appear immediately. Each result key contains the claims with that field value. Only values present in the input create groups: if no claim has status `submitted`, there is no `submitted` group. An empty input array returns `{}`. **Clear** resets the dropdown to **Select a grouping** and empties the output.
 
 The output panel moves beneath the section or section group you interact with and clears the previous section's result. Buttons for unfinished functions display a message that the test is not connected yet.
+
+**Test claim search in the browser**
+
+Under **Search Operations**, type `CLM-000001` into **Search by Claim ID**. The matching record appears in **Test Output** after a 300 ms pause in typing; there is no Find Claim button. Each keystroke restarts the delay. Leaving the input before the delay ends immediately finishes the pending search.
+
+The input trims surrounding whitespace and requires an exact, case-sensitive ID. An unknown or partial ID shows a no-match message. Empty or whitespace-only input immediately shows a prompt to enter an ID. **Clear** empties the input and output and cancels any pending search.
+
+`findClaimById` uses a linear search and returns the first matching claim, or `null` for an unknown ID or empty array. It does not modify the input array. **Find Clinician** and **Binary Search Claim** remain unconnected.
 
 **Type checking**
 
@@ -124,5 +133,6 @@ The `.gitignore` excludes dependencies, build output, local environment files, a
 - `sortClaimsById` is implemented and connected to ascending/descending arrow controls. Checks passed for both directions, preserving the original array, returning a new array, empty input, and duplicate IDs.
 - `sortAppointmentsByDate` is implemented and connected to earliest/latest arrow controls. Checks passed for both directions, year boundaries, equal dates, preserving the original array, returning a new array, empty input, and single-item input.
 - `groupClaimsBy` is implemented and connected to the grouping dropdown for location, payer, status, and service type.
-- Searches, calculations, and validations remain to be implemented.
+- `findClaimById` is implemented and connected to the debounced **Search by Claim ID** input.
+- Clinician lookup, binary claim search, calculations, and validations remain to be implemented.
 - Testing currently uses the browser page. `npm test` is still a placeholder and exits with an error; no automated test suite is configured.

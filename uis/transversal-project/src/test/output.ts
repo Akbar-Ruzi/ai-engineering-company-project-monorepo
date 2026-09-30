@@ -20,6 +20,8 @@ export function setupOutput() {
                 ? "Select an appointment status to see the result..."
                 : section.querySelector("#claim-group-key")
                 ? "Select a grouping to see the result..."
+                : section.querySelector("#find-claim-id")
+                ? "Enter a claim ID to search."
                 : "Click a test button to see the result...";
         }
 
