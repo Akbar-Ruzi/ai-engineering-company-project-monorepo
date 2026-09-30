@@ -18,7 +18,7 @@ Based on [CONTEXT-healthcore.en.md](CONTEXT-healthcore.en.md). Change `[ ]` to `
 ## 3. Searches (`src/utils/search.ts`)
 
 - [x] `findClaimById`: use linear search; return the claim or `null`.
-- [ ] `findClinicianById`: use linear search; return the clinician or `null`.
+- [x] `findClinicianById`: use linear search; return the clinician or `null`.
 - [ ] `binarySearchClaimById`: search claims sorted by ID ascending; return the index or `-1`.
 
 ## 4. Validation (`src/utils/validations.ts`)

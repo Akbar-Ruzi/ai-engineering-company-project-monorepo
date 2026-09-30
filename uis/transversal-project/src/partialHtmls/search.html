@@ -4,23 +4,27 @@
         Search Operations
       </h2>
 
-      <div class="mb-4">
-        <label for="find-claim-id" class="block mb-2">Search by Claim ID</label>
-        <input
-          id="find-claim-id"
-          type="text"
-          placeholder="CLM-000001"
-          class="border rounded px-3 py-2"
-        />
+      <div class="flex flex-wrap gap-4 mb-4">
+        <div>
+          <label for="find-claim-id" class="block mb-2">Search by Claim ID</label>
+          <input
+            id="find-claim-id"
+            type="text"
+            placeholder="CLM-000001"
+            class="border rounded px-3 py-2"
+          />
+        </div>
+        <div>
+          <label for="find-clinician-id" class="block mb-2">Search by Clinician ID</label>
+          <input
+            id="find-clinician-id"
+            type="text"
+            placeholder="CLN-000001"
+            class="border rounded px-3 py-2"
+          />
+        </div>
       </div>
       <div class="flex flex-wrap gap-3">
-        <button
-          id="find-clinician"
-          class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        >
-          Find Clinician
-        </button>
-
         <button
           id="binary-search-claim"
           class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"

@@ -1,47 +1,63 @@
-import { sampleClaims } from "../data/sampleData";
-import { findClaimById } from "../utils/search";
+﻿import { sampleClaims, sampleClinicians } from "../data/sampleData";
+import { findClaimById, findClinicianById } from "../utils/search";
 import type { TestOutput } from "./output";
 
 export function setupSearchTests({ output }: TestOutput) {
-    const claimIdInput = document.querySelector<HTMLInputElement>("#find-claim-id")!;
-    let searchTimeout: ReturnType<typeof setTimeout> | undefined;
+    const searches = [
+        {
+            selector: "#find-claim-id",
+            label: "claim",
+            find: (id: string) => findClaimById(sampleClaims, id),
+        },
+        {
+            selector: "#find-clinician-id",
+            label: "clinician",
+            find: (id: string) => findClinicianById(sampleClinicians, id),
+        },
+    ];
 
-    function cancelSearch() {
-        clearTimeout(searchTimeout);
-        searchTimeout = undefined;
-    }
+    const resets = searches.map(({ selector, label, find }) => {
+        const input = document.querySelector<HTMLInputElement>(selector)!;
+        let searchTimeout: ReturnType<typeof setTimeout> | undefined;
 
-    function showResult() {
-        cancelSearch();
-        if (!output) return;
-        const claimId = claimIdInput.value.trim();
-        const claim = findClaimById(sampleClaims, claimId);
-        output.textContent = !claimId
-            ? "Enter a claim ID to search."
-            : claim
-            ? JSON.stringify(claim, null, 2)
-            : `No claim found with ID ${claimId}.`;
-    }
-
-    claimIdInput.addEventListener("input", () => {
-        cancelSearch();
-        if (!output) return;
-        const claimId = claimIdInput.value.trim();
-        if (!claimId) {
-            showResult();
-            return;
+        function cancelSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = undefined;
         }
 
-        output.textContent = "Searching...";
-        searchTimeout = setTimeout(showResult, 300);
+        function showResult() {
+            cancelSearch();
+            if (!output) return;
+            const id = input.value.trim();
+            const result = id ? find(id) : null;
+            output.textContent = !id
+                ? `Enter a ${label} ID to search.`
+                : result
+                ? JSON.stringify(result, null, 2)
+                : `No ${label} found with ID ${id}.`;
+        }
+
+        input.addEventListener("input", () => {
+            cancelSearch();
+            if (!output) return;
+            if (!input.value.trim()) {
+                showResult();
+                return;
+            }
+
+            output.textContent = "Searching...";
+            searchTimeout = setTimeout(showResult, 300);
+        });
+
+        input.addEventListener("blur", () => {
+            if (searchTimeout !== undefined) showResult();
+        });
+
+        return () => {
+            cancelSearch();
+            input.value = "";
+        };
     });
 
-    claimIdInput.addEventListener("blur", () => {
-        if (searchTimeout !== undefined) showResult();
-    });
-
-    return () => {
-        cancelSearch();
-        claimIdInput.value = "";
-    };
+    return () => resets.forEach((reset) => reset());
 }

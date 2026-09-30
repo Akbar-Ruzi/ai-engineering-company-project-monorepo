@@ -21,7 +21,7 @@ export function setupOutput() {
                 : section.querySelector("#claim-group-key")
                 ? "Select a grouping to see the result..."
                 : section.querySelector("#find-claim-id")
-                ? "Enter a claim ID to search."
+                ? "Enter a claim or clinician ID to search."
                 : "Click a test button to see the result...";
         }
 

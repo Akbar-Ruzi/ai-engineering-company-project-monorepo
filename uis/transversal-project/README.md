@@ -24,7 +24,7 @@ transversal-project/
     │   ├── test.ts            # Initializes the feature helpers
     │   ├── claims.ts          # Claim filtering, sorting, grouping, and reset controls
     │   ├── appointments.ts    # Appointment filtering, date sorting, and reset controls
-    │   ├── search.ts          # Debounced claim ID search and reset control
+    │   ├── search.ts          # Debounced claim and clinician ID searches and reset controls
     │   ├── output.ts          # Shared output panel and Clear behavior
     │   └── partialHtmls.ts    # Loads HTML sections before connecting controls
     ├── partialHtmls/           # Separate HTML sections
@@ -103,7 +103,13 @@ Under **Search Operations**, type `CLM-000001` into **Search by Claim ID**. The 
 
 The input trims surrounding whitespace and requires an exact, case-sensitive ID. An unknown or partial ID shows a no-match message. Empty or whitespace-only input immediately shows a prompt to enter an ID. **Clear** empties the input and output and cancels any pending search.
 
-`findClaimById` uses a linear search and returns the first matching claim, or `null` for an unknown ID or empty array. It does not modify the input array. **Find Clinician** and **Binary Search Claim** remain unconnected.
+`findClaimById` uses a linear search and returns the first matching claim, or `null` for an unknown ID or empty array. It does not modify the input array. **Binary Search Claim** remains unconnected.
+
+**Test clinician search in the browser**
+
+Under **Search Operations**, type `CLN-000001` into **Search by Clinician ID**. This uses the same 300 ms debounce, immediate completion on leaving the input, whitespace trimming, and exact case-sensitive matching as claim search. There is no Find Clinician button. Empty input shows a prompt; an unknown ID shows a no-match message. **Clear** resets both search inputs and cancels their pending searches.
+
+`findClinicianById` uses a linear search and returns the first matching clinician, or `null` for an unknown ID or empty array, without modifying the input array.
 
 **Type checking**
 
@@ -134,5 +140,6 @@ The `.gitignore` excludes dependencies, build output, local environment files, a
 - `sortAppointmentsByDate` is implemented and connected to earliest/latest arrow controls. Checks passed for both directions, year boundaries, equal dates, preserving the original array, returning a new array, empty input, and single-item input.
 - `groupClaimsBy` is implemented and connected to the grouping dropdown for location, payer, status, and service type.
 - `findClaimById` is implemented and connected to the debounced **Search by Claim ID** input.
-- Clinician lookup, binary claim search, calculations, and validations remain to be implemented.
+- `findClinicianById` is implemented and connected to the debounced **Search by Clinician ID** input.
+- Binary claim search, calculations, and validations remain to be implemented.
 - Testing currently uses the browser page. `npm test` is still a placeholder and exits with an error; no automated test suite is configured.
