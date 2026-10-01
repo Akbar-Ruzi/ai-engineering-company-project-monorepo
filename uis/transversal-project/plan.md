@@ -1,4 +1,4 @@
-﻿# Project Plan
+# Project Plan
 
 Based on [CONTEXT-healthcore.en.md](CONTEXT-healthcore.en.md). Change `[ ]` to `[x]` when a task is complete.
 
@@ -15,11 +15,11 @@ Based on [CONTEXT-healthcore.en.md](CONTEXT-healthcore.en.md). Change `[ ]` to `
 - [X] `sortAppointmentsByDate`: sort ascending or descending without changing the original array.
 - [X] `groupClaimsBy`: group by location, payer, status, or service type.
 
-## 3. Searches (`src/utils/search.ts`)
+## 3. Searches (`src/utils/search.ts`) ✅
 
 - [x] `findClaimById`: use linear search; return the claim or `null`.
 - [x] `findClinicianById`: use linear search; return the clinician or `null`.
-- [ ] `binarySearchClaimById`: search claims sorted by ID ascending; return the index or `-1`.
+- [x] `binarySearchClaimById`: search claims sorted by ID ascending; return the index or `-1`.
 
 ## 4. Validation (`src/utils/validations.ts`)
 
@@ -58,4 +58,4 @@ Based on [CONTEXT-healthcore.en.md](CONTEXT-healthcore.en.md). Change `[ ]` to `
 - [ ] Keep functions based on their inputs, without global state; use correct types and no `any`.
 - [ ] Run `npm.cmd run typecheck` and fix all errors.
 - [ ] Add automated assertions and replace the placeholder `npm test` script.
-- [ ] Connect the existing HTML buttons in `src/test.ts` to display results and errors. This is a project testing aid; a new HTML form is not required by the context.
+- [ ] Connect the existing HTML controls through the helpers in `src/test/` to display results and errors. This is a project testing aid; a new HTML form is not required by the context.

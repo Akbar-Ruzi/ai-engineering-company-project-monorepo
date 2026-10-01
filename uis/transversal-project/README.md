@@ -103,7 +103,7 @@ Under **Search Operations**, type `CLM-000001` into **Search by Claim ID**. The 
 
 The input trims surrounding whitespace and requires an exact, case-sensitive ID. An unknown or partial ID shows a no-match message. Empty or whitespace-only input immediately shows a prompt to enter an ID. **Clear** empties the input and output and cancels any pending search.
 
-`findClaimById` uses a linear search and returns the first matching claim, or `null` for an unknown ID or empty array. It does not modify the input array. **Binary Search Claim** remains unconnected.
+`findClaimById` uses a linear search and returns the first matching claim, or `null` for an unknown ID or empty array. It does not modify the input array. For binary search, type a claim ID in **Binary Search by Claim ID**, beside the clinician search. Results appear after a 300 ms pause in typing, or immediately when leaving the input; there is no button. The helper sorts a copy of the sample claims by ID ascending and displays the zero-based index and matching record, or a no-match message. Empty input shows a prompt. **Clear** also resets the binary search input.
 
 **Test clinician search in the browser**
 
@@ -141,5 +141,5 @@ The `.gitignore` excludes dependencies, build output, local environment files, a
 - `groupClaimsBy` is implemented and connected to the grouping dropdown for location, payer, status, and service type.
 - `findClaimById` is implemented and connected to the debounced **Search by Claim ID** input.
 - `findClinicianById` is implemented and connected to the debounced **Search by Clinician ID** input.
-- Binary claim search, calculations, and validations remain to be implemented.
+- `binarySearchClaimById` is implemented and connected to the debounced **Binary Search by Claim ID** input. Calculations and validations remain to be implemented.
 - Testing currently uses the browser page. `npm test` is still a placeholder and exits with an error; no automated test suite is configured.

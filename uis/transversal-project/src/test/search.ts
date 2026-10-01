@@ -1,8 +1,10 @@
 ﻿import { sampleClaims, sampleClinicians } from "../data/sampleData";
-import { findClaimById, findClinicianById } from "../utils/search";
+import { binarySearchClaimById, findClaimById, findClinicianById } from "../utils/search";
+import { sortClaimsById } from "../utils/collections";
 import type { TestOutput } from "./output";
 
 export function setupSearchTests({ output }: TestOutput) {
+    const sortedClaims = sortClaimsById(sampleClaims, "asc");
     const searches = [
         {
             selector: "#find-claim-id",
@@ -13,6 +15,16 @@ export function setupSearchTests({ output }: TestOutput) {
             selector: "#find-clinician-id",
             label: "clinician",
             find: (id: string) => findClinicianById(sampleClinicians, id),
+        },
+        {
+            selector: "#binary-search-claim-id",
+            label: "claim",
+            find: (id: string) => {
+                const index = binarySearchClaimById(sortedClaims, id);
+                return index === -1
+                    ? null
+                    : `Index in claims sorted by ID ascending (zero-based): ${index}\n${JSON.stringify(sortedClaims[index], null, 2)}`;
+            },
         },
     ];
 
@@ -33,7 +45,7 @@ export function setupSearchTests({ output }: TestOutput) {
             output.textContent = !id
                 ? `Enter a ${label} ID to search.`
                 : result
-                ? JSON.stringify(result, null, 2)
+                ? typeof result === "string" ? result : JSON.stringify(result, null, 2)
                 : `No ${label} found with ID ${id}.`;
         }
 
