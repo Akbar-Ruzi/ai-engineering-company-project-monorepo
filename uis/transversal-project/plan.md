@@ -31,7 +31,7 @@ Based on [CONTEXT-healthcore.en.md](CONTEXT-healthcore.en.md). Change `[ ]` to `
 
 ## 5. Billing Denials (`src/utils/transformations.ts`)
 
-- [ ] `calculateDenialRate`: count only `denied` claims, return a percentage rounded to 2 decimals, and throw for an empty array.
+- [x] `calculateDenialRate`: count only `denied` claims, return a percentage rounded to 2 decimals, and throw for an empty array.
 - [ ] `denialRateByPayer`: calculate the rate for each payer present.
 - [ ] `denialRateByLocation`: calculate the rate for each location present.
 - [ ] `flagHighDenialPayers`: return payers above the threshold; default to 8%.

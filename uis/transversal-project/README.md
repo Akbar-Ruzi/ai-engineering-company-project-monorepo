@@ -111,6 +111,10 @@ Under **Search Operations**, type `CLN-000001` into **Search by Clinician ID**. 
 
 `findClinicianById` uses a linear search and returns the first matching clinician, or `null` for an unknown ID or empty array, without modifying the input array.
 
+**Test denial rate in the browser**
+
+Under **Transformations & Reports**, click **Calculate Denial Rate**. The result appears in **Test Output** as `Denial rate: 40.00%` for the sample claims. Errors appear in the same panel, and **Clear** clears the result. The handler is in `src/test/transformations.ts`.
+
 **Type checking**
 
 The root `tsconfig.json` is configured for Vite and browser APIs, with strict type checking and `noEmit` enabled. Run this after meaningful changes and before committing:
@@ -133,6 +137,8 @@ The `.gitignore` excludes dependencies, build output, local environment files, a
 
 **Current status**
 
+- `calculateDenialRate` is implemented and connected to the **Calculate Denial Rate** button.
+
 - Models and sample data are defined and exported, including `CMEReport` and `CMEStatus`. The extra `Clinic` interface is retained.
 - `filterClaims` is implemented and connected to the browser controls. It matches all provided criteria and ignores omitted filters, while treating empty strings as supplied values.
 - `filterAppointmentsByStatus` is implemented and connected to immediate status selection in the browser.
@@ -141,5 +147,5 @@ The `.gitignore` excludes dependencies, build output, local environment files, a
 - `groupClaimsBy` is implemented and connected to the grouping dropdown for location, payer, status, and service type.
 - `findClaimById` is implemented and connected to the debounced **Search by Claim ID** input.
 - `findClinicianById` is implemented and connected to the debounced **Search by Clinician ID** input.
-- `binarySearchClaimById` is implemented and connected to the debounced **Binary Search by Claim ID** input. Calculations and validations remain to be implemented.
+- `binarySearchClaimById` is implemented and connected to the debounced **Binary Search by Claim ID** input. The remaining calculations and validations are not yet implemented.
 - Testing currently uses the browser page. `npm test` is still a placeholder and exits with an error; no automated test suite is configured.

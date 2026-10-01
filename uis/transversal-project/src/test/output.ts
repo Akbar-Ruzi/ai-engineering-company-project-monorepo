@@ -26,7 +26,7 @@ export function setupOutput() {
         }
 
         const button = target.closest("button");
-        if (event.type === "click" && button && !["filter-claims", "reset-filters", "sort-claims-asc", "sort-claims-desc", "sort-appointments-asc", "sort-appointments-desc"].includes(button.id)) {
+        if (event.type === "click" && button && !["filter-claims", "reset-filters", "sort-claims-asc", "sort-claims-desc", "sort-appointments-asc", "sort-appointments-desc", "denial-rate"].includes(button.id)) {
             output.textContent = `${button.textContent?.trim()}: this test is not connected yet.`;
         }
     }
