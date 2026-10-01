@@ -1,36 +1,33 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>HealthCore Function Tester</title>
+    <title>HealthCore Function Tester</title>
 
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
 
-<body class="bg-gray-100 min-h-screen">
+  <body class="bg-gray-100 min-h-screen">
+    <header class="bg-white border-b">
+      <div class="max-w-6xl mx-auto px-6 py-5">
+        <h1 class="text-2xl font-bold text-gray-900">
+          HealthCore Function Tester
+        </h1>
 
-  <header class="bg-white border-b">
-    <div class="max-w-6xl mx-auto px-6 py-5">
-      <h1 class="text-2xl font-bold text-gray-900">
-        HealthCore Function Tester
-      </h1>
+        <p class="text-gray-600 mt-1">
+          Manually test Milestone 2 TypeScript functions
+        </p>
+      </div>
+    </header>
 
-      <p class="text-gray-600 mt-1">
-        Manually test Milestone 2 TypeScript functions
-      </p>
-    </div>
-  </header>
+    <main class="max-w-6xl mx-auto px-6 py-8">
+      <!-- Section markup is loaded from partialHtmls/ by test/partialHtmls.ts. -->
+    </main>
 
-  <main class="max-w-6xl mx-auto px-6 py-8">
-
-    <!-- Section markup is loaded from partialHtmls/ by test/partialHtmls.ts. -->
-  </main>
-
-  <!-- All test logic stays outside the HTML -->
- <script type="module" src="./test/test.ts"></script>
-
-</body>
+    <!-- All test logic stays outside the HTML -->
+    <script type="module" src="./test/test.ts"></script>
+  </body>
 </html>

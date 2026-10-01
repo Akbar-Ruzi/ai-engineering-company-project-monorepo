@@ -6,4 +6,4 @@ import output from "../partialHtmls/output.html?raw";
 
 // Insert the local HTML sections before test.ts connects the controls.
 document.querySelector("main")!.innerHTML =
-    collections + search + transformations + validations + output;
+  collections + search + transformations + validations + output;

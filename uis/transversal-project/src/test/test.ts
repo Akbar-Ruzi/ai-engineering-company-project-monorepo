@@ -12,7 +12,7 @@ const resetSearch = setupSearchTests(output);
 setupTransformationTests(output);
 
 setupClearOutput(output, () => {
-    resetClaims();
-    resetAppointments();
-    resetSearch();
+  resetClaims();
+  resetAppointments();
+  resetSearch();
 });

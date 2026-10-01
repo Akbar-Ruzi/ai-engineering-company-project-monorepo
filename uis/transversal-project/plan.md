@@ -11,11 +11,11 @@ The numbered sections follow the Required Functions order in the context. Prepar
 
 ## 1. Collection Operations (`src/utils/collections.ts`) ✅
 
-- [X] `filterClaims`: match all supplied filters.
-- [X] `filterAppointmentsByStatus`: match any supplied status.
-- [X] `sortClaimsById`: sort ascending or descending without changing the original array.
-- [X] `sortAppointmentsByDate`: sort ascending or descending without changing the original array.
-- [X] `groupClaimsBy`: group by location, payer, status, or service type.
+- [x] `filterClaims`: match all supplied filters.
+- [x] `filterAppointmentsByStatus`: match any supplied status.
+- [x] `sortClaimsById`: sort ascending or descending without changing the original array.
+- [x] `sortAppointmentsByDate`: sort ascending or descending without changing the original array.
+- [x] `groupClaimsBy`: group by location, payer, status, or service type.
 
 ## 2. Search Operations (`src/utils/search.ts`) ✅
 
