@@ -39,6 +39,7 @@ export function setupOutput() {
         "sort-appointments-asc",
         "sort-appointments-desc",
         "denial-rate",
+        "denial-payer",
       ].includes(button.id)
     ) {
       output.textContent = `${button.textContent?.trim()}: this test is not connected yet.`;

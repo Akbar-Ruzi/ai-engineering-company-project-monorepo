@@ -26,7 +26,7 @@ The numbered sections follow the Required Functions order in the context. Prepar
 ## 3. Billing Denial Rate Calculator (`src/utils/transformations.ts`)
 
 - [x] `calculateDenialRate`: count only `denied` claims, return a percentage rounded to 2 decimals, and throw for an empty array.
-- [ ] `denialRateByPayer`: calculate the rate for each payer present.
+- [x] `denialRateByPayer`: calculate the rate for each payer present.
 - [ ] `denialRateByLocation`: calculate the rate for each location present.
 - [ ] `flagHighDenialPayers`: return payers above the threshold; default to 8%.
 

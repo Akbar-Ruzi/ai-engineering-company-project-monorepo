@@ -115,6 +115,8 @@ Under **Search Operations**, type `CLN-000001` into **Search by Clinician ID**. 
 
 Under **Transformations & Reports**, click **Calculate Denial Rate**. The result appears in **Test Output** as `Denial rate: 40.00%` for the sample claims. Errors appear in the same panel, and **Clear** clears the result. The handler is in `src/test/transformations.ts`.
 
+Click **Denial Rate by Payer** to display BlueCross: 50.00%, Aetna: 100.00%, Medicare: 0.00%, and Cigna: 0.00%. The grouped claims also appear in the browser console under `payer` for debugging.
+
 **Type checking**
 
 The root `tsconfig.json` is configured for Vite and browser APIs, with strict type checking and `noEmit` enabled. Run this after meaningful changes and before committing:
