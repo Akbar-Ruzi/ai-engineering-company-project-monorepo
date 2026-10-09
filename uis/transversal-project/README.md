@@ -25,6 +25,7 @@ transversal-project/
     │   ├── claims.ts          # Claim filtering, sorting, grouping, and reset controls
     │   ├── appointments.ts    # Appointment filtering, date sorting, and reset controls
     │   ├── search.ts          # Debounced claim and clinician ID searches and reset controls
+    │   ├── transformations.ts # Denial rate and high denial payer button handlers
     │   ├── output.ts          # Shared output panel and Clear behavior
     │   └── partialHtmls.ts    # Loads HTML sections before connecting controls
     ├── partialHtmls/           # Separate HTML sections
@@ -71,7 +72,7 @@ The loading dependency is `index.html` → `test/test.ts` → `test/partialHtmls
 1. `index.html` loads `test.ts` as a module.
 2. `test.ts` uses `import "./partialHtmls";` to run `partialHtmls.ts` before its own setup code.
 3. `partialHtmls.ts` imports the HTML files as text and inserts them into `<main>`.
-4. `test.ts` initializes the shared output handling and the claim, appointment, and search helpers, which connect the controls to the utility functions.
+4. `test.ts` initializes the shared output handling and the claim, appointment, search, and transformation helpers, which connect the controls to the utility functions.
 
 This order ensures the HTML controls exist before the test code tries to use them. The import needs no function call or named export: it runs the code in `partialHtmls.ts` directly.
 
@@ -127,6 +128,10 @@ us-ga-001 --> HealthCore Atlanta: 0.00%
 
 `denialRateByLocation` groups claims by `locationId` and returns percentages rounded to two decimal places. Only `denied` claims count as denied; all claims at that location count toward the total. Only locations present in the claims are included, empty input returns `{}`, and the input is unchanged. The browser helper looks up location names in `sampleLocations`; the utility returns location IDs as keys.
 
+Click **Flag High Denial Payers (>8%)** to display `BlueCross` and `Aetna` in **Test Output** for the sample claims. The button calls `flagHighDenialPayers(sampleClaims)` with the default threshold of 8%.
+
+`flagHighDenialPayers` returns payer names whose denial rate is strictly greater than the threshold; a rate equal to the threshold is excluded. Pass a second argument to use a custom percentage threshold, such as `flagHighDenialPayers(claims, 10)`. Empty input or no qualifying payers returns `[]`, which the browser displays as **No payers returned.** The function leaves the input unchanged.
+
 **Type checking**
 
 The root `tsconfig.json` is configured for Vite and browser APIs, with strict type checking and `noEmit` enabled. Run this after meaningful changes and before committing:
@@ -168,6 +173,7 @@ The `.gitignore` excludes dependencies, build output, local environment files, a
 - `calculateDenialRate` is implemented and connected to the **Calculate Denial Rate** button.
 - `denialRateByPayer` is implemented and connected to the **Denial Rate by Payer** button.
 - `denialRateByLocation` is implemented and connected to the **Denial Rate by Location** button, displaying location IDs, names, and percentages. Checks passed for sample results, rounding, empty input, single claims, counting only denied claims, and preserving the input.
+- `flagHighDenialPayers` is implemented and connected to the **Flag High Denial Payers (>8%)** button. Checks passed for the context example, custom thresholds, exact threshold boundaries, empty input, no denials, and preserving the input. All four billing denial functions are complete.
 
 - Models and sample data are defined and exported, including `CMEReport` and `CMEStatus`. The extra `Clinic` interface is retained.
 - `filterClaims` is implemented and connected to the browser controls. It matches all provided criteria and ignores omitted filters, while treating empty strings as supplied values.

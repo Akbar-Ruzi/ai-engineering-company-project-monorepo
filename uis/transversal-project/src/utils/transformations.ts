@@ -95,3 +95,29 @@ export function denialRateByLocation(claims: Claim[]): Record<string, number> {
   }
   return result;
 }
+
+/**
+ * Mental Model:
+ *  Payer	      Denial rate  	Above 8%?
+    Aetna	      12.5%         	Yes
+    Cigna	      6.5%          	No
+    BlueCross	  9.2%	          Yes
+    Medicare	8%	            No
+    ========================
+    Expected result:
+    ["Aetna", "BlueCross"]
+ * 
+ *   
+ */
+export function flagHighDenialPayers(
+  claims: Claim[],
+  threshold: number = 8,
+): string[] {
+  const result: string[] = [];
+  for (const [payer, rate] of Object.entries(denialRateByPayer(claims))) {
+    if (rate > threshold) {
+      result.push(payer);
+    }
+  }
+  return result;
+}

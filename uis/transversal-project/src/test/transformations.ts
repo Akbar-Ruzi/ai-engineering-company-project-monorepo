@@ -3,10 +3,27 @@ import {
   calculateDenialRate,
   denialRateByLocation,
   denialRateByPayer,
+  flagHighDenialPayers,
 } from "../utils/transformations";
 import type { TestOutput } from "./output";
 
 export function setupTransformationTests({ output }: TestOutput) {
+  document
+    .querySelector("#flag-high-denial-payers")
+    ?.addEventListener("click", () => {
+      if (!output) return;
+
+      try {
+        const payers = flagHighDenialPayers(sampleClaims);
+        output.textContent =
+          "Payers with denial rates above 8%:\n" +
+          (payers.length > 0 ? payers.join("\n") : "No payers returned.");
+      } catch (error) {
+        output.textContent =
+          error instanceof Error ? error.message : String(error);
+      }
+    });
+
   document.querySelector("#denial-location")?.addEventListener("click", () => {
     if (!output) return;
 

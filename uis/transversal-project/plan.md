@@ -23,12 +23,12 @@ The numbered sections follow the Required Functions order in the context. Prepar
 - [x] `findClinicianById`: use linear search; return the clinician or `null`.
 - [x] `binarySearchClaimById`: search claims sorted by ID ascending; return the index or `-1`.
 
-## 3. Billing Denial Rate Calculator (`src/utils/transformations.ts`)
+## 3. Billing Denial Rate Calculator (`src/utils/transformations.ts`) ✅
 
 - [x] `calculateDenialRate`: count only `denied` claims, return a percentage rounded to 2 decimals, and throw for an empty array.
 - [x] `denialRateByPayer`: calculate the rate for each payer present.
 - [x] `denialRateByLocation`: calculate the rate for each location present.
-- [ ] `flagHighDenialPayers`: return payers above the threshold; default to 8%.
+- [x] `flagHighDenialPayers`: return payers above the threshold; default to 8%. Connected to the HTML button; checks passed for the context example, custom thresholds, exact threshold boundaries, empty input, no denials, and preserving the input.
 
 ## 4. No-Show Cost Estimator (`src/utils/transformations.ts`)
 

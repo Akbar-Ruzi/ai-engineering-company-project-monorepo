@@ -41,6 +41,7 @@ export function setupOutput() {
         "denial-rate",
         "denial-payer",
         "denial-location",
+        "flag-high-denial-payers",
       ].includes(button.id)
     ) {
       output.textContent = `${button.textContent?.trim()}: this test is not connected yet.`;
