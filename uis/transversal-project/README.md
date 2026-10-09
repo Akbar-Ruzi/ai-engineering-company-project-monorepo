@@ -115,7 +115,17 @@ Under **Search Operations**, type `CLN-000001` into **Search by Clinician ID**. 
 
 Under **Transformations & Reports**, click **Calculate Denial Rate**. The result appears in **Test Output** as `Denial rate: 40.00%` for the sample claims. Errors appear in the same panel, and **Clear** clears the result. The handler is in `src/test/transformations.ts`.
 
-Click **Denial Rate by Payer** to display BlueCross: 50.00%, Aetna: 100.00%, Medicare: 0.00%, and Cigna: 0.00%. The grouped claims also appear in the browser console under `payer` for debugging.
+Click **Denial Rate by Payer** to display BlueCross: 50.00%, Aetna: 100.00%, Medicare: 0.00%, and Cigna: 0.00%.
+
+Click **Denial Rate by Location** to display each location ID, name, and denial rate in **Test Output**:
+
+```text
+us-tx-001 --> HealthCore Austin Central: 50.00%
+us-fl-001 --> HealthCore Miami: 50.00%
+us-ga-001 --> HealthCore Atlanta: 0.00%
+```
+
+`denialRateByLocation` groups claims by `locationId` and returns percentages rounded to two decimal places. Only `denied` claims count as denied; all claims at that location count toward the total. Only locations present in the claims are included, empty input returns `{}`, and the input is unchanged. The browser helper looks up location names in `sampleLocations`; the utility returns location IDs as keys.
 
 **Type checking**
 
@@ -156,6 +166,8 @@ The `.gitignore` excludes dependencies, build output, local environment files, a
 **Current status**
 
 - `calculateDenialRate` is implemented and connected to the **Calculate Denial Rate** button.
+- `denialRateByPayer` is implemented and connected to the **Denial Rate by Payer** button.
+- `denialRateByLocation` is implemented and connected to the **Denial Rate by Location** button, displaying location IDs, names, and percentages. Checks passed for sample results, rounding, empty input, single claims, counting only denied claims, and preserving the input.
 
 - Models and sample data are defined and exported, including `CMEReport` and `CMEStatus`. The extra `Clinic` interface is retained.
 - `filterClaims` is implemented and connected to the browser controls. It matches all provided criteria and ignores omitted filters, while treating empty strings as supplied values.

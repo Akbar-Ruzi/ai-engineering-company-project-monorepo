@@ -59,3 +59,39 @@ export function denialRateByPayer(claims: Claim[]): Record<string, number> {
 
   return result;
 }
+
+/**
+ * Mental Model
+ * For example, imagine these claims:
+  Claim	Location	Status
+  CLM-001	us-tx-001	approved
+  CLM-002	us-fl-001	denied
+  CLM-003	us-tx-001	denied
+  CLM-004	us-fl-001	denied
+  CLM-005	us-tx-001	approved
+  =====================
+  Your expected result is:
+  {
+    "us-tx-001": 33.33,
+    "us-fl-001": 100
+  }
+ */
+
+export function denialRateByLocation(claims: Claim[]): Record<string, number> {
+  const groupedClaimsById = claims.reduce<Record<string, Claim[]>>(
+    (acc, claim) => {
+      const location = claim.locationId;
+      if (!acc[location]) {
+        acc[location] = [];
+      }
+      acc[location].push(claim);
+      return acc;
+    },
+    {},
+  );
+  const result: Record<string, number> = {};
+  for (const [location, claim] of Object.entries(groupedClaimsById)) {
+    result[location] = calculateDenialRate(claim);
+  }
+  return result;
+}

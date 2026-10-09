@@ -27,7 +27,7 @@ The numbered sections follow the Required Functions order in the context. Prepar
 
 - [x] `calculateDenialRate`: count only `denied` claims, return a percentage rounded to 2 decimals, and throw for an empty array.
 - [x] `denialRateByPayer`: calculate the rate for each payer present.
-- [ ] `denialRateByLocation`: calculate the rate for each location present.
+- [x] `denialRateByLocation`: calculate the rate for each location present.
 - [ ] `flagHighDenialPayers`: return payers above the threshold; default to 8%.
 
 ## 4. No-Show Cost Estimator (`src/utils/transformations.ts`)
