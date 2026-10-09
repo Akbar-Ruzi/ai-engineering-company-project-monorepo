@@ -67,6 +67,8 @@ As `index.html` grew, its operation sections and output panel were split into sm
 
 The TypeScript helpers live in `src/test/`; the HTML fragments remain in `src/partialHtmls/`.
 
+`transformations.html` contains separate **Billing Denial Rate Calculator**, **No-Show Cost Estimator**, and **CME Compliance Tracker** sections. Billing and no-show buttons sit side by side with consistent spacing and wrap onto another row on narrower screens.
+
 The loading dependency is `index.html` → `test/test.ts` → `test/partialHtmls.ts`:
 
 1. `index.html` loads `test.ts` as a module.
@@ -98,6 +100,8 @@ Under **Group Claims**, choose **Location**, **Payer**, **Status**, or **Service
 
 The output panel moves beneath the section or section group you interact with and clears the previous section's result. Buttons for unfinished functions display a message that the test is not connected yet.
 
+The clicked operation button turns dark slate to indicate the active result. Clicking another button moves the highlight. Switching sections, changing an input or dropdown, clicking **Reset Filters**, or clicking **Clear** removes the previous highlight.
+
 **Test claim search in the browser**
 
 Under **Search Operations**, type `CLM-000001` into **Search by Claim ID**. The matching record appears in **Test Output** after a 300 ms pause in typing; there is no Find Claim button. Each keystroke restarts the delay. Leaving the input before the delay ends immediately finishes the pending search.
@@ -114,7 +118,7 @@ Under **Search Operations**, type `CLN-000001` into **Search by Clinician ID**. 
 
 **Test denial rate in the browser**
 
-Under **Transformations & Reports**, click **Calculate Denial Rate**. The result appears in **Test Output** as `Denial rate: 40.00%` for the sample claims. Errors appear in the same panel, and **Clear** clears the result. The handler is in `src/test/transformations.ts`.
+Under **Billing Denial Rate Calculator**, click **Calculate Denial Rate**. The result appears in **Test Output** as `Denial rate: 40.00%` for the sample claims. Errors appear in the same panel, and **Clear** clears the result. The handler is in `src/test/transformations.ts`.
 
 Click **Denial Rate by Payer** to display BlueCross: 50.00%, Aetna: 100.00%, Medicare: 0.00%, and Cigna: 0.00%.
 
@@ -131,6 +135,10 @@ us-ga-001 --> HealthCore Atlanta: 0.00%
 Click **Flag High Denial Payers (>8%)** to display `BlueCross` and `Aetna` in **Test Output** for the sample claims. The button calls `flagHighDenialPayers(sampleClaims)` with the default threshold of 8%.
 
 `flagHighDenialPayers` returns payer names whose denial rate is strictly greater than the threshold; a rate equal to the threshold is excluded. Pass a second argument to use a custom percentage threshold, such as `flagHighDenialPayers(claims, 10)`. Empty input or no qualifying payers returns `[]`, which the browser displays as **No payers returned.** The function leaves the input unchanged.
+
+**No-show and CME browser controls**
+
+The **No-Show Cost Estimator** section has **Calculate No-Show Cost**, **No-Show Rate by Location**, and **Flag High No-Show Locations (>20%)** buttons. The **CME Compliance Tracker** section has **Generate CME Report**. These controls currently show the “test is not connected yet” message; their utility functions and browser handlers remain to be implemented.
 
 **Type checking**
 

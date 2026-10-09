@@ -1,8 +1,8 @@
-<!-- Transformations -->
+<!-- Billing Denial Rate Calculator -->
 <section class="bg-white rounded-lg shadow-sm border p-6 mb-6">
-  <h2 class="text-xl font-semibold mb-4">Transformations & Reports</h2>
+  <h2 class="text-xl font-semibold mb-4">Billing Denial Rate Calculator</h2>
 
-  <div class="flex flex-wrap gap-3">
+  <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
     <button
       id="denial-rate"
       class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
@@ -30,14 +30,46 @@
     >
       Flag High Denial Payers (&gt;8%)
     </button>
+  </div>
+</section>
 
+<!-- No-Show Cost Estimator -->
+<section class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+  <h2 class="text-xl font-semibold mb-4">No-Show Cost Estimator</h2>
+  <p class="text-gray-600 mb-4">
+    Estimate revenue lost to no-shows during the 7 calendar days ending on the
+    week-ending date, including that date, and review no-show rates by location.
+  </p>
+
+  <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
     <button
       id="no-show-cost"
       class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
     >
-      No-Show Cost
+      Calculate No-Show Cost
     </button>
 
+    <button
+      id="no-show-rate-location"
+      class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+    >
+      No-Show Rate by Location
+    </button>
+
+    <button
+      id="flag-high-no-show-locations"
+      class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+    >
+      Flag High No-Show Locations (&gt;20%)
+    </button>
+  </div>
+</section>
+
+<!-- CME Compliance Tracker -->
+<section class="bg-white rounded-lg shadow-sm border p-6 mb-6">
+  <h2 class="text-xl font-semibold mb-4">CME Compliance Tracker</h2>
+
+  <div class="flex flex-wrap gap-3">
     <button
       id="cme-report"
       class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
