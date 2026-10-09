@@ -133,6 +133,22 @@ npm run typecheck -- --watch
 
 Errors appear in that terminal. Keep `npm run dev` running for browser updates; Vite does not check types. Press **Ctrl+C** to stop either command.
 
+**Formatting**
+
+Use Prettier to format the project files:
+
+```bash
+npm run format
+```
+
+Check formatting without changing files before committing:
+
+```bash
+npm run format:check
+```
+
+The check exits with an error if any files need formatting. Run `npm run format` to fix them, then check again. If PowerShell blocks `npm`, use `npm.cmd` for these commands.
+
 **Git**
 
 The `.gitignore` excludes dependencies, build output, local environment files, and logs. Commit `package-lock.json` so dependency versions stay consistent.
