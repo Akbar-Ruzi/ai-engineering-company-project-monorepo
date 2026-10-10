@@ -180,11 +180,9 @@ export function calculateNoShowCost(
 }
 
 /**
- *
- *   No-show rate = (No-show appointments / Total appointments) * 100
- *
- *
- *
+ * mental mode:
+ * Group appointments by location, loop through each group, count missed appointments, divide by the group's total,
+ *  multiply by 100, and save the percentage under that location ID.
  */
 export function noShowRateByLocation(
   appointments: Appointment[],
@@ -209,6 +207,26 @@ export function noShowRateByLocation(
     );
     const noShowRate = (noShowAppointments.length / totalAppointments) * 100;
     result[location] = Number(noShowRate.toFixed(2));
+  }
+  return result;
+}
+
+/**
+ *  Calculate the no-show rate for each location, loop through each location and its rate,
+ *  check whether the rate exceeds the threshold (default 20%), collect the IDs of locations that exceed it,
+ *  and return those IDs as an array.
+ */
+export function flagHighNoShowLocations(
+  appointments: Appointment[],
+  threshold: number = 20,
+): string[] {
+  const result: string[] = [];
+  for (const [location, rate] of Object.entries(
+    noShowRateByLocation(appointments),
+  )) {
+    if (rate > threshold) {
+      result.push(location);
+    }
   }
   return result;
 }

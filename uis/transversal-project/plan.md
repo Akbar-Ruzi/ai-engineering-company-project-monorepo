@@ -26,15 +26,15 @@ The numbered sections follow the Required Functions order in the context. Prepar
 ## 3. Billing Denial Rate Calculator (`src/utils/transformations.ts`) ✅
 
 - [x] `calculateDenialRate`: count only `denied` claims, return a percentage rounded to 2 decimals, and throw for an empty array.
-- [x] `denialRateByPayer`: calculate the rate for each payer present.
-- [x] `denialRateByLocation`: calculate the rate for each location present.
-- [x] `flagHighDenialPayers`: return payers above the threshold; default to 8%. Connected to the HTML button; checks passed for the context example, custom thresholds, exact threshold boundaries, empty input, no denials, and preserving the input.
+- [x] `denialRateByPayer`: calculate the rate for each payer present. The HTML button displays the returned object with numeric percentages.
+- [x] `denialRateByLocation`: calculate the rate for each location present. The HTML button displays the returned object beside clinic names and formatted percentages.
+- [x] `flagHighDenialPayers`: return payers above the threshold; default to 8%. Connected to the HTML button, displaying the returned string array; checks passed for the context example, custom thresholds, exact threshold boundaries, empty input, no denials, and preserving the input.
 
-## 4. No-Show Cost Estimator (`src/utils/transformations.ts`)
+## 4. No-Show Cost Estimator (`src/utils/transformations.ts`) ?
 
-- [x] `calculateNoShowCost`: use the selected clinic's service fees for the 7 calendar days ending on the supplied date, inclusive. Round USD to 2 decimals; return 0 when there are no no-shows. Connected to the HTML clinic/date controls, with output directly below Calculate No-Show Cost and above the divider. Clear restores the default week-ending date. Verified sample totals (Austin $220, Miami $555, Atlanta $0 for 2025-03-14), inclusive month/year/leap-year boundaries, clinic/status filtering, rounding, empty arrays, input preservation, button results, missing-date feedback, and Clear reset. Typecheck passed.
-- [ ] `noShowRateByLocation`: calculate each location's percentage, rounded to 2 decimals.
-- [ ] `flagHighNoShowLocations`: return locations above the threshold; default to 20%.
+- [x] `calculateNoShowCost`: use the selected clinic's service fees for the 7 calendar days ending on the supplied date, inclusive. Round USD to 2 decimals; return 0 when there are no no-shows. Connected to the HTML clinic/date controls, with output directly below Calculate No-Show Cost and above the divider. Displays the clinic and inclusive date range on the first line, and the dollar amount (for example, $220) on the second. Clear restores the default week-ending date. Verified sample totals (Austin $220, Miami $555, Atlanta $0 for 2025-03-14), inclusive month/year/leap-year boundaries, clinic/status filtering, rounding, empty arrays, input preservation, button results, missing-date feedback, and Clear reset. Typecheck passed.
+- [x] `noShowRateByLocation`: calculate each location's percentage, rounded to 2 decimals. Connected to the HTML button; displays the returned object beside clinic names and formatted rates. Verified sample rates (Austin 50%, Miami 100%, Atlanta 0%), empty input, rounding, all appointment statuses, all/no no-shows, and input preservation. Matches the Context; typecheck passed.
+- [x] `flagHighNoShowLocations`: return location IDs as a string array above the threshold; default to 20%. Connected to the HTML button; displays the array beside clinic names. Verified sample IDs (us-tx-001, us-fl-001), custom thresholds, exact 20%/50%/100% boundaries, empty input, no no-shows, and input preservation. Matches the Context; typecheck passed.
 
 ## 5. CME Compliance Tracker (`src/utils/transformations.ts`)
 

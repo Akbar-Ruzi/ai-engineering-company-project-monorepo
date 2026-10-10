@@ -25,7 +25,7 @@ transversal-project/
     │   ├── claims.ts          # Claim filtering, sorting, grouping, and reset controls
     │   ├── appointments.ts    # Appointment filtering, date sorting, and reset controls
     │   ├── search.ts          # Debounced claim and clinician ID searches and reset controls
-    │   ├── transformations.ts # Denial rate and high denial payer button handlers
+    │   ├── transformations.ts # Billing denial and no-show button handlers
     │   ├── output.ts          # Shared output panel and Clear behavior
     │   └── partialHtmls.ts    # Loads HTML sections before connecting controls
     ├── partialHtmls/           # Separate HTML sections
@@ -120,9 +120,9 @@ Under **Search Operations**, type `CLN-000001` into **Search by Clinician ID**. 
 
 Under **Billing Denial Rate Calculator**, click **Calculate Denial Rate**. The result appears in **Test Output** as `Denial rate: 40.00%` for the sample claims. Errors appear in the same panel, and **Clear** clears the result. The handler is in `src/test/transformations.ts`.
 
-Click **Denial Rate by Payer** to display BlueCross: 50.00%, Aetna: 100.00%, Medicare: 0.00%, and Cigna: 0.00%.
+Click **Denial Rate by Payer** to display the returned object with numeric percentages: `{"BlueCross":50,"Aetna":100,"Medicare":0,"Cigna":0}`.
 
-Click **Denial Rate by Location** to display each location ID, name, and denial rate in **Test Output**:
+Click **Denial Rate by Location** to display the returned object (`{"us-tx-001":50,"us-fl-001":50,"us-ga-001":0}`) beside each location ID, clinic name, and formatted denial rate in **Test Output**:
 
 ```text
 us-tx-001 --> HealthCore Austin Central: 50.00%
@@ -132,13 +132,46 @@ us-ga-001 --> HealthCore Atlanta: 0.00%
 
 `denialRateByLocation` groups claims by `locationId` and returns percentages rounded to two decimal places. Only `denied` claims count as denied; all claims at that location count toward the total. Only locations present in the claims are included, empty input returns `{}`, and the input is unchanged. The browser helper looks up location names in `sampleLocations`; the utility returns location IDs as keys.
 
-Click **Flag High Denial Payers (>8%)** to display `BlueCross` and `Aetna` in **Test Output** for the sample claims. The button calls `flagHighDenialPayers(sampleClaims)` with the default threshold of 8%.
+Click **Flag High Denial Payers (>8%)** to display the returned string array `["BlueCross", "Aetna"]` in **Test Output** for the sample claims. The button calls `flagHighDenialPayers(sampleClaims)` with the default threshold of 8%.
 
-`flagHighDenialPayers` returns payer names whose denial rate is strictly greater than the threshold; a rate equal to the threshold is excluded. Pass a second argument to use a custom percentage threshold, such as `flagHighDenialPayers(claims, 10)`. Empty input or no qualifying payers returns `[]`, which the browser displays as **No payers returned.** The function leaves the input unchanged.
+`flagHighDenialPayers` returns payer names whose denial rate is strictly greater than the threshold; a rate equal to the threshold is excluded. Pass a second argument to use a custom percentage threshold, such as `flagHighDenialPayers(claims, 10)`. Empty input or no qualifying payers returns `[]`, which the browser displays as `[]`. The function leaves the input unchanged.
 
-**No-show and CME browser controls**
+**Test no-show calculations in the browser**
 
-The **No-Show Cost Estimator** section has **Calculate No-Show Cost**, **No-Show Rate by Location**, and **Flag High No-Show Locations (>20%)** buttons. The **CME Compliance Tracker** section has **Generate CME Report**. These controls currently show the “test is not connected yet” message; their utility functions and browser handlers remain to be implemented.
+All three buttons in **No-Show Cost Estimator** are connected to the utility functions through `src/test/transformations.ts`.
+
+Select a clinic and week-ending date, then click **Calculate No-Show Cost**. For Austin and 2025-03-14, the output is:
+
+```text
+No-show cost for HealthCore Austin Central in 7 calendar days ending 2025-03-14 (inclusive)
+$220
+```
+
+The calculation includes the seven calendar days ending on the selected date, counts only that clinic's no-shows, and uses its service fees. The function returns a number rounded to two decimal places; the browser adds the dollar sign. Sample totals for 2025-03-14 are Austin $220, Miami $555, and Atlanta $0. **Clear** restores the default week-ending date.
+
+Click **No-Show Rate by Location** to display the returned object beside the readable clinic rates:
+
+```json
+{
+  "us-tx-001": 50,
+  "us-fl-001": 100,
+  "us-ga-001": 0
+}
+```
+
+```text
+us-tx-001 --> HealthCore Austin Central: 50.00%
+us-fl-001 --> HealthCore Miami: 100.00%
+us-ga-001 --> HealthCore Atlanta: 0.00%
+```
+
+`noShowRateByLocation` divides each location's no-show count by its total appointment count and multiplies by 100, rounding to two decimal places. All appointment statuses count toward the total. Empty input returns `{}`; only locations present in the input appear.
+
+Click **Flag High No-Show Locations (>20%)** to display the returned string array `["us-tx-001", "us-fl-001"]` beside the corresponding clinic names. `flagHighNoShowLocations` defaults to 20 and flags only rates strictly above the threshold; exactly 20% is excluded. A second argument overrides the threshold. Empty input or no qualifying locations returns `[]`.
+
+The location rate and flagged no-show outputs use two columns separated by 128px, wrapping on smaller screens. Clinic names come from `sampleLocations`; the utility functions return location IDs and leave inputs unchanged.
+
+The **CME Compliance Tracker** controls remain unconnected and show the ?test is not connected yet? message.
 
 **Type checking**
 
@@ -183,6 +216,10 @@ The `.gitignore` excludes dependencies, build output, local environment files, a
 - `denialRateByLocation` is implemented and connected to the **Denial Rate by Location** button, displaying location IDs, names, and percentages. Checks passed for sample results, rounding, empty input, single claims, counting only denied claims, and preserving the input.
 - `flagHighDenialPayers` is implemented and connected to the **Flag High Denial Payers (>8%)** button. Checks passed for the context example, custom thresholds, exact threshold boundaries, empty input, no denials, and preserving the input. All four billing denial functions are complete.
 
+- `calculateNoShowCost` is implemented and connected to the clinic/date controls. Sample totals and inclusive date boundaries, filtering, rounding, empty input, and input preservation were checked.
+- `noShowRateByLocation` is implemented and connected, displaying the numeric object beside clinic names and percentages. Checks passed for sample rates, rounding, all statuses, empty input, and input preservation.
+- `flagHighNoShowLocations` is implemented and connected, displaying the string array beside clinic names. Checks passed for the default 20% threshold, custom thresholds, exact 20%/50%/100% boundaries, empty input, no no-shows, and input preservation. All three no-show functions match the Context; typecheck passed.
+
 - Models and sample data are defined and exported, including `CMEReport` and `CMEStatus`. The extra `Clinic` interface is retained.
 - `filterClaims` is implemented and connected to the browser controls. It matches all provided criteria and ignores omitted filters, while treating empty strings as supplied values.
 - `filterAppointmentsByStatus` is implemented and connected to immediate status selection in the browser.
@@ -191,5 +228,5 @@ The `.gitignore` excludes dependencies, build output, local environment files, a
 - `groupClaimsBy` is implemented and connected to the grouping dropdown for location, payer, status, and service type.
 - `findClaimById` is implemented and connected to the debounced **Search by Claim ID** input.
 - `findClinicianById` is implemented and connected to the debounced **Search by Clinician ID** input.
-- `binarySearchClaimById` is implemented and connected to the debounced **Binary Search by Claim ID** input. The remaining calculations and validations are not yet implemented.
+- `binarySearchClaimById` is implemented and connected to the debounced **Binary Search by Claim ID** input. CME calculations and validations remain to be implemented.
 - Testing currently uses the browser page. `npm test` is still a placeholder and exits with an error; no automated test suite is configured.

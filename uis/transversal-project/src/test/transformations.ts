@@ -9,6 +9,7 @@ import {
   denialRateByLocation,
   denialRateByPayer,
   flagHighDenialPayers,
+  flagHighNoShowLocations,
   noShowRateByLocation,
 } from "../utils/transformations";
 import { showResult, type TestOutput } from "./output";
@@ -53,6 +54,33 @@ export function setupTransformationTests({ output }: TestOutput) {
           output.textContent =
             error instanceof Error ? error.message : String(error);
         }
+      }
+    });
+
+  document
+    .querySelector("#flag-high-no-show-locations")
+    ?.addEventListener("click", () => {
+      if (!output) return;
+
+      try {
+        const locations = flagHighNoShowLocations(sampleAppointments);
+        showResult(
+          output,
+          "Locations with no-show rates above 20%:",
+          locations,
+          locations
+            .map((locationId) => {
+              const locationName =
+                sampleLocations.find(
+                  (location) => location.locationId === locationId,
+                )?.name ?? "Unknown location";
+              return `${locationId} --> ${locationName}`;
+            })
+            .join("\n"),
+        );
+      } catch (error) {
+        output.textContent =
+          error instanceof Error ? error.message : String(error);
       }
     });
 
