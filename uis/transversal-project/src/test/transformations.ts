@@ -1,6 +1,11 @@
-import { sampleClaims, sampleLocations } from "../data/sampleData";
+import {
+  sampleAppointments,
+  sampleClaims,
+  sampleLocations,
+} from "../data/sampleData";
 import {
   calculateDenialRate,
+  calculateNoShowCost,
   denialRateByLocation,
   denialRateByPayer,
   flagHighDenialPayers,
@@ -8,6 +13,46 @@ import {
 import type { TestOutput } from "./output";
 
 export function setupTransformationTests({ output }: TestOutput) {
+  const locationSelect =
+    document.querySelector<HTMLSelectElement>("#no-show-location");
+  const weekEndingInput = document.querySelector<HTMLInputElement>(
+    "#no-show-week-ending",
+  );
+
+  sampleLocations.forEach((location) => {
+    const option = document.createElement("option");
+    option.value = location.locationId;
+    option.textContent = location.name;
+    locationSelect?.append(option);
+  });
+
+  document.querySelector("#no-show-cost")?.addEventListener("click", () => {
+    if (!output) return;
+
+    try {
+      const location = sampleLocations.find(
+        (location) => location.locationId === locationSelect?.value,
+      );
+      if (!location) throw new Error("Select a clinic.");
+      if (!weekEndingInput?.value || !weekEndingInput.checkValidity()) {
+        throw new Error("Enter a valid week-ending date.");
+      }
+
+      const cost = calculateNoShowCost(
+        sampleAppointments,
+        location,
+        weekEndingInput.value,
+      );
+      output.textContent =
+        `No-show cost for ${location.name}\n` +
+        `7 calendar days ending ${weekEndingInput.value} (inclusive)\n` +
+        `Estimated revenue lost: $${cost.toFixed(2)} USD`;
+    } catch (error) {
+      output.textContent =
+        error instanceof Error ? error.message : String(error);
+    }
+  });
+
   document
     .querySelector("#flag-high-denial-payers")
     ?.addEventListener("click", () => {
@@ -73,4 +118,8 @@ export function setupTransformationTests({ output }: TestOutput) {
         error instanceof Error ? error.message : String(error);
     }
   });
+
+  return () => {
+    if (weekEndingInput) weekEndingInput.value = weekEndingInput.defaultValue;
+  };
 }

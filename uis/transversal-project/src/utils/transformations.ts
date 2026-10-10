@@ -1,4 +1,4 @@
-import type { Claim } from "../types/models";
+import type { Claim, Appointment, Location } from "../types/models";
 
 export function calculateDenialRate(claims: Claim[]): number {
   if (claims.length === 0) {
@@ -120,4 +120,61 @@ export function flagHighDenialPayers(
     }
   }
   return result;
+}
+
+/**
+ * 
+ * Mental model: Filter → Calculate → Accumulate → Return
+    1. Date range: Find the 7-day period ending on weekEndingDate.
+    2. Loop: Go through each appointment.
+    3. Filter: Skip appointments that:
+      - Are not no_show.
+      - Belong to another location.
+      - Fall outside the date range.
+    4. Calculate: Look up the consultation fee for each qualifying appointment.
+    5. Accumulate: Add each fee to totalCost.
+    6. Return: Round the total to 2 decimal places.
+    Remember: Check each appointment → Skip if it doesn't qualify → Add its fee if it qualifies → Return the total lost revenue.
+ */
+
+export function calculateNoShowCost(
+  appointments: Appointment[],
+  location: Location,
+  weekEndingDate: string,
+): number {
+  let totalCost = 0;
+
+  const endDate = new Date(weekEndingDate);
+  // create a new Date object with the same date as endDate. Because we want to change startDate without changing endDate.
+  const startDate = new Date(endDate);
+  // Subtract 6 days
+  startDate.setUTCDate(startDate.getUTCDate() - 6);
+  // we only care about the calendar date, not the appointment time.
+
+  const startDateString = startDate.toISOString().slice(0, 10);
+  const endDateString = endDate.toISOString().slice(0, 10);
+
+  // Loop through every appointment
+  for (const appointment of appointments) {
+    if (appointment.status !== "no_show") {
+      // Is this appointment's status something other than no_show?
+      continue; // If yes, continue skips the rest of the current iteration and moves to the next appointment.
+    }
+    // We only want appointments belonging to the selected clinic.
+    if (appointment.locationId !== location.locationId) {
+      continue;
+    }
+    // Extract the appointment date
+    const appointmentDate = appointment.scheduledDate.slice(0, 10);
+
+    // Check whether the appointment is outside the date range
+    if (appointmentDate < startDateString || appointmentDate > endDateString) {
+      continue;
+    }
+
+    // Look up the consultation fee
+    const fee = location.averageConsultationFee[appointment.serviceType];
+    totalCost += fee;
+  }
+  return Math.round((totalCost + Number.EPSILON) * 100) / 100;
 }

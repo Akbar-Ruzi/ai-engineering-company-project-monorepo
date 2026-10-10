@@ -30,11 +30,20 @@ export function setupOutput() {
 
     const section = target.closest("section");
     if (!section) return;
+    const noShowCostButton = section.querySelector("#no-show-cost");
+    const isNoShowCostControl = [
+      "no-show-cost",
+      "no-show-location",
+      "no-show-week-ending",
+    ].includes(button?.id ?? target.id);
+    const outputAnchor =
+      (isNoShowCostControl ? noShowCostButton?.parentElement : null) ??
+      section.closest("[data-output-group]") ??
+      section;
+    outputAnchor.after(outputPanel);
     if (section !== activeSection) {
       clearActiveButton();
       activeSection = section;
-      const outputAnchor = section.closest("[data-output-group]") ?? section;
-      outputAnchor.after(outputPanel);
       outputPanel.hidden = false;
       output.textContent = section.contains(
         document.querySelector("#appointment-status"),
@@ -67,6 +76,7 @@ export function setupOutput() {
         "denial-payer",
         "denial-location",
         "flag-high-denial-payers",
+        "no-show-cost",
       ].includes(button.id)
     ) {
       output.textContent = `${button.textContent?.trim()}: this test is not connected yet.`;

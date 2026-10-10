@@ -32,7 +32,7 @@ The numbered sections follow the Required Functions order in the context. Prepar
 
 ## 4. No-Show Cost Estimator (`src/utils/transformations.ts`)
 
-- [ ] `calculateNoShowCost`: use the selected clinic's service fees for the 7 calendar days ending on the supplied date, inclusive. Round USD to 2 decimals; return 0 when there are no no-shows.
+- [x] `calculateNoShowCost`: use the selected clinic's service fees for the 7 calendar days ending on the supplied date, inclusive. Round USD to 2 decimals; return 0 when there are no no-shows. Connected to the HTML clinic/date controls, with output directly below Calculate No-Show Cost and above the divider. Clear restores the default week-ending date. Verified sample totals (Austin $220, Miami $555, Atlanta $0 for 2025-03-14), inclusive month/year/leap-year boundaries, clinic/status filtering, rounding, empty arrays, input preservation, button results, missing-date feedback, and Clear reset. Typecheck passed.
 - [ ] `noShowRateByLocation`: calculate each location's percentage, rounded to 2 decimals.
 - [ ] `flagHighNoShowLocations`: return locations above the threshold; default to 20%.
 

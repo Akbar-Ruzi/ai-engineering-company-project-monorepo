@@ -9,10 +9,11 @@ const output = setupOutput();
 const resetClaims = setupClaimTests(output);
 const resetAppointments = setupAppointmentTests(output);
 const resetSearch = setupSearchTests(output);
-setupTransformationTests(output);
+const resetTransformations = setupTransformationTests(output);
 
 setupClearOutput(output, () => {
   resetClaims();
   resetAppointments();
   resetSearch();
+  resetTransformations();
 });
