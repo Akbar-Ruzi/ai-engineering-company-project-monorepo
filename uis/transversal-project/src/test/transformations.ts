@@ -9,6 +9,7 @@ import {
   denialRateByLocation,
   denialRateByPayer,
   flagHighDenialPayers,
+  noShowRateByLocation,
 } from "../utils/transformations";
 import type { TestOutput } from "./output";
 
@@ -25,6 +26,33 @@ export function setupTransformationTests({ output }: TestOutput) {
     option.textContent = location.name;
     locationSelect?.append(option);
   });
+
+  document
+    .querySelector("#no-show-rate-location")
+    ?.addEventListener("click", () => {
+      try {
+        const rates = noShowRateByLocation(sampleAppointments);
+        if (!output) return;
+        output.textContent =
+          "No-show rate by location:\n" +
+          (Object.entries(rates)
+            .map(([locationId, rate]) => {
+              const locationName =
+                sampleLocations.find(
+                  (location) => location.locationId === locationId,
+                )?.name ?? "Unknown location";
+              return `${locationId} --> ${locationName}: ${rate.toFixed(2)}%`;
+            })
+            .join("\n") ||
+            "No rates returned yet. Check the browser console for your logs.");
+      } catch (error) {
+        console.error(error);
+        if (output) {
+          output.textContent =
+            error instanceof Error ? error.message : String(error);
+        }
+      }
+    });
 
   document.querySelector("#no-show-cost")?.addEventListener("click", () => {
     if (!output) return;

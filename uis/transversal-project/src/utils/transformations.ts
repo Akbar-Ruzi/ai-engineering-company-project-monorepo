@@ -178,3 +178,37 @@ export function calculateNoShowCost(
   }
   return Math.round((totalCost + Number.EPSILON) * 100) / 100;
 }
+
+/**
+ *
+ *   No-show rate = (No-show appointments / Total appointments) * 100
+ *
+ *
+ *
+ */
+export function noShowRateByLocation(
+  appointments: Appointment[],
+): Record<string, number> {
+  const groupedAppointmentsByLocation = appointments.reduce<
+    Record<string, Appointment[]>
+  >((acc, appointment) => {
+    const location = appointment.locationId;
+    if (!acc[location]) {
+      acc[location] = [];
+    }
+    acc[location].push(appointment);
+    return acc;
+  }, {});
+  const result: Record<string, number> = {};
+  for (const [location, locationAppointments] of Object.entries(
+    groupedAppointmentsByLocation,
+  )) {
+    const totalAppointments = locationAppointments.length;
+    const noShowAppointments = locationAppointments.filter(
+      (appointment) => appointment.status === "no_show",
+    );
+    const noShowRate = (noShowAppointments.length / totalAppointments) * 100;
+    result[location] = Number(noShowRate.toFixed(2));
+  }
+  return result;
+}
