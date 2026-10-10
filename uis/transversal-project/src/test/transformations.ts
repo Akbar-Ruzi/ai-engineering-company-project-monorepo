@@ -11,7 +11,7 @@ import {
   flagHighDenialPayers,
   noShowRateByLocation,
 } from "../utils/transformations";
-import type { TestOutput } from "./output";
+import { showResult, type TestOutput } from "./output";
 
 export function setupTransformationTests({ output }: TestOutput) {
   const locationSelect =
@@ -33,9 +33,11 @@ export function setupTransformationTests({ output }: TestOutput) {
       try {
         const rates = noShowRateByLocation(sampleAppointments);
         if (!output) return;
-        output.textContent =
-          "No-show rate by location:\n" +
-          (Object.entries(rates)
+        showResult(
+          output,
+          "No-show rate by location:",
+          rates,
+          Object.entries(rates)
             .map(([locationId, rate]) => {
               const locationName =
                 sampleLocations.find(
@@ -43,8 +45,8 @@ export function setupTransformationTests({ output }: TestOutput) {
                 )?.name ?? "Unknown location";
               return `${locationId} --> ${locationName}: ${rate.toFixed(2)}%`;
             })
-            .join("\n") ||
-            "No rates returned yet. Check the browser console for your logs.");
+            .join("\n"),
+        );
       } catch (error) {
         console.error(error);
         if (output) {
@@ -72,9 +74,8 @@ export function setupTransformationTests({ output }: TestOutput) {
         weekEndingInput.value,
       );
       output.textContent =
-        `No-show cost for ${location.name}\n` +
-        `7 calendar days ending ${weekEndingInput.value} (inclusive)\n` +
-        `Estimated revenue lost: $${cost.toFixed(2)} USD`;
+        `No-show cost for ${location.name} in 7 calendar days ending ${weekEndingInput.value} (inclusive)\n` +
+        `$${cost}`;
     } catch (error) {
       output.textContent =
         error instanceof Error ? error.message : String(error);
@@ -90,7 +91,7 @@ export function setupTransformationTests({ output }: TestOutput) {
         const payers = flagHighDenialPayers(sampleClaims);
         output.textContent =
           "Payers with denial rates above 8%:\n" +
-          (payers.length > 0 ? payers.join("\n") : "No payers returned.");
+          JSON.stringify(payers, null, 2);
       } catch (error) {
         output.textContent =
           error instanceof Error ? error.message : String(error);
@@ -102,8 +103,10 @@ export function setupTransformationTests({ output }: TestOutput) {
 
     try {
       const rates = denialRateByLocation(sampleClaims);
-      output.textContent =
-        "Denial rate by location:\n" +
+      showResult(
+        output,
+        "Denial rate by location:",
+        rates,
         Object.entries(rates)
           .map(([locationId, rate]) => {
             const locationName =
@@ -112,7 +115,8 @@ export function setupTransformationTests({ output }: TestOutput) {
               )?.name ?? "Unknown location";
             return `${locationId} --> ${locationName}: ${rate.toFixed(2)}%`;
           })
-          .join("\n");
+          .join("\n"),
+      );
     } catch (error) {
       output.textContent =
         error instanceof Error ? error.message : String(error);
@@ -137,10 +141,7 @@ export function setupTransformationTests({ output }: TestOutput) {
     try {
       const rates = denialRateByPayer(sampleClaims);
       output.textContent =
-        "Denial rate by payer:\n" +
-        Object.entries(rates)
-          .map(([payer, rate]) => `${payer}: ${rate.toFixed(2)}%`)
-          .join("\n");
+        "Denial rate by payer:\n" + JSON.stringify(rates, null, 2);
     } catch (error) {
       output.textContent =
         error instanceof Error ? error.message : String(error);

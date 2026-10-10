@@ -1,3 +1,25 @@
+export function showResult(
+  output: HTMLPreElement | null,
+  title: string,
+  result: unknown,
+  readable: string,
+  rawText?: string,
+) {
+  if (!output) return;
+  const rawResult = document.createElement("span");
+  rawResult.textContent =
+    rawText ?? JSON.stringify(result, null, 2) ?? String(result);
+  const formattedResult = document.createElement("span");
+  formattedResult.textContent = readable;
+  const results = document.createElement("span");
+  results.style.display = "flex";
+  results.style.flexWrap = "wrap";
+  results.style.columnGap = "8rem";
+  results.style.rowGap = "1.5rem";
+  results.append(rawResult, formattedResult);
+  output.replaceChildren(`${title}\n`, results);
+}
+
 export function setupOutput() {
   const output = document.querySelector<HTMLPreElement>("#output");
   const outputPanel = document.querySelector<HTMLElement>("#output-panel");
