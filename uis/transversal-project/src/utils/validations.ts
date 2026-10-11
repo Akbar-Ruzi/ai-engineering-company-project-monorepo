@@ -1,4 +1,6 @@
-import type { Claim } from "../types/models";
+import type { Claim, Clinician } from "../types/models";
+import { isValidISODate } from "./helpers";
+import { sampleAllowedRoles } from "../data/sampleData";
 
 /**
  * -----Mental model — Big picture--------
@@ -20,11 +22,7 @@ export const validateClaim = (
   if (!(claim.claimAmount > 0)) errors.push("claimAmount must be > 0");
 
   const submissionDate = new Date(claim.submissionDate).getTime();
-  const isValidSubmissionDate =
-    /^\d{4}-\d{2}-\d{2}$/.test(claim.submissionDate) &&
-    !Number.isNaN(submissionDate) &&
-    new Date(submissionDate).toISOString().slice(0, 10) ===
-      claim.submissionDate;
+  const isValidSubmissionDate = isValidISODate(claim.submissionDate);
   if (!isValidSubmissionDate || submissionDate > Date.now())
     errors.push(
       "submissionDate must be a valid date in YYYY-MM-DD format and not a future date",
@@ -37,6 +35,45 @@ export const validateClaim = (
     errors.push(
       "must match the format HC- followed by 6 alphanumeric characters",
     );
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+};
+
+/**
+ * ---- Mental model — Big picture -------
+ * Receive a clinician, check their CME hours, verify their licence expiry date,
+ * validate their role, collect an error message for every failed rule,
+ * and return whether the clinician is valid.
+ */
+export const validateClinician = (
+  clinician: Clinician,
+): { valid: boolean; errors: string[] } => {
+  const errors: string[] = [];
+  if (!(clinician.cmeHoursRequired >= 0))
+    errors.push("CME hours required cannot be negative");
+
+  if (!(clinician.cmeHoursLogged >= 0))
+    errors.push("CME hours logged cannot be negative");
+
+  const isValidExpiryDate = isValidISODate(clinician.licenceExpiryDate);
+
+  const today = new Date();
+  const todayDate = [
+    today.getFullYear(),
+    String(today.getMonth() + 1).padStart(2, "0"),
+    String(today.getDate()).padStart(2, "0"),
+  ].join("-");
+
+  if (!isValidExpiryDate)
+    errors.push("licenceExpiryDate must be a valid date in YYYY-MM-DD format");
+  else if (clinician.licenceExpiryDate < todayDate)
+    errors.push("Licence is expired");
+
+  if (!sampleAllowedRoles.includes(clinician.role))
+    errors.push("role must be one of the four defined values");
+
   return {
     valid: errors.length === 0,
     errors,

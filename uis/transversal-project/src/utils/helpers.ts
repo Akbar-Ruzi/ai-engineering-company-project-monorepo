@@ -51,3 +51,13 @@ export const getLicenceDaysRemaining = (
       (1000 * 60 * 60 * 24),
   );
 };
+
+// Checks YYYY-MM-DD format and rejects impossible calendar dates.
+export const isValidISODate = (dateString: string): boolean => {
+  const timestamp = new Date(dateString).getTime();
+  return (
+    /^\d{4}-\d{2}-\d{2}$/.test(dateString) &&
+    !Number.isNaN(timestamp) &&
+    new Date(timestamp).toISOString().slice(0, 10) === dateString
+  );
+};

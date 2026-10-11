@@ -255,4 +255,50 @@ export const sampleClinicians: Clinician[] = [
     cmeHoursLogged: 40,
     cmeYearStartDate: "2025-01-01",
   },
+  // Valid: zero CME hours are allowed.
+  {
+    clinicianId: "CLN-000004",
+    firstName: "Jamie",
+    lastName: "Taylor",
+    role: "medical_assistant",
+    locationId: "us-tx-001",
+    licenceState: "TX",
+    licenceExpiryDate: "2028-06-30",
+    cmeHoursRequired: 0,
+    cmeHoursLogged: 0,
+    cmeYearStartDate: "2026-01-01",
+  },
+  // Invalid: both required and logged CME hours are negative (two errors).
+  {
+    clinicianId: "CLN-000005",
+    firstName: "Alex",
+    lastName: "Morgan",
+    role: "nurse_practitioner",
+    locationId: "us-fl-001",
+    licenceState: "FL",
+    licenceExpiryDate: "2028-05-15",
+    cmeHoursRequired: -1,
+    cmeHoursLogged: -1,
+    cmeYearStartDate: "2026-01-01",
+  },
+  // Invalid: impossible expiry date and unsupported role (two errors).
+  {
+    clinicianId: "CLN-000006",
+    firstName: "Sam",
+    lastName: "Lee",
+    role: "receptionist" as Clinician["role"],
+    locationId: "us-ga-001",
+    licenceState: "GA",
+    licenceExpiryDate: "2028-02-30",
+    cmeHoursRequired: 20,
+    cmeHoursLogged: 10,
+    cmeYearStartDate: "2026-01-01",
+  },
+];
+
+export const sampleAllowedRoles: string[] = [
+  "physician",
+  "nurse_practitioner",
+  "nurse",
+  "medical_assistant",
 ];

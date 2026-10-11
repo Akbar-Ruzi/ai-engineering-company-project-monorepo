@@ -64,6 +64,7 @@ export function setupOutput() {
       "cme-as-of-date",
     ].includes(button?.id ?? target.id);
     const outputAnchor =
+      target.closest("[data-validation-row]") ??
       (isNoShowCostControl ? noShowCostButton?.parentElement : null) ??
       (isCMEReportControl
         ? section.querySelector("#cme-report")?.parentElement
@@ -113,6 +114,7 @@ export function setupOutput() {
         "cme-at-risk",
         "cme-expiring-licences",
         "validate-claim",
+        "validate-clinician",
       ].includes(button.id)
     ) {
       output.textContent = `${button.textContent?.trim()}: this test is not connected yet.`;

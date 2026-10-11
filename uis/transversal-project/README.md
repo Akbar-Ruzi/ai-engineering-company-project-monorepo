@@ -26,6 +26,7 @@ transversal-project/
     │   ├── appointments.ts    # Appointment filtering, date sorting, and reset controls
     │   ├── search.ts          # Debounced claim and clinician ID searches and reset controls
     │   ├── transformations.ts # Billing denial, no-show, and CME button handlers
+    │   ├── validations.ts     # Claim and clinician validation controls
     │   ├── output.ts          # Shared output panel and Clear behavior
     │   └── partialHtmls.ts    # Loads HTML sections before connecting controls
     ├── partialHtmls/           # Separate HTML sections
@@ -206,6 +207,20 @@ Return `{ valid: true, errors: [] }` when all rules pass. Otherwise, return `{ v
 
 In **Validations**, choose a claim from **Claim to validate** and click **Validate Claim**. The button passes the selected claim and clinic IDs from `sampleLocations` to `validateClaim`, displaying the returned object beside a readable success message or all errors. **Clear** restores the first claim selection. The browser handlers live in `src/test/validations.ts`.
 
+**Clinician validation business rules**
+
+`validateClinician(clinician)` checks all four rules independently:
+
+- `cmeHoursRequired` and `cmeHoursLogged` must each be >= 0; zero is valid and NaN is rejected.
+- `licenceExpiryDate` must be a real calendar date in `YYYY-MM-DD` format. Today and future dates pass; past dates produce `Licence is expired`. Today uses the browser's local calendar date.
+- `role` must be `physician`, `nurse_practitioner`, `nurse`, or `medical_assistant`, as listed in `sampleAllowedRoles`.
+
+The function returns `{ valid, errors }` with one message per failed rule and leaves the input unchanged. Both claim and clinician validators reuse `isValidISODate` from `src/utils/helpers.ts` to reject malformed and impossible dates.
+
+Choose **Clinician to validate** and click **Validate Clinician**. Claim and clinician controls occupy separate rows with a divider; the shared output appears directly below the corresponding row, showing the returned object and a success message or all errors. **Clear** resets both selections.
+
+Three static dummy clinicians cover validation: `CLN-000004` passes with zero hours, `CLN-000005` fails both hour rules, and `CLN-000006` fails the expiry-date and role rules. The original clinicians also provide expired licences. The invalid role intentionally uses a TypeScript assertion for runtime testing.
+
 **Type checking**
 
 The root `tsconfig.json` is configured for Vite and browser APIs, with strict type checking and `noEmit` enabled. Run this after meaningful changes and before committing:
@@ -244,6 +259,8 @@ The `.gitignore` excludes dependencies, build output, local environment files, a
 
 **Current status**
 
+- `validateClinician` is implemented and connected to its dropdown and button. Checks passed for all sample clinicians, all four allowed roles, zero/negative/NaN hours, present/future/expired/invalid dates, four simultaneous errors, input preservation, and TypeScript.
+
 - `validateClaim` is implemented and connected to the claim dropdown and **Validate Claim** button. Checks passed for all sample claims, all five rules failing together, today's date, invalid dates and amounts, patient ID boundaries, input preservation, and TypeScript.
 
 - `calculateDenialRate` is implemented and connected to the **Calculate Denial Rate** button.
@@ -266,5 +283,5 @@ The `.gitignore` excludes dependencies, build output, local environment files, a
 - `findClinicianById` is implemented and connected to the debounced **Search by Clinician ID** input.
 - `getCliniciansAtRisk` is implemented and connected to the HTML button and as-of date input. Checks passed for sample at-risk and overdue results, no matches, empty input, input preservation, TypeScript, and formatting.
 - `getCliniciansWithExpiringLicences` is implemented and connected to its date input and 90/30-day dropdown. Checks passed for sample alerts, inclusive 0/30/90-day boundaries, expired exclusions, leap-year dates, empty input, input preservation, and TypeScript.
-- `binarySearchClaimById` is implemented and connected to the debounced **Binary Search by Claim ID** input. Report refinements and validations remain to be implemented.
+- `binarySearchClaimById` is implemented and connected to the debounced **Binary Search by Claim ID** input. Report refinements, threshold validators, and appointment validation remain to be implemented.
 - Testing currently uses the browser page. `npm test` is still a placeholder and exits with an error; no automated test suite is configured.
