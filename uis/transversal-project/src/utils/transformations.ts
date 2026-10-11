@@ -247,7 +247,7 @@ export function flagHighNoShowLocations(
   - How many days remain in the CME cycle?
   - Is the clinician on track?
   - How many days remain until their medical license expires?
-  ---------Mental Model
+  ---------Mental Model -------------
  * Loop through each clinician, calculate their required and completed CME hours,
  * determine how much time remains in their CME cycle, evaluate their compliance status,
  * calculate their licence expiry countdown, and create one report object for each clinician.
@@ -272,7 +272,7 @@ export function generateCMEReport(
     );
 
     const hoursRemaining = Math.max(
-      0, // O means : Calculate the remaining hours, but never allow the result to go below zero.
+      0, // 0 means : Calculate the remaining hours, but never allow the result to go below zero.
       clinician.cmeHoursRequired - clinician.cmeHoursLogged,
     );
 
@@ -294,4 +294,19 @@ export function generateCMEReport(
       licenceDaysRemaining,
     };
   });
+}
+
+export function getCliniciansAtRisk(
+  clinicians: Clinician[],
+  asOfDate: string,
+): Clinician[] {
+  const riskyReports = generateCMEReport(clinicians, asOfDate).filter(
+    (report) =>
+      report.complianceStatus === "at_risk" ||
+      report.complianceStatus === "overdue",
+  );
+
+  return clinicians.filter((clinician) =>
+    riskyReports.some((report) => report.clinicianId === clinician.clinicianId),
+  );
 }

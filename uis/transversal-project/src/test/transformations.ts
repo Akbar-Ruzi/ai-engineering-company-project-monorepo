@@ -12,6 +12,7 @@ import {
   flagHighDenialPayers,
   flagHighNoShowLocations,
   generateCMEReport,
+  getCliniciansAtRisk,
   noShowRateByLocation,
 } from "../utils/transformations";
 import { showResult, type TestOutput } from "./output";
@@ -25,6 +26,37 @@ const formatDaysRemaining = (days: number, pastLabel: string): string => {
 export function setupTransformationTests({ output }: TestOutput) {
   const cmeDateInput =
     document.querySelector<HTMLInputElement>("#cme-as-of-date");
+
+  document.querySelector("#cme-at-risk")?.addEventListener("click", () => {
+    if (!output) return;
+
+    try {
+      if (!cmeDateInput?.value || !cmeDateInput.checkValidity()) {
+        throw new Error("Enter a valid as-of date.");
+      }
+
+      const clinicians = getCliniciansAtRisk(
+        sampleClinicians,
+        cmeDateInput.value,
+      );
+      showResult(
+        output,
+        `Clinicians at risk or overdue as of ${cmeDateInput.value}:`,
+        clinicians,
+        clinicians.length
+          ? clinicians
+              .map(
+                (clinician) =>
+                  `${clinician.firstName} ${clinician.lastName} (${clinician.clinicianId})`,
+              )
+              .join("\n")
+          : "No clinicians are at risk or overdue.",
+      );
+    } catch (error) {
+      output.textContent =
+        error instanceof Error ? error.message : String(error);
+    }
+  });
 
   document.querySelector("#cme-report")?.addEventListener("click", () => {
     if (!output) return;
