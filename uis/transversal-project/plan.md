@@ -39,7 +39,7 @@ The numbered sections follow the Required Functions order in the context. Prepar
 ## 5. CME Compliance Tracker (`src/utils/transformations.ts`)
 
 - [x] `generateCMEReport`: report fields, remaining hours (minimum 0), calendar days left in the cycle, and signed days until licence expiry are implemented. Still round the returned numeric completion percentage to 1 decimal and verify zero required hours and date boundaries.
-- [ ] `getCliniciansAtRisk`: return clinicians who are `at_risk` or `overdue`.
+- [x] `getCliniciansAtRisk`: return clinicians who are `at_risk` or `overdue`; connected to the HTML button and as-of date input.
 - [ ] `getCliniciansWithExpiringLicences`: find licences expiring within the supplied days; test 90-day and 30-day alerts.
 
 ## 6. Validations (`src/utils/validations.ts`)

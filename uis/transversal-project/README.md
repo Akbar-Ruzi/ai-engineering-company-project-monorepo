@@ -175,11 +175,13 @@ The location rate and flagged no-show outputs use two columns separated by 128px
 
 In **CME Compliance Tracker**, choose an **As of date** and click **Generate CME Report**. The button calls `generateCMEReport(sampleClinicians, asOfDate)` and displays the returned report array beside readable results for each clinician: status, required and logged hours, remaining hours, completion percentage, cycle countdown, and licence expiry.
 
-Negative countdowns appear as `286 days overdue` for the cycle and `517 days past expiration` for a licence; positive countdowns appear as `79 days remaining`. The report array retains signed numeric day counts. The date defaults to 2025-03-14, missing dates show feedback, and **Clear** restores the default date.
+Negative countdowns appear as `286 days overdue` for the cycle and `517 days past expiration` for a licence; positive countdowns appear as `79 days remaining`. The report array retains signed numeric day counts. The date defaults to 2025-07-01, missing dates show feedback, and **Clear** restores the default date.
+
+Click **Get Clinicians at Risk** to call `getCliniciansAtRisk(sampleClinicians, asOfDate)`. It returns clinicians whose status is `at_risk` or `overdue`, displaying the array beside their names and IDs. With the sample data, 2025-07-01 returns Sandra Flores; 2026-01-01 returns Marcus Reid and Sandra Flores. No matches display an empty array and a readable message. The function uses `getCMEStatus` and leaves the input unchanged.
 
 `src/utils/helpers.ts` exports `getCMECycleEnd`, shared by the report and status functions, and `getCMEStatus`. Status checks prioritize completed hours, then an incomplete cycle that has reached its end, then progress more than 15 percentage points behind elapsed cycle progress, otherwise `on_track`.
 
-The readable output formats completion to one decimal. The report's numeric `percentComplete` still needs rounding to one decimal to fully meet the context. Zero required hours and dates before the cycle starts also need edge-case handling or validation. The at-risk and expiring-licence filter functions remain pending.
+The readable output formats completion to one decimal. The report's numeric `percentComplete` still needs rounding to one decimal to fully meet the context. Zero required hours and dates before the cycle starts also need edge-case handling or validation. The expiring-licence filter function remains pending; its HTML button is present but unconnected.
 
 **Type checking**
 
@@ -237,5 +239,6 @@ The `.gitignore` excludes dependencies, build output, local environment files, a
 - `groupClaimsBy` is implemented and connected to the grouping dropdown for location, payer, status, and service type.
 - `findClaimById` is implemented and connected to the debounced **Search by Claim ID** input.
 - `findClinicianById` is implemented and connected to the debounced **Search by Clinician ID** input.
-- `binarySearchClaimById` is implemented and connected to the debounced **Binary Search by Claim ID** input. The remaining CME filters, report refinements, and validations remain to be implemented.
+- `getCliniciansAtRisk` is implemented and connected to the HTML button and as-of date input. Checks passed for sample at-risk and overdue results, no matches, empty input, input preservation, TypeScript, and formatting.
+- `binarySearchClaimById` is implemented and connected to the debounced **Binary Search by Claim ID** input. The expiring-licence filter, report refinements, and validations remain to be implemented.
 - Testing currently uses the browser page. `npm test` is still a placeholder and exits with an error; no automated test suite is configured.

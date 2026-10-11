@@ -300,13 +300,8 @@ export function getCliniciansAtRisk(
   clinicians: Clinician[],
   asOfDate: string,
 ): Clinician[] {
-  const riskyReports = generateCMEReport(clinicians, asOfDate).filter(
-    (report) =>
-      report.complianceStatus === "at_risk" ||
-      report.complianceStatus === "overdue",
-  );
-
-  return clinicians.filter((clinician) =>
-    riskyReports.some((report) => report.clinicianId === clinician.clinicianId),
-  );
+  return clinicians.filter((clinician) => {
+    const status = getCMEStatus(clinician, asOfDate);
+    return status === "at_risk" || status === "overdue";
+  });
 }
