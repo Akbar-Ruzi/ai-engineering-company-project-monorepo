@@ -1,6 +1,5 @@
-import type { Claim, Clinician } from "../types/models";
+import type { Claim, Clinician, ClinicianRole } from "../types/models";
 import { isValidISODate } from "./helpers";
-import { sampleAllowedRoles } from "../data/sampleData";
 
 /**
  * -----Mental model — Big picture--------
@@ -11,19 +10,22 @@ import { sampleAllowedRoles } from "../data/sampleData";
 export const validateClaim = (
   claim: Claim,
   knownLocationIds: string[],
+  asOfDate: string,
 ): {
   valid: boolean;
   errors: string[];
 } => {
+  if (!isValidISODate(asOfDate))
+    throw new Error("asOfDate must be a valid date in YYYY-MM-DD format");
   const errors: string[] = [];
   if (!knownLocationIds.includes(claim.locationId))
     errors.push("locationId must match one of the known clinic IDs");
 
-  if (!(claim.claimAmount > 0)) errors.push("claimAmount must be > 0");
+  if (!Number.isFinite(claim.claimAmount) || claim.claimAmount <= 0)
+    errors.push("claimAmount must be a finite number > 0");
 
-  const submissionDate = new Date(claim.submissionDate).getTime();
   const isValidSubmissionDate = isValidISODate(claim.submissionDate);
-  if (!isValidSubmissionDate || submissionDate > Date.now())
+  if (!isValidSubmissionDate || claim.submissionDate > asOfDate)
     errors.push(
       "submissionDate must be a valid date in YYYY-MM-DD format and not a future date",
     );
@@ -49,29 +51,32 @@ export const validateClaim = (
  */
 export const validateClinician = (
   clinician: Clinician,
+  allowedRoles: readonly ClinicianRole[],
+  asOfDate: string,
 ): { valid: boolean; errors: string[] } => {
+  if (!isValidISODate(asOfDate))
+    throw new Error("asOfDate must be a valid date in YYYY-MM-DD format");
   const errors: string[] = [];
-  if (!(clinician.cmeHoursRequired >= 0))
-    errors.push("CME hours required cannot be negative");
+  if (
+    !Number.isFinite(clinician.cmeHoursRequired) ||
+    clinician.cmeHoursRequired < 0
+  )
+    errors.push("CME hours required must be finite and >= 0");
 
-  if (!(clinician.cmeHoursLogged >= 0))
-    errors.push("CME hours logged cannot be negative");
+  if (
+    !Number.isFinite(clinician.cmeHoursLogged) ||
+    clinician.cmeHoursLogged < 0
+  )
+    errors.push("CME hours logged must be finite and >= 0");
 
   const isValidExpiryDate = isValidISODate(clinician.licenceExpiryDate);
 
-  const today = new Date();
-  const todayDate = [
-    today.getFullYear(),
-    String(today.getMonth() + 1).padStart(2, "0"),
-    String(today.getDate()).padStart(2, "0"),
-  ].join("-");
-
   if (!isValidExpiryDate)
     errors.push("licenceExpiryDate must be a valid date in YYYY-MM-DD format");
-  else if (clinician.licenceExpiryDate < todayDate)
+  else if (clinician.licenceExpiryDate < asOfDate)
     errors.push("Licence is expired");
 
-  if (!sampleAllowedRoles.includes(clinician.role))
+  if (!allowedRoles.includes(clinician.role))
     errors.push("role must be one of the four defined values");
 
   return {

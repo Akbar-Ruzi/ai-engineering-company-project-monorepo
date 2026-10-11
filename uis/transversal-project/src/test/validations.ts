@@ -15,8 +15,23 @@ import {
   noShowRateByLocation,
 } from "../utils/transformations";
 import { showResult, type TestOutput } from "./output";
+import type { ClinicianRole } from "../types/models";
 
 export function setupValidationTests({ output }: TestOutput) {
+  const getTodayDate = (): string => {
+    const today = new Date();
+    return [
+      today.getFullYear(),
+      String(today.getMonth() + 1).padStart(2, "0"),
+      String(today.getDate()).padStart(2, "0"),
+    ].join("-");
+  };
+  const allowedRoles: readonly ClinicianRole[] = [
+    "physician",
+    "nurse_practitioner",
+    "nurse",
+    "medical_assistant",
+  ];
   const noShowLocationSelect = document.querySelector<HTMLSelectElement>(
     "#no-show-threshold-location",
   );
@@ -63,7 +78,7 @@ export function setupValidationTests({ output }: TestOutput) {
         (claim) => claim.claimId === claimSelect?.value,
       );
       if (!claim) throw new Error("Select a claim to validate.");
-      const result = validateClaim(claim, knownLocationIds);
+      const result = validateClaim(claim, knownLocationIds, getTodayDate());
       showResult(
         output,
         `Validation for ${claim.claimId}:`,
@@ -87,7 +102,11 @@ export function setupValidationTests({ output }: TestOutput) {
           (clinician) => clinician.clinicianId === clinicianSelect?.value,
         );
         if (!clinician) throw new Error("Select a clinician to validate.");
-        const result = validateClinician(clinician);
+        const result = validateClinician(
+          clinician,
+          allowedRoles,
+          getTodayDate(),
+        );
         showResult(
           output,
           `Validation for ${clinician.clinicianId}:`,
