@@ -116,6 +116,7 @@ export function setupOutput() {
         "validate-claim",
         "validate-clinician",
         "check-denial-threshold",
+        "check-no-show-threshold",
       ].includes(button.id)
     ) {
       output.textContent = `${button.textContent?.trim()}: this test is not connected yet.`;

@@ -1,5 +1,6 @@
 import {
   sampleClaims,
+  sampleAppointments,
   sampleClinicians,
   sampleLocations,
 } from "../data/sampleData";
@@ -7,11 +8,27 @@ import {
   validateClaim,
   validateClinician,
   isDenialRateAboveThreshold,
+  isNoShowRateAboveThreshold,
 } from "../utils/validations";
-import { calculateDenialRate } from "../utils/transformations";
+import {
+  calculateDenialRate,
+  noShowRateByLocation,
+} from "../utils/transformations";
 import { showResult, type TestOutput } from "./output";
 
 export function setupValidationTests({ output }: TestOutput) {
+  const noShowLocationSelect = document.querySelector<HTMLSelectElement>(
+    "#no-show-threshold-location",
+  );
+  const noShowThresholdInput = document.querySelector<HTMLInputElement>(
+    "#no-show-rate-threshold",
+  );
+  sampleLocations.forEach((location) => {
+    const option = document.createElement("option");
+    option.value = location.locationId;
+    option.textContent = `${location.name} (${location.locationId})`;
+    noShowLocationSelect?.append(option);
+  });
   const thresholdInput = document.querySelector<HTMLInputElement>(
     "#denial-rate-threshold",
   );
@@ -105,7 +122,38 @@ export function setupValidationTests({ output }: TestOutput) {
       );
     });
 
+  document
+    .querySelector("#check-no-show-threshold")
+    ?.addEventListener("click", () => {
+      if (!output || !noShowThresholdInput || !noShowLocationSelect) return;
+      if (
+        noShowThresholdInput.value === "" ||
+        !noShowThresholdInput.checkValidity()
+      ) {
+        output.textContent =
+          "Enter a no-show rate threshold between 0 and 100%.";
+        return;
+      }
+      const rate =
+        noShowRateByLocation(sampleAppointments)[noShowLocationSelect.value];
+      if (rate === undefined) {
+        output.textContent =
+          "No appointments are available for the selected clinic.";
+        return;
+      }
+      const threshold = noShowThresholdInput.valueAsNumber;
+      const result = isNoShowRateAboveThreshold(rate, threshold);
+      showResult(
+        output,
+        `No-show rate threshold check for ${noShowLocationSelect.value}:`,
+        result,
+        `No-show rate: ${rate}%\nThreshold: ${threshold}%\n${result ? "No-show rate exceeds the threshold." : "No-show rate does not exceed the threshold."}`,
+      );
+    });
+
   return () => {
+    if (noShowThresholdInput) noShowThresholdInput.value = "20";
+    if (noShowLocationSelect) noShowLocationSelect.selectedIndex = 0;
     if (thresholdInput) thresholdInput.value = "8";
     if (claimSelect) claimSelect.selectedIndex = 0;
     if (clinicianSelect) clinicianSelect.selectedIndex = 0;

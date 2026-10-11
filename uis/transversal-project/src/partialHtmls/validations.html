@@ -56,4 +56,32 @@
       Check Denial Rate Threshold
     </button>
   </div>
+  <hr class="my-6 border-gray-200" />
+  <div data-validation-row class="flex flex-wrap items-end gap-3">
+    <label class="flex flex-col gap-1 flex-1" for="no-show-threshold-location">
+      Clinic for no-show rate
+      <select
+        id="no-show-threshold-location"
+        class="border rounded px-3 py-2"
+      ></select>
+    </label>
+    <label class="flex flex-col gap-1" for="no-show-rate-threshold">
+      No-show rate threshold (%)
+      <input
+        id="no-show-rate-threshold"
+        type="number"
+        min="0"
+        max="100"
+        step="any"
+        value="20"
+        class="border rounded px-3 py-2"
+      />
+    </label>
+    <button
+      id="check-no-show-threshold"
+      class="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700"
+    >
+      Check No-show Rate Threshold
+    </button>
+  </div>
 </section>

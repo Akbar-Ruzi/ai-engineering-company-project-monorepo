@@ -90,3 +90,10 @@ export function isDenialRateAboveThreshold(
 ): boolean {
   return rate > threshold;
 }
+
+export const isNoShowRateAboveThreshold = (
+  rate: number,
+  threshold: number = 20,
+): boolean => {
+  return rate > threshold;
+};
