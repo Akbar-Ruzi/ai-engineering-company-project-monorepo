@@ -6,7 +6,11 @@ import type {
   CMEReport,
 } from "../types/models";
 
-import { getCMECycleEnd, getCMEStatus } from "./helpers";
+import {
+  getCMECycleEnd,
+  getCMEStatus,
+  getLicenceDaysRemaining,
+} from "./helpers";
 
 export function calculateDenialRate(claims: Claim[]): number {
   if (claims.length === 0) {
@@ -265,12 +269,6 @@ export function generateCMEReport(
       (cycleEnd.getTime() - new Date(asOfDate).getTime()) /
         (1000 * 60 * 60 * 24),
     );
-    const licenceDaysRemaining = Math.round(
-      (new Date(clinician.licenceExpiryDate).getTime() -
-        new Date(asOfDate).getTime()) /
-        (1000 * 60 * 60 * 24),
-    );
-
     const hoursRemaining = Math.max(
       0, // 0 means : Calculate the remaining hours, but never allow the result to go below zero.
       clinician.cmeHoursRequired - clinician.cmeHoursLogged,
@@ -291,7 +289,7 @@ export function generateCMEReport(
       daysRemainingInCycle,
       complianceStatus: getCMEStatus(clinician, asOfDate),
       licenceExpiryDate: clinician.licenceExpiryDate,
-      licenceDaysRemaining,
+      licenceDaysRemaining: getLicenceDaysRemaining(clinician, asOfDate),
     };
   });
 }
@@ -303,5 +301,16 @@ export function getCliniciansAtRisk(
   return clinicians.filter((clinician) => {
     const status = getCMEStatus(clinician, asOfDate);
     return status === "at_risk" || status === "overdue";
+  });
+}
+
+export function getCliniciansWithExpiringLicences(
+  clinicians: Clinician[],
+  asOfDate: string,
+  daysThreshold: number,
+): Clinician[] {
+  return clinicians.filter((clinician) => {
+    const remainingDays = getLicenceDaysRemaining(clinician, asOfDate);
+    return remainingDays >= 0 && remainingDays <= daysThreshold;
   });
 }

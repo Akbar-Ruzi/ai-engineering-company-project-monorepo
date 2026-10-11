@@ -182,10 +182,15 @@ Click **Get Clinicians at Risk** to call `getCliniciansAtRisk(sampleClinicians, 
 
 **Shared CME helper functions (`src/utils/helpers.ts`)**
 
+Click **Get Clinicians with Expiring Licences** using its separate **As of date** field and **Licence alert threshold** dropdown: 90 days for first alerts (default), or 30 days for urgent alerts. The button calls `getCliniciansWithExpiringLicences(sampleClinicians, asOfDate, daysThreshold)` and displays the returned array beside names, IDs, and expiry dates. The date defaults to 2026-04-01. Clear restores both defaults, and missing dates show feedback.
+
+The filter includes expiry dates from the as-of date through the threshold date, inclusive, and excludes already expired licences. Try 2026-04-01 with 90 days to see Marcus Reid; 30 days returns no matches. Try 2026-06-01 with 30 days to see Marcus, whose licence expires on 2026-06-30 (29 days remaining). Empty input or no matches returns `[]`; the input array is unchanged.
+
 - `getCMECycleEnd(startDate: string): Date` returns the date one UTC calendar year after the cycle start. Both `generateCMEReport` and `getCMEStatus` reuse it.
+- `getLicenceDaysRemaining(clinician: Clinician, asOfDate: string): number` returns signed days until licence expiry. Both `generateCMEReport` and `getCliniciansWithExpiringLicences` reuse it.
 - `getCMEStatus(clinician: Clinician, asOfDate: string): CMEStatus` determines compliance status. Both `generateCMEReport` and `getCliniciansAtRisk` reuse it. Checks prioritize completed hours, then an incomplete cycle that has reached its end, then progress more than 15 percentage points behind elapsed cycle progress, otherwise `on_track`.
 
-The readable output formats completion to one decimal. The report's numeric `percentComplete` still needs rounding to one decimal to fully meet the context. Zero required hours and dates before the cycle starts also need edge-case handling or validation. The expiring-licence filter function remains pending; its HTML button is present but unconnected.
+The readable output formats completion to one decimal. The report's numeric `percentComplete` still needs rounding to one decimal to fully meet the context. Zero required hours and dates before the cycle starts also need edge-case handling or validation.
 
 **Type checking**
 
@@ -244,5 +249,6 @@ The `.gitignore` excludes dependencies, build output, local environment files, a
 - `findClaimById` is implemented and connected to the debounced **Search by Claim ID** input.
 - `findClinicianById` is implemented and connected to the debounced **Search by Clinician ID** input.
 - `getCliniciansAtRisk` is implemented and connected to the HTML button and as-of date input. Checks passed for sample at-risk and overdue results, no matches, empty input, input preservation, TypeScript, and formatting.
-- `binarySearchClaimById` is implemented and connected to the debounced **Binary Search by Claim ID** input. The expiring-licence filter, report refinements, and validations remain to be implemented.
+- `getCliniciansWithExpiringLicences` is implemented and connected to its date input and 90/30-day dropdown. Checks passed for sample alerts, inclusive 0/30/90-day boundaries, expired exclusions, leap-year dates, empty input, input preservation, and TypeScript.
+- `binarySearchClaimById` is implemented and connected to the debounced **Binary Search by Claim ID** input. Report refinements and validations remain to be implemented.
 - Testing currently uses the browser page. `npm test` is still a placeholder and exits with an error; no automated test suite is configured.

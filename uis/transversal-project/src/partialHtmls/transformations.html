@@ -119,11 +119,39 @@
     >
       Get Clinicians at Risk
     </button>
-    <button
-      id="cme-expiring-licences"
-      class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
-    >
-      Get Clinicians with Expiring Licences
-    </button>
   </div>
+
+  <hr class="my-4 border-gray-200" />
+
+  <div class="flex flex-wrap items-end gap-4">
+    <label class="flex flex-col gap-1" for="licence-as-of-date">
+      As of date
+      <input
+        id="licence-as-of-date"
+        type="date"
+        value="2026-04-01"
+        required
+        class="border rounded px-3 py-2"
+      />
+    </label>
+    <label class="flex flex-col gap-1" for="licence-days-threshold">
+      Licence alert threshold
+      <select id="licence-days-threshold" class="border rounded px-3 py-2">
+        <option value="90" selected>90 days — First alert</option>
+        <option value="30">30 days — Urgent alert</option>
+      </select>
+    </label>
+    <p class="text-gray-600 flex-1 min-w-64">
+      Licence alerts include the as-of date and threshold date, excluding
+      already expired licences. Try April 1, 2026: Marcus appears in the 90-day
+      alert but not the 30-day alert. For a 30-day result, try June 1, 2026:
+      Marcus's licence expires on June 30, 2026, with 29 days remaining.
+    </p>
+  </div>
+  <button
+    id="cme-expiring-licences"
+    class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 mt-4"
+  >
+    Get Clinicians with Expiring Licences
+  </button>
 </section>

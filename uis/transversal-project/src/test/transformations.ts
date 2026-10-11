@@ -13,6 +13,7 @@ import {
   flagHighNoShowLocations,
   generateCMEReport,
   getCliniciansAtRisk,
+  getCliniciansWithExpiringLicences,
   noShowRateByLocation,
 } from "../utils/transformations";
 import { showResult, type TestOutput } from "./output";
@@ -26,6 +27,49 @@ const formatDaysRemaining = (days: number, pastLabel: string): string => {
 export function setupTransformationTests({ output }: TestOutput) {
   const cmeDateInput =
     document.querySelector<HTMLInputElement>("#cme-as-of-date");
+  const licenceThresholdSelect = document.querySelector<HTMLSelectElement>(
+    "#licence-days-threshold",
+  );
+  const licenceDateInput = document.querySelector<HTMLInputElement>(
+    "#licence-as-of-date",
+  );
+
+  document
+    .querySelector("#cme-expiring-licences")
+    ?.addEventListener("click", () => {
+      if (!output) return;
+
+      try {
+        if (!licenceDateInput?.value || !licenceDateInput.checkValidity()) {
+          throw new Error("Enter a valid as-of date.");
+        }
+        const daysThreshold = Number(licenceThresholdSelect?.value);
+        if (![30, 90].includes(daysThreshold)) {
+          throw new Error("Select a licence alert threshold.");
+        }
+        const clinicians = getCliniciansWithExpiringLicences(
+          sampleClinicians,
+          licenceDateInput.value,
+          daysThreshold,
+        );
+        showResult(
+          output,
+          `Licences expiring within ${daysThreshold} days of ${licenceDateInput.value} (inclusive):`,
+          clinicians,
+          clinicians.length
+            ? clinicians
+                .map(
+                  (clinician) =>
+                    `${clinician.firstName} ${clinician.lastName} (${clinician.clinicianId}): expires ${clinician.licenceExpiryDate}`,
+                )
+                .join("\n")
+            : "No licences expire within the selected period.",
+        );
+      } catch (error) {
+        output.textContent =
+          error instanceof Error ? error.message : String(error);
+      }
+    });
 
   document.querySelector("#cme-at-risk")?.addEventListener("click", () => {
     if (!output) return;
@@ -253,6 +297,9 @@ export function setupTransformationTests({ output }: TestOutput) {
 
   return () => {
     if (cmeDateInput) cmeDateInput.value = cmeDateInput.defaultValue;
+    if (licenceDateInput)
+      licenceDateInput.value = licenceDateInput.defaultValue;
+    if (licenceThresholdSelect) licenceThresholdSelect.value = "90";
     if (weekEndingInput) weekEndingInput.value = weekEndingInput.defaultValue;
   };
 }

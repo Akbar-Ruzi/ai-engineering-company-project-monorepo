@@ -40,3 +40,14 @@ export const getCMEStatus = (
 
   return "on_track";
 };
+
+export const getLicenceDaysRemaining = (
+  clinician: Clinician,
+  asOfDate: string,
+): number => {
+  return Math.round(
+    (new Date(clinician.licenceExpiryDate).getTime() -
+      new Date(asOfDate).getTime()) /
+      (1000 * 60 * 60 * 24),
+  );
+};

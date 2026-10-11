@@ -58,8 +58,16 @@ export function setupOutput() {
       "no-show-location",
       "no-show-week-ending",
     ].includes(button?.id ?? target.id);
+    const isCMEReportControl = [
+      "cme-report",
+      "cme-at-risk",
+      "cme-as-of-date",
+    ].includes(button?.id ?? target.id);
     const outputAnchor =
       (isNoShowCostControl ? noShowCostButton?.parentElement : null) ??
+      (isCMEReportControl
+        ? section.querySelector("#cme-report")?.parentElement
+        : null) ??
       section.closest("[data-output-group]") ??
       section;
     outputAnchor.after(outputPanel);
@@ -103,6 +111,7 @@ export function setupOutput() {
         "flag-high-no-show-locations",
         "cme-report",
         "cme-at-risk",
+        "cme-expiring-licences",
       ].includes(button.id)
     ) {
       output.textContent = `${button.textContent?.trim()}: this test is not connected yet.`;

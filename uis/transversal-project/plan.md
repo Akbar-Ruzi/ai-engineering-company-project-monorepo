@@ -36,11 +36,11 @@ The numbered sections follow the Required Functions order in the context. Prepar
 - [x] `noShowRateByLocation`: calculate each location's percentage, rounded to 2 decimals. Connected to the HTML button; displays the returned object beside clinic names and formatted rates. Verified sample rates (Austin 50%, Miami 100%, Atlanta 0%), empty input, rounding, all appointment statuses, all/no no-shows, and input preservation. Matches the Context; typecheck passed.
 - [x] `flagHighNoShowLocations`: return location IDs as a string array above the threshold; default to 20%. Connected to the HTML button; displays the array beside clinic names. Verified sample IDs (us-tx-001, us-fl-001), custom thresholds, exact 20%/50%/100% boundaries, empty input, no no-shows, and input preservation. Matches the Context; typecheck passed.
 
-## 5. CME Compliance Tracker (`src/utils/transformations.ts`)
+## 5. CME Compliance Tracker (`src/utils/transformations.ts`) ✅
 
 - [x] `generateCMEReport`: report fields, remaining hours (minimum 0), calendar days left in the cycle, and signed days until licence expiry are implemented. Still round the returned numeric completion percentage to 1 decimal and verify zero required hours and date boundaries.
 - [x] `getCliniciansAtRisk`: return clinicians who are `at_risk` or `overdue`; connected to the HTML button and as-of date input.
-- [ ] `getCliniciansWithExpiringLicences`: find licences expiring within the supplied days; test 90-day and 30-day alerts.
+- [x] `getCliniciansWithExpiringLicences`: returns licences expiring from the as-of date through the threshold date, inclusive; excludes expired licences. Connected to a separate licence as-of date input and a 90-day first-alert / 30-day urgent-alert dropdown. Clear restores the date and threshold defaults. Verified sample alerts, inclusive 0/30/90-day boundaries, expired exclusions, leap-year dates, empty input, and input preservation; typecheck passed.
 
 ## 6. Validations (`src/utils/validations.ts`)
 
