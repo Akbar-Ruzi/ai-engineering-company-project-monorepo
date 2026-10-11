@@ -281,7 +281,7 @@ export const sampleClinicians: Clinician[] = [
     cmeHoursLogged: -1,
     cmeYearStartDate: "2026-01-01",
   },
-  // Invalid: impossible expiry date and unsupported role (two errors).
+  // Invalid expiry date and role; 10/30 CME hours also tests 33.3% rounding.
   {
     clinicianId: "CLN-000006",
     firstName: "Sam",
@@ -290,7 +290,7 @@ export const sampleClinicians: Clinician[] = [
     locationId: "us-ga-001",
     licenceState: "GA",
     licenceExpiryDate: "2028-02-30",
-    cmeHoursRequired: 20,
+    cmeHoursRequired: 30,
     cmeHoursLogged: 10,
     cmeYearStartDate: "2026-01-01",
   },

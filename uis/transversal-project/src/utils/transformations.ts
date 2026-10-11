@@ -274,11 +274,15 @@ export function generateCMEReport(
       clinician.cmeHoursRequired - clinician.cmeHoursLogged,
     );
 
-    const percentComplete = Number(
-      ((clinician.cmeHoursLogged / clinician.cmeHoursRequired) * 100).toFixed(
-        1,
-      ),
-    );
+    const percentComplete =
+      clinician.cmeHoursRequired === 0
+        ? 100
+        : Number(
+            (
+              (clinician.cmeHoursLogged / clinician.cmeHoursRequired) *
+              100
+            ).toFixed(1),
+          );
 
     return {
       clinicianId: clinician.clinicianId,
