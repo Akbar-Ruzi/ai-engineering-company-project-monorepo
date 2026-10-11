@@ -3,10 +3,18 @@ import {
   sampleClinicians,
   sampleLocations,
 } from "../data/sampleData";
-import { validateClaim, validateClinician } from "../utils/validations";
+import {
+  validateClaim,
+  validateClinician,
+  isDenialRateAboveThreshold,
+} from "../utils/validations";
+import { calculateDenialRate } from "../utils/transformations";
 import { showResult, type TestOutput } from "./output";
 
 export function setupValidationTests({ output }: TestOutput) {
+  const thresholdInput = document.querySelector<HTMLInputElement>(
+    "#denial-rate-threshold",
+  );
   const claimSelect =
     document.querySelector<HTMLSelectElement>("#validation-claim");
   const clinicianSelect = document.querySelector<HTMLSelectElement>(
@@ -77,7 +85,28 @@ export function setupValidationTests({ output }: TestOutput) {
       }
     });
 
+  document
+    .querySelector("#check-denial-threshold")
+    ?.addEventListener("click", () => {
+      if (!output || !thresholdInput) return;
+      if (thresholdInput.value === "" || !thresholdInput.checkValidity()) {
+        output.textContent =
+          "Enter a denial rate threshold between 0 and 100%.";
+        return;
+      }
+      const threshold = thresholdInput.valueAsNumber;
+      const rate = calculateDenialRate(sampleClaims);
+      const result = isDenialRateAboveThreshold(rate, threshold);
+      showResult(
+        output,
+        "Denial rate threshold check:",
+        result,
+        `Sample claim denial rate: ${rate}%\nThreshold: ${threshold}%\n${result ? "Denial rate exceeds the threshold." : "Denial rate does not exceed the threshold."}`,
+      );
+    });
+
   return () => {
+    if (thresholdInput) thresholdInput.value = "8";
     if (claimSelect) claimSelect.selectedIndex = 0;
     if (clinicianSelect) clinicianSelect.selectedIndex = 0;
   };

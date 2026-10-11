@@ -221,6 +221,12 @@ Choose **Clinician to validate** and click **Validate Clinician**. Claim and cli
 
 Three static dummy clinicians cover validation: `CLN-000004` passes with zero hours, `CLN-000005` fails both hour rules, and `CLN-000006` fails the expiry-date and role rules. The original clinicians also provide expired licences. The invalid role intentionally uses a TypeScript assertion for runtime testing.
 
+**Denial rate threshold check**
+
+`isDenialRateAboveThreshold(rate, threshold)` returns `rate > threshold`. The rate is required, the threshold defaults to 8%, and equality returns `false`. The caller calculates or supplies the rate; the utility does not read sample claims.
+
+In **Validations**, enter a **Denial rate threshold (%)** between 0 and 100, then click **Check Denial Rate Threshold**. The handler calculates the current sample claim denial rate and passes it with the selected threshold. The boolean result and readable rate/threshold comparison appear directly below the row. Empty or out-of-range input displays feedback. **Clear** restores the threshold to 8%.
+
 **Type checking**
 
 The root `tsconfig.json` is configured for Vite and browser APIs, with strict type checking and `noEmit` enabled. Run this after meaningful changes and before committing:
@@ -259,6 +265,8 @@ The `.gitignore` excludes dependencies, build output, local environment files, a
 
 **Current status**
 
+- `isDenialRateAboveThreshold` is implemented and connected to its threshold input and button. Checks passed for the supplied sample rate, default 8% threshold, custom thresholds, equality, boundary values, and TypeScript.
+
 - `validateClinician` is implemented and connected to its dropdown and button. Checks passed for all sample clinicians, all four allowed roles, zero/negative/NaN hours, present/future/expired/invalid dates, four simultaneous errors, input preservation, and TypeScript.
 
 - `validateClaim` is implemented and connected to the claim dropdown and **Validate Claim** button. Checks passed for all sample claims, all five rules failing together, today's date, invalid dates and amounts, patient ID boundaries, input preservation, and TypeScript.
@@ -283,5 +291,5 @@ The `.gitignore` excludes dependencies, build output, local environment files, a
 - `findClinicianById` is implemented and connected to the debounced **Search by Clinician ID** input.
 - `getCliniciansAtRisk` is implemented and connected to the HTML button and as-of date input. Checks passed for sample at-risk and overdue results, no matches, empty input, input preservation, TypeScript, and formatting.
 - `getCliniciansWithExpiringLicences` is implemented and connected to its date input and 90/30-day dropdown. Checks passed for sample alerts, inclusive 0/30/90-day boundaries, expired exclusions, leap-year dates, empty input, input preservation, and TypeScript.
-- `binarySearchClaimById` is implemented and connected to the debounced **Binary Search by Claim ID** input. Report refinements, threshold validators, and appointment validation remain to be implemented.
+- `binarySearchClaimById` is implemented and connected to the debounced **Binary Search by Claim ID** input. Report refinements, the no-show threshold validator, and appointment validation remain to be implemented.
 - Testing currently uses the browser page. `npm test` is still a placeholder and exits with an error; no automated test suite is configured.

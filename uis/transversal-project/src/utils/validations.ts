@@ -79,3 +79,14 @@ export const validateClinician = (
     errors,
   };
 };
+/**
+ * --------Mental model-------------
+ * Receive Rate → Compare Threshold → Return Boolean
+ */
+
+export function isDenialRateAboveThreshold(
+  rate: number,
+  threshold: number = 8,
+): boolean {
+  return rate > threshold;
+}
