@@ -25,7 +25,7 @@ transversal-project/
     │   ├── claims.ts          # Claim filtering, sorting, grouping, and reset controls
     │   ├── appointments.ts    # Appointment filtering, date sorting, and reset controls
     │   ├── search.ts          # Debounced claim and clinician ID searches and reset controls
-    │   ├── transformations.ts # Billing denial and no-show button handlers
+    │   ├── transformations.ts # Billing denial, no-show, and CME button handlers
     │   ├── output.ts          # Shared output panel and Clear behavior
     │   └── partialHtmls.ts    # Loads HTML sections before connecting controls
     ├── partialHtmls/           # Separate HTML sections
@@ -40,6 +40,7 @@ transversal-project/
     │   └── models.ts           # Data types and interfaces
     └── utils/
         ├── collections.ts     # Filtering, sorting, and grouping
+        ├── helpers.ts         # Shared CME cycle-end and status functions
         ├── search.ts          # Record lookup
         ├── transformations.ts # Denial, no-show, and CME calculations
         └── validations.ts     # Data validation
@@ -179,7 +180,10 @@ Negative countdowns appear as `286 days overdue` for the cycle and `517 days pas
 
 Click **Get Clinicians at Risk** to call `getCliniciansAtRisk(sampleClinicians, asOfDate)`. It returns clinicians whose status is `at_risk` or `overdue`, displaying the array beside their names and IDs. With the sample data, 2025-07-01 returns Sandra Flores; 2026-01-01 returns Marcus Reid and Sandra Flores. No matches display an empty array and a readable message. The function uses `getCMEStatus` and leaves the input unchanged.
 
-`src/utils/helpers.ts` exports `getCMECycleEnd`, shared by the report and status functions, and `getCMEStatus`. Status checks prioritize completed hours, then an incomplete cycle that has reached its end, then progress more than 15 percentage points behind elapsed cycle progress, otherwise `on_track`.
+**Shared CME helper functions (`src/utils/helpers.ts`)**
+
+- `getCMECycleEnd(startDate: string): Date` returns the date one UTC calendar year after the cycle start. Both `generateCMEReport` and `getCMEStatus` reuse it.
+- `getCMEStatus(clinician: Clinician, asOfDate: string): CMEStatus` determines compliance status. Both `generateCMEReport` and `getCliniciansAtRisk` reuse it. Checks prioritize completed hours, then an incomplete cycle that has reached its end, then progress more than 15 percentage points behind elapsed cycle progress, otherwise `on_track`.
 
 The readable output formats completion to one decimal. The report's numeric `percentComplete` still needs rounding to one decimal to fully meet the context. Zero required hours and dates before the cycle starts also need edge-case handling or validation. The expiring-licence filter function remains pending; its HTML button is present but unconnected.
 
