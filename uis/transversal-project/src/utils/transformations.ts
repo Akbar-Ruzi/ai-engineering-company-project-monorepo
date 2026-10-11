@@ -303,7 +303,13 @@ export function getCliniciansAtRisk(
     return status === "at_risk" || status === "overdue";
   });
 }
-
+/**
+ * ---------Mental model — Big picture-------
+ * Loop through each clinician, calculate how many days remain until their licence expires,
+ *  keep clinicians whose remaining days fall between 0 and the threshold,
+ * and return the matching clinicians.
+ * Loop → Calculate Days → Compare → Keep or Skip → Return
+ */
 export function getCliniciansWithExpiringLicences(
   clinicians: Clinician[],
   asOfDate: string,
