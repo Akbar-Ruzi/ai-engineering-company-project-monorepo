@@ -29,9 +29,8 @@ export const getCMEStatus = (
   const cycleProgress =
     ((current - start.getTime()) / (end.getTime() - start.getTime())) * 100;
 
-  const percentComplete = Number(
-    ((clinician.cmeHoursLogged / clinician.cmeHoursRequired) * 100).toFixed(1),
-  );
+  const percentComplete =
+    (clinician.cmeHoursLogged / clinician.cmeHoursRequired) * 100;
 
   // This compares how much time has passed against how much work has been completed.
   if (cycleProgress - percentComplete > 15) {

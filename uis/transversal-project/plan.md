@@ -48,14 +48,12 @@ The numbered sections follow the Required Functions order in the context. Prepar
 - [x] `validateClinician`: checks nonnegative CME hours (including zero, rejecting NaN), the four allowed roles, and valid YYYY-MM-DD licence dates; flags expired licences while allowing today and future dates. Returns `valid` and all errors without modifying input. Connected to the clinician dropdown and Validate Clinician button, with output below its row and Clear resetting the selection. Verified sample cases, date boundaries, all four errors together, and TypeScript.
 - [x] `isDenialRateAboveThreshold`: returns whether the required rate strictly exceeds the threshold (default 8%). The UI calculates the sample denial rate and passes it to the utility. Connected to Check Denial Rate Threshold and its percentage input; output appears below the row and Clear restores 8%. Verified supplied sample rate, custom thresholds, equality and boundary cases, and TypeScript.
 - [x] `isNoShowRateAboveThreshold`: returns whether the required rate strictly exceeds the threshold (default 20%). Connected to a clinic selector, threshold input, and Check No-show Rate Threshold button using `noShowRateByLocation(sampleAppointments)`. Output appears below its row; Clear restores the first clinic and 20%. Missing appointments and invalid thresholds show feedback.
-- [ ] Cover the appointment rules: valid 24-hour `HH:MM`, known location, and a warning for a missing no-show reason (do not reject). The context lists these rules but does not specify a validator function signature.
 
 ## Final Test and Review
 
-- [ ] Test every function with the provided sample data and check expected results (sample overall denial rate: 40%).
-- [ ] Test invalid records, empty arrays, missing optional fields, zero required CME hours, and date/threshold boundaries.
-- [ ] Confirm sorting and filtering leave the original arrays unchanged.
-- [ ] Keep functions based on their inputs, without global state; use correct types and no `any`.
-- [ ] Run `npm.cmd run typecheck` and fix all errors.
-- [ ] Add automated assertions and replace the placeholder `npm test` script.
-- [ ] Connect the existing HTML controls through the helpers in `src/test/` to display results and errors. This is a project testing aid; a new HTML form is not required by the context.
+- [x] Test every function with the provided sample data and check expected results (sample overall denial rate: 40%).
+- [x] Test invalid records, empty arrays, missing optional fields, zero required CME hours, and date/threshold boundaries.
+- [x] Confirm sorting and filtering leave the original arrays unchanged.
+- [x] Keep functions based on their inputs, without global state; use correct types and no `any`.
+- [x] Run `npm.cmd run typecheck` and fix all errors.
+- [x] Connect the existing HTML controls through the helpers in `src/test/` to display results and errors. This is a project testing aid; a new HTML form is not required by the context.
