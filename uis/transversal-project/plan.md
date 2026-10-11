@@ -44,7 +44,7 @@ The numbered sections follow the Required Functions order in the context. Prepar
 
 ## 6. Validations (`src/utils/validations.ts`)
 
-- [ ] `validateClaim`: check positive amounts, nonfuture submission dates, known locations, patient ID format, and required denial reasons. Return `valid` and one error per failed rule.
+- [x] `validateClaim`: checks positive amounts, valid nonfuture submission dates, known locations, patient ID format, and required denial reasons. Returns `valid` and one error per failed rule. Connected to the HTML claim dropdown and Validate Claim button; Clear resets the selection. Verified all sample claims, five simultaneous errors, today's date, invalid dates and NaN amounts, patient ID boundaries, and input preservation; typecheck passed.
 - [ ] `validateClinician`: check nonnegative CME hours, allowed roles, and valid licence dates; flag expired licences. Return `valid` and errors.
 - [ ] `isDenialRateAboveThreshold`: check whether the rate exceeds the threshold; default to 8%.
 - [ ] `isNoShowRateAboveThreshold`: check whether the rate exceeds the threshold; default to 20%.

@@ -112,6 +112,7 @@ export function setupOutput() {
         "cme-report",
         "cme-at-risk",
         "cme-expiring-licences",
+        "validate-claim",
       ].includes(button.id)
     ) {
       output.textContent = `${button.textContent?.trim()}: this test is not connected yet.`;

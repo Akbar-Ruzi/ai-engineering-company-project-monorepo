@@ -192,6 +192,20 @@ The filter includes expiry dates from the as-of date through the threshold date,
 
 The readable output formats completion to one decimal. The report's numeric `percentComplete` still needs rounding to one decimal to fully meet the context. Zero required hours and dates before the cycle starts also need edge-case handling or validation.
 
+**Claim validation business rules**
+
+`validateClaim(claim, knownLocationIds)` must check all five rules:
+
+- `claimAmount` must be greater than 0.
+- `submissionDate` must not be a future date.
+- `locationId` must match an ID in `knownLocationIds` (use IDs from `sampleLocations`).
+- If `status === "denied"`, `denialReason` must be present.
+- `patientId` must match `HC-` followed by exactly six alphanumeric characters: `/^HC-[A-Za-z0-9]{6}$/`.
+
+Return `{ valid: true, errors: [] }` when all rules pass. Otherwise, return `{ valid: false, errors: [...] }` with one message for each failed rule; check every rule rather than stopping at the first error. Invalid submission dates and `NaN` amounts are also rejected.
+
+In **Validations**, choose a claim from **Claim to validate** and click **Validate Claim**. The button passes the selected claim and clinic IDs from `sampleLocations` to `validateClaim`, displaying the returned object beside a readable success message or all errors. **Clear** restores the first claim selection. The browser handlers live in `src/test/validations.ts`.
+
 **Type checking**
 
 The root `tsconfig.json` is configured for Vite and browser APIs, with strict type checking and `noEmit` enabled. Run this after meaningful changes and before committing:
@@ -229,6 +243,8 @@ The check exits with an error if any files need formatting. Run `npm run format`
 The `.gitignore` excludes dependencies, build output, local environment files, and logs. Commit `package-lock.json` so dependency versions stay consistent.
 
 **Current status**
+
+- `validateClaim` is implemented and connected to the claim dropdown and **Validate Claim** button. Checks passed for all sample claims, all five rules failing together, today's date, invalid dates and amounts, patient ID boundaries, input preservation, and TypeScript.
 
 - `calculateDenialRate` is implemented and connected to the **Calculate Denial Rate** button.
 - `denialRateByPayer` is implemented and connected to the **Denial Rate by Payer** button.

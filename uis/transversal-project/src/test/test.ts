@@ -4,16 +4,19 @@ import { setupClaimTests } from "./claims";
 import { setupAppointmentTests } from "./appointments";
 import { setupSearchTests } from "./search";
 import { setupTransformationTests } from "./transformations";
+import { setupValidationTests } from "./validations";
 
 const output = setupOutput();
 const resetClaims = setupClaimTests(output);
 const resetAppointments = setupAppointmentTests(output);
 const resetSearch = setupSearchTests(output);
 const resetTransformations = setupTransformationTests(output);
+const resetValidations = setupValidationTests(output);
 
 setupClearOutput(output, () => {
   resetClaims();
   resetAppointments();
   resetSearch();
   resetTransformations();
+  resetValidations();
 });

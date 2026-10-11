@@ -54,6 +54,20 @@ export const sampleLocations: Location[] = [
   },
 ];
 
+// Valid baseline for the dummy validation cases appended to sampleClaims.
+const validationClaimBase: Claim = {
+  claimId: "CLM-000006",
+  patientId: "HC-F6R228",
+  locationId: "us-tx-001",
+  serviceType: "primary_care",
+  payerName: "BlueCross",
+  payerId: "BC001",
+  submissionDate: "2025-03-15",
+  claimAmount: 180,
+  status: "submitted",
+  resubmitted: false,
+};
+
 export const sampleClaims: Claim[] = [
   {
     claimId: "CLM-000001",
@@ -116,6 +130,38 @@ export const sampleClaims: Claim[] = [
     claimAmount: 215,
     status: "pending",
     resubmitted: false,
+  },
+  // Valid control: expect valid: true and no errors.
+  { ...validationClaimBase },
+  // Zero amount: expect one claimAmount error.
+  { ...validationClaimBase, claimId: "CLM-000007", claimAmount: 0 },
+  // Negative amount: expect one claimAmount error.
+  { ...validationClaimBase, claimId: "CLM-000008", claimAmount: -50 },
+  // Future submission date: expect one submissionDate error.
+  {
+    ...validationClaimBase,
+    claimId: "CLM-000009",
+    submissionDate: "2099-01-01",
+  },
+  // Unknown clinic: expect one locationId error.
+  {
+    ...validationClaimBase,
+    claimId: "CLM-000010",
+    locationId: "us-xx-999",
+  },
+  // Denied without a denialReason: expect one denialReason error.
+  { ...validationClaimBase, claimId: "CLM-000011", status: "denied" },
+  // Invalid patient ID (only five characters after HC-): expect one patientId error.
+  { ...validationClaimBase, claimId: "CLM-000012", patientId: "HC-A3F29" },
+  // All five rules fail: expect five errors, rather than stopping at the first.
+  {
+    ...validationClaimBase,
+    claimId: "CLM-000013",
+    claimAmount: 0,
+    submissionDate: "2099-01-01",
+    locationId: "us-xx-999",
+    status: "denied",
+    patientId: "INVALID",
   },
 ];
 
