@@ -1,6 +1,7 @@
 import {
   sampleAppointments,
   sampleClaims,
+  sampleClinicians,
   sampleLocations,
 } from "../data/sampleData";
 import {
@@ -10,11 +11,53 @@ import {
   denialRateByPayer,
   flagHighDenialPayers,
   flagHighNoShowLocations,
+  generateCMEReport,
   noShowRateByLocation,
 } from "../utils/transformations";
 import { showResult, type TestOutput } from "./output";
 
+const formatDaysRemaining = (days: number, pastLabel: string): string => {
+  const count = Math.abs(days);
+  const unit = count === 1 ? "day" : "days";
+  return `${count} ${unit} ${days < 0 ? pastLabel : "remaining"}`;
+};
+
 export function setupTransformationTests({ output }: TestOutput) {
+  const cmeDateInput =
+    document.querySelector<HTMLInputElement>("#cme-as-of-date");
+
+  document.querySelector("#cme-report")?.addEventListener("click", () => {
+    if (!output) return;
+
+    try {
+      if (!cmeDateInput?.value || !cmeDateInput.checkValidity()) {
+        throw new Error("Enter a valid as-of date.");
+      }
+
+      const reports = generateCMEReport(sampleClinicians, cmeDateInput.value);
+      showResult(
+        output,
+        `CME report as of ${cmeDateInput.value}:`,
+        reports,
+        reports
+          .map((report) =>
+            [
+              `${report.fullName} (${report.clinicianId})`,
+              `Status: ${report.complianceStatus}`,
+              `Hours: ${report.hoursLogged}/${report.hoursRequired}; remaining: ${report.hoursRemaining}`,
+              `Complete: ${report.percentComplete.toFixed(1)}%`,
+              `Cycle: ${formatDaysRemaining(report.daysRemainingInCycle, "overdue")}`,
+              `Licence expires: ${report.licenceExpiryDate}; ${formatDaysRemaining(report.licenceDaysRemaining, "past expiration")}`,
+            ].join("\n"),
+          )
+          .join("\n\n"),
+      );
+    } catch (error) {
+      output.textContent =
+        error instanceof Error ? error.message : String(error);
+    }
+  });
+
   const locationSelect =
     document.querySelector<HTMLSelectElement>("#no-show-location");
   const weekEndingInput = document.querySelector<HTMLInputElement>(
@@ -177,6 +220,7 @@ export function setupTransformationTests({ output }: TestOutput) {
   });
 
   return () => {
+    if (cmeDateInput) cmeDateInput.value = cmeDateInput.defaultValue;
     if (weekEndingInput) weekEndingInput.value = weekEndingInput.defaultValue;
   };
 }

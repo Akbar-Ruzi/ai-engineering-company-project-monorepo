@@ -30,7 +30,7 @@ The numbered sections follow the Required Functions order in the context. Prepar
 - [x] `denialRateByLocation`: calculate the rate for each location present. The HTML button displays the returned object beside clinic names and formatted percentages.
 - [x] `flagHighDenialPayers`: return payers above the threshold; default to 8%. Connected to the HTML button, displaying the returned string array; checks passed for the context example, custom thresholds, exact threshold boundaries, empty input, no denials, and preserving the input.
 
-## 4. No-Show Cost Estimator (`src/utils/transformations.ts`) ?
+## 4. No-Show Cost Estimator (`src/utils/transformations.ts`) ✅
 
 - [x] `calculateNoShowCost`: use the selected clinic's service fees for the 7 calendar days ending on the supplied date, inclusive. Round USD to 2 decimals; return 0 when there are no no-shows. Connected to the HTML clinic/date controls, with output directly below Calculate No-Show Cost and above the divider. Displays the clinic and inclusive date range on the first line, and the dollar amount (for example, $220) on the second. Clear restores the default week-ending date. Verified sample totals (Austin $220, Miami $555, Atlanta $0 for 2025-03-14), inclusive month/year/leap-year boundaries, clinic/status filtering, rounding, empty arrays, input preservation, button results, missing-date feedback, and Clear reset. Typecheck passed.
 - [x] `noShowRateByLocation`: calculate each location's percentage, rounded to 2 decimals. Connected to the HTML button; displays the returned object beside clinic names and formatted rates. Verified sample rates (Austin 50%, Miami 100%, Atlanta 0%), empty input, rounding, all appointment statuses, all/no no-shows, and input preservation. Matches the Context; typecheck passed.
@@ -38,11 +38,9 @@ The numbered sections follow the Required Functions order in the context. Prepar
 
 ## 5. CME Compliance Tracker (`src/utils/transformations.ts`)
 
-- [ ] `generateCMEReport`: calculate remaining hours (minimum 0), completion percentage (1 decimal), calendar days left in the cycle, and days until licence expiry.
-- [ ] Apply CME statuses: `complete` when required hours are met; otherwise `overdue` after the cycle ends, `at_risk` when active and more than 15 percentage points behind cycle progress, or `on_track`.
+- [x] `generateCMEReport`: report fields, remaining hours (minimum 0), calendar days left in the cycle, and signed days until licence expiry are implemented. Still round the returned numeric completion percentage to 1 decimal and verify zero required hours and date boundaries.
 - [ ] `getCliniciansAtRisk`: return clinicians who are `at_risk` or `overdue`.
 - [ ] `getCliniciansWithExpiringLicences`: find licences expiring within the supplied days; test 90-day and 30-day alerts.
-- [ ] Follow the reference requirements: physicians need 40 CME hours/year; nurse practitioners need 30.
 
 ## 6. Validations (`src/utils/validations.ts`)
 

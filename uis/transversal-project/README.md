@@ -171,7 +171,15 @@ Click **Flag High No-Show Locations (>20%)** to display the returned string arra
 
 The location rate and flagged no-show outputs use two columns separated by 128px, wrapping on smaller screens. Clinic names come from `sampleLocations`; the utility functions return location IDs and leave inputs unchanged.
 
-The **CME Compliance Tracker** controls remain unconnected and show the ?test is not connected yet? message.
+**Test CME reports in the browser**
+
+In **CME Compliance Tracker**, choose an **As of date** and click **Generate CME Report**. The button calls `generateCMEReport(sampleClinicians, asOfDate)` and displays the returned report array beside readable results for each clinician: status, required and logged hours, remaining hours, completion percentage, cycle countdown, and licence expiry.
+
+Negative countdowns appear as `286 days overdue` for the cycle and `517 days past expiration` for a licence; positive countdowns appear as `79 days remaining`. The report array retains signed numeric day counts. The date defaults to 2025-03-14, missing dates show feedback, and **Clear** restores the default date.
+
+`src/utils/helpers.ts` exports `getCMECycleEnd`, shared by the report and status functions, and `getCMEStatus`. Status checks prioritize completed hours, then an incomplete cycle that has reached its end, then progress more than 15 percentage points behind elapsed cycle progress, otherwise `on_track`.
+
+The readable output formats completion to one decimal. The report's numeric `percentComplete` still needs rounding to one decimal to fully meet the context. Zero required hours and dates before the cycle starts also need edge-case handling or validation. The at-risk and expiring-licence filter functions remain pending.
 
 **Type checking**
 
@@ -221,6 +229,7 @@ The `.gitignore` excludes dependencies, build output, local environment files, a
 - `flagHighNoShowLocations` is implemented and connected, displaying the string array beside clinic names. Checks passed for the default 20% threshold, custom thresholds, exact 20%/50%/100% boundaries, empty input, no no-shows, and input preservation. All three no-show functions match the Context; typecheck passed.
 
 - Models and sample data are defined and exported, including `CMEReport` and `CMEStatus`. The extra `Clinic` interface is retained.
+- `generateCMEReport` is implemented and connected to the date input and **Generate CME Report** button. Shared CME helpers and readable countdown labels are implemented. Typecheck and formatting checks passed for the HTML connection and countdown display; numeric completion rounding and edge-case verification remain pending.
 - `filterClaims` is implemented and connected to the browser controls. It matches all provided criteria and ignores omitted filters, while treating empty strings as supplied values.
 - `filterAppointmentsByStatus` is implemented and connected to immediate status selection in the browser.
 - `sortClaimsById` is implemented and connected to ascending/descending arrow controls. Checks passed for both directions, preserving the original array, returning a new array, empty input, and duplicate IDs.
@@ -228,5 +237,5 @@ The `.gitignore` excludes dependencies, build output, local environment files, a
 - `groupClaimsBy` is implemented and connected to the grouping dropdown for location, payer, status, and service type.
 - `findClaimById` is implemented and connected to the debounced **Search by Claim ID** input.
 - `findClinicianById` is implemented and connected to the debounced **Search by Clinician ID** input.
-- `binarySearchClaimById` is implemented and connected to the debounced **Binary Search by Claim ID** input. CME calculations and validations remain to be implemented.
+- `binarySearchClaimById` is implemented and connected to the debounced **Binary Search by Claim ID** input. The remaining CME filters, report refinements, and validations remain to be implemented.
 - Testing currently uses the browser page. `npm test` is still a placeholder and exits with an error; no automated test suite is configured.

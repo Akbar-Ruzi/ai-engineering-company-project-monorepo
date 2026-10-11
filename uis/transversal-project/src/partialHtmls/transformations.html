@@ -90,12 +90,35 @@
 <section class="bg-white rounded-lg shadow-sm border p-6 mb-6">
   <h2 class="text-xl font-semibold mb-4">CME Compliance Tracker</h2>
 
+  <label class="flex flex-col gap-1 mb-4" for="cme-as-of-date">
+    As of date
+    <input
+      id="cme-as-of-date"
+      type="date"
+      value="2025-03-14"
+      required
+      class="border rounded px-3 py-2"
+    />
+  </label>
+
   <div class="flex flex-wrap gap-3">
     <button
       id="cme-report"
       class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
     >
       Generate CME Report
+    </button>
+    <button
+      id="cme-at-risk"
+      class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+    >
+      Get Clinicians at Risk
+    </button>
+    <button
+      id="cme-expiring-licences"
+      class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+    >
+      Get Clinicians with Expiring Licences
     </button>
   </div>
 </section>

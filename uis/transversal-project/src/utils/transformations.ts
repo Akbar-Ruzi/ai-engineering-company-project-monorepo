@@ -1,4 +1,12 @@
-import type { Claim, Appointment, Location } from "../types/models";
+import type {
+  Claim,
+  Appointment,
+  Location,
+  Clinician,
+  CMEReport,
+} from "../types/models";
+
+import { getCMECycleEnd, getCMEStatus } from "./helpers";
 
 export function calculateDenialRate(claims: Claim[]): number {
   if (claims.length === 0) {
@@ -229,4 +237,61 @@ export function flagHighNoShowLocations(
     }
   }
   return result;
+}
+
+/**
+ * ------- generates a report for every clinician -------------
+ * -----goal is to determine:-------
+  - How many CME hours remain?
+  - What percentage has been completed?
+  - How many days remain in the CME cycle?
+  - Is the clinician on track?
+  - How many days remain until their medical license expires?
+  ---------Mental Model
+ * Loop through each clinician, calculate their required and completed CME hours,
+ * determine how much time remains in their CME cycle, evaluate their compliance status,
+ * calculate their licence expiry countdown, and create one report object for each clinician.
+ */
+export function generateCMEReport(
+  clinicians: Clinician[],
+  asOfDate: string,
+): CMEReport[] {
+  return clinicians.map((clinician) => {
+    const cycleEnd = getCMECycleEnd(clinician.cmeYearStartDate);
+
+    // Why Math.round()?
+    // Because the division may produce a decimal number, and your report expects whole days.
+    const daysRemainingInCycle = Math.round(
+      (cycleEnd.getTime() - new Date(asOfDate).getTime()) /
+        (1000 * 60 * 60 * 24),
+    );
+    const licenceDaysRemaining = Math.round(
+      (new Date(clinician.licenceExpiryDate).getTime() -
+        new Date(asOfDate).getTime()) /
+        (1000 * 60 * 60 * 24),
+    );
+
+    const hoursRemaining = Math.max(
+      0, // O means : Calculate the remaining hours, but never allow the result to go below zero.
+      clinician.cmeHoursRequired - clinician.cmeHoursLogged,
+    );
+
+    const percentComplete =
+      (clinician.cmeHoursLogged / clinician.cmeHoursRequired) * 100;
+
+    return {
+      clinicianId: clinician.clinicianId,
+      fullName: `${clinician.firstName} ${clinician.lastName}`,
+      role: clinician.role,
+      locationId: clinician.locationId,
+      hoursRequired: clinician.cmeHoursRequired,
+      hoursLogged: clinician.cmeHoursLogged,
+      hoursRemaining,
+      percentComplete,
+      daysRemainingInCycle,
+      complianceStatus: getCMEStatus(clinician, asOfDate),
+      licenceExpiryDate: clinician.licenceExpiryDate,
+      licenceDaysRemaining,
+    };
+  });
 }

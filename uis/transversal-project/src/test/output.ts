@@ -101,6 +101,7 @@ export function setupOutput() {
         "no-show-cost",
         "no-show-rate-location",
         "flag-high-no-show-locations",
+        "cme-report",
       ].includes(button.id)
     ) {
       output.textContent = `${button.textContent?.trim()}: this test is not connected yet.`;
