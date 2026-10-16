@@ -42,3 +42,6 @@ yarn-error.log*
 next-env.d.ts
 
 context-healthcore.md
+
+# future enhancements: draft components, not committed yet (see plan.md)
+/components/future/

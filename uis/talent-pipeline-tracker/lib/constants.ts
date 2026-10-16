@@ -13,3 +13,5 @@ export const STAGE_LABELS: Record<CandidateStage, string> = {
   technical_interview: "Technical interview",
   offer_presented: "Offer presented",
 };
+
+export const PAGE_SIZE = 10;
