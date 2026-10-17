@@ -25,6 +25,9 @@ export default function CandidateTable({
           <th scope="col" className="px-6 py-5 lg:px-8">
             Current stage
           </th>
+          <th scope="col" className="px-6 py-5 lg:px-8">
+            <span className="sr-only">Actions</span>
+          </th>
         </tr>
       </thead>
       <tbody className="divide-y divide-slate-100">
@@ -47,6 +50,12 @@ export default function CandidateTable({
             </td>
             <td className="px-6 py-5 lg:px-8">
               <StageBadge stage={candidate.stage} />
+            </td>
+            {/* Visual cue only; the row overlay link above handles the click */}
+            <td className="px-6 py-5 text-right lg:px-8" aria-hidden="true">
+              <span className="whitespace-nowrap text-sm font-medium text-blue-600">
+                View details
+              </span>
             </td>
           </tr>
         ))}

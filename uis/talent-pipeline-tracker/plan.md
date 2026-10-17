@@ -77,6 +77,9 @@ Files: `app/page.tsx`, candidate list components in `components/candidate-list/`
   - Mobile (below 768px, `md:hidden`): `components/candidate-list/candidate-cards.tsx`.
   - Tablet and desktop (768px and up, `hidden md:block`): `components/candidate-list/candidate-table.tsx`.
   - Both receive the same `candidates: Candidate[]` prop; only CSS decides which one is visible.
+- [x] Make each candidate open `/candidates/[id]` with one link per candidate.
+  - Mobile: the whole card is the link (tap anywhere, including the right arrow).
+  - Tablet and desktop: the whole row is clickable (overlay on the name link), plus a "View details" cue column at the end (`aria-hidden`, not a second link).
 - [x] Display status/stage using the UI labels in [README.md](README.md#api-and-data), never raw API values.
 - [x] Color status badges by meaning (Received blue, In progress amber, Selected green, Discarded rose), matching the screenshots. Keep stage badges neutral grey; stage is a position in the process, not a judgment.
 - [x] Add `whitespace-nowrap` to badges and short buttons so labels like "In progress", "Drawer View", and "Edit Candidate" stay on one line. Several screenshots show them wrapping; treat that as an export bug, not the design.
