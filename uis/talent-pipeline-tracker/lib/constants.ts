@@ -15,3 +15,6 @@ export const STAGE_LABELS: Record<CandidateStage, string> = {
 };
 
 export const PAGE_SIZE = 10;
+
+// Wait this long after the last keystroke before searching
+export const SEARCH_DELAY_MS = 300;

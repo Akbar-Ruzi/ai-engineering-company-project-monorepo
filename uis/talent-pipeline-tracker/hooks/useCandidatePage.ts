@@ -1,27 +1,47 @@
-import { useEffect, useState } from "react";
-import type { CandidateListResponse } from "@/types/candidate";
+import { useEffect, useEffectEvent, useState } from "react";
+import type { CandidateListResponse, ListFilters } from "@/types/candidate";
 import { getRecords } from "@/lib/api/records";
 import { PAGE_SIZE } from "@/lib/constants";
+
+type CandidatePageOptions = ListFilters & {
+  page: number; // from the URL (?page=…)
+  onPageOutOfRange: (page: number) => void; // called with a valid page to jump to
+};
 
 /**
  * ------------Tablet/desktop------------
  *  table: one numbered page at a time.
- * holds one page of results at a time (page, setPage)
+ * The page comes from the URL; this hook only fetches it.
  * Changing the page replaces the rows; nothing is kept from the previous page.
  */
-export function useCandidatePage() {
+export function useCandidatePage({
+  status,
+  stage,
+  search,
+  page,
+  onPageOutOfRange,
+}: CandidatePageOptions) {
   const [result, setResult] = useState<CandidateListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPageState] = useState(1);
   const [reloadKey, setReloadKey] = useState(0);
+
+  // Page, search or filters changed → show the skeleton.
+  // Done during render (not in an effect), so the old rows never show under the new request.
+  // Going back to page 1 on a filter change is done in the URL (useRecordsFilters).
+  const requestKey = `${status ?? ""}|${stage ?? ""}|${search ?? ""}|${page}`;
+  const [prevRequestKey, setPrevRequestKey] = useState(requestKey);
+  if (requestKey !== prevRequestKey) {
+    setPrevRequestKey(requestKey);
+    setLoading(true);
+  }
 
   useEffect(() => {
     // Without ignore, a slow, older reply can arrive last and overwrite the table. The rows then don't match the highlighted page.
     let ignore = false; // only the latest request updates the table
     async function load() {
       try {
-        const response = await getRecords({ page, limit: PAGE_SIZE });
+        const response = await getRecords({ page, limit: PAGE_SIZE, status, stage, search });
         if (!ignore) {
           setResult(response);
           setError(null);
@@ -40,13 +60,27 @@ export function useCandidatePage() {
     return () => {
       ignore = true;
     };
-  }, [reloadKey, page]);
+  }, [reloadKey, page, status, stage, search]);
 
-  const setPage = (nextPage: number) => {
-    if (nextPage === page) return; // clicking the current page does nothing
-    setLoading(true);
-    setPageState(nextPage);
-  };
+  // Out of range: candidates exist (total > 0) but this page came back empty,
+  // e.g. ?page=99, an old bookmark, or fewer results after candidates were removed.
+  const isOutOfRange =
+    !loading &&
+    !error &&
+    result !== null &&
+    result.total > 0 &&
+    result.data.length === 0 &&
+    page > 1;
+  const lastPage = result ? Math.max(1, Math.ceil(result.total / PAGE_SIZE)) : 1;
+
+  // useEffectEvent: always calls the latest onPageOutOfRange without re-running the effect
+  const reportOutOfRange = useEffectEvent((validPage: number) =>
+    onPageOutOfRange(validPage),
+  );
+  useEffect(() => {
+    // Math.min with page - 1: always moves back, so it can never jump to the same empty page again
+    if (isOutOfRange) reportOutOfRange(Math.min(lastPage, page - 1));
+  }, [isOutOfRange, lastPage, page]);
 
   const retry = () => {
     setLoading(true); // show the skeleton again
@@ -54,5 +88,6 @@ export function useCandidatePage() {
     setReloadKey((k) => k + 1); // new value → the effect runs again
   };
 
-  return { result, loading, error, page, setPage, retry };
+  // While out of range, report loading: the skeleton shows instead of an empty table
+  return { result, loading: loading || isOutOfRange, error, retry };
 }

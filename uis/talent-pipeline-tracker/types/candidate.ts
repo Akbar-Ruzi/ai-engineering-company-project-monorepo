@@ -44,3 +44,6 @@ export type GetRecordsParams = {
   stage?: CandidateStage;
   search?: string;
 };
+
+// Filters shared by the table and the mobile feed
+export type ListFilters = Pick<GetRecordsParams, "status" | "stage" | "search">;

@@ -1,5 +1,5 @@
 import { useEffect, useEffectEvent, useRef, useState } from "react";
-import type { Candidate } from "@/types/candidate";
+import type { Candidate, ListFilters } from "@/types/candidate";
 import { getRecords } from "@/lib/api/records";
 import { PAGE_SIZE } from "@/lib/constants";
 
@@ -8,7 +8,7 @@ import { PAGE_SIZE } from "@/lib/constants";
  * a feed that grows as the user scrolls.
  * Each new page is added to the end; already-loaded cards stay.
  */
-export function useCandidateFeed() {
+export function useCandidateFeed({ status, stage, search }: ListFilters) {
   const [candidates, setCandidates] = useState<Candidate[]>([]); //  holds all cards loaded so far, and only grows.
   const [total, setTotal] = useState(0);// is the count from the API (100), used to know when to stop.
   const [lastPage, setLastPage] = useState(0); // the last page added, so the next request is lastPage + 1.
@@ -22,13 +22,34 @@ export function useCandidateFeed() {
   // the second call sees true and stops. State wouldn't change until the next render, so both calls could get through. 
   const loadingMoreRef = useRef(false); // updates instantly, unlike state, so two quick calls can't both start
   const loadMoreAreaRef = useRef<HTMLDivElement>(null); //  points at the <div> around <LoadMore>, the element the scroll watcher looks at.
+  // Which list is current. Bumped each time the first page reloads, so a
+  // loadMore reply that started for an older list can tell it's out of date.
+  const listIdRef = useRef(0);
+
+  // Search or filters changed → throw away the old cards and show the skeleton.
+  // Done during render (not in an effect), so old cards are never shown under the new filters.
+  const filterKey = `${status ?? ""}|${stage ?? ""}|${search ?? ""}`;
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  if (filterKey !== prevFilterKey) {
+    setPrevFilterKey(filterKey);
+    setCandidates([]);
+    setTotal(0);
+    setLastPage(0);
+    setLoading(true);
+    setError(null);
+    setLoadingMore(false);
+    setLoadMoreError(null);
+    setEnded(false);
+  }
 
   // First page: its own request, independent of the table
   useEffect(() => {
+    listIdRef.current += 1; // a new list starts; older loadMore replies no longer belong to it
+    loadingMoreRef.current = false; // an old loadMore still in flight must not block the new list
     let ignore = false; // only the latest request updates the feed
     async function load() {
       try {
-        const response = await getRecords({ page: 1, limit: PAGE_SIZE });
+        const response = await getRecords({ page: 1, limit: PAGE_SIZE, status, stage, search });
         if (!ignore) {
           setCandidates(response.data);
           setTotal(response.total);
@@ -51,18 +72,21 @@ export function useCandidateFeed() {
     return () => {
       ignore = true;
     };
-  }, [reloadKey]);
+  }, [reloadKey, status, stage, search]);
 
   const loadMore = async () => {
     // Guards: one request at a time, stop at the end
     if (loadingMoreRef.current || ended || candidates.length >= total) return;
 
     const nextPage = lastPage + 1; // computed once, used for the request and the state
+    const listId = listIdRef.current; // the list this request belongs to
+    const isOutdated = () => listId !== listIdRef.current; // filters changed while waiting
     loadingMoreRef.current = true;
     setLoadingMore(true);
     setLoadMoreError(null);
     try {
-      const response = await getRecords({ page: nextPage, limit: PAGE_SIZE });
+      const response = await getRecords({ page: nextPage, limit: PAGE_SIZE, status, stage, search });
+      if (isOutdated()) return; // drop it: these cards belong to the old filters
       if (response.data.length === 0) {
         setEnded(true); // past the last page (candidates were removed): stop here
       } else {
@@ -70,12 +94,17 @@ export function useCandidateFeed() {
         setLastPage(nextPage);
       }
     } catch (err) {
+      if (isOutdated()) return; // an old list's error must not show under the new one
       setLoadMoreError(
         err instanceof Error ? err.message : "Could not load more candidates.",
       ); // already-loaded cards stay on screen
     } finally {
-      loadingMoreRef.current = false;
-      setLoadingMore(false);
+      // Only the current list's request may clear the busy flag;
+      // otherwise an old reply could unlock it while a new loadMore is running.
+      if (!isOutdated()) {
+        loadingMoreRef.current = false;
+        setLoadingMore(false);
+      }
     }
   };
 

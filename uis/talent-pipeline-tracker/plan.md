@@ -106,7 +106,7 @@ Files: `app/page.tsx`, candidate list components in `components/candidate-list/`
   - `app/page.tsx` only calls the two hooks and renders the components. Accept the extra page-1 request on first load (both views are always mounted).
   - Do this before step 4, so search and filters can be passed to both hooks as input.
 
-## 4. Filter and search without reloading
+## 4. Filter and search without reloading ✅
 
 Goal: filter by status and stage, and search by name or email without reloading the page.
 
@@ -114,29 +114,29 @@ Files: candidate list page and its filter/search components.
 
 - [x] Confirm the allowed status values from the backend documentation and define their TypeScript type.
 - [x] Confirm the allowed stage values from the backend documentation and define their TypeScript type.
-- [ ] Reuse GET `/records` from step 3; add documented query parameters if the API handles filtering or search.
-- [ ] Add Status and Stage filters using the backend's allowed values.
-- [ ] Use the [README.md mappings](README.md#api-and-data) for filter options: display UI labels, but use raw API values for filter logic, URL parameters, and API queries.
-- [ ] Add a search box that matches name or email, ignoring letter case.
-- [ ] Keep the search string in local `useState`. For client-side search, filter the loaded candidates using case-insensitive `includes` on name and email. If the official API documentation supports a search query parameter, refetch with that parameter instead where appropriate. Typing must update results without a full page reload.
-- [ ] Make search and both filters work together without a full page reload.
-- [ ] Store status and stage in the URL so refreshing keeps them; preserve unrelated URL parameters.
-- [ ] Read status and stage using `useSearchParams`; follow the installed Next.js guidance for any required Suspense boundary.
-- [ ] On a filter change, copy the current query into `URLSearchParams`, set the changed filter value, or delete its key when empty. Keep unrelated parameters.
-- [ ] Navigate with `router.push` or `router.replace`, using `usePathname` for the current path. Append `?${params.toString()}` only when parameters remain, so an empty query does not leave a trailing `?`.
-- [ ] Add Clear filters to reset search, status, and stage.
-- [ ] Reset pagination to page 1 whenever search, status, or stage changes, and show accurate result counts.
-- [ ] Mobile: when search, status, or stage changes, clear the loaded cards and start again from page 1. Ignore replies from older requests that arrive late, so old results never mix into the new list.
-- [ ] Correct out-of-range or invalid pages: if the requested page is beyond the last page while `total > 0` (for example `?page=99`, an old bookmark, or fewer results after a change), jump to the last valid page; treat invalid values such as `?page=abc` or `?page=-3` as page 1. Never show an empty page while matching candidates exist.
-- [ ] Tell empty results apart using `total`: `total === 0` with no filters shows "No candidates yet"; `total === 0` with filters shows "No matching candidates" with Clear filters; an empty page with `total > 0` is corrected automatically, not shown as empty.
-- [ ] Search/filter all loaded candidates before client pagination. If the backend paginates, use its documented search/filter support to search beyond the current page; record a blocker if that support is missing.
-- [ ] Show a “No matching candidates” empty state when search or status/stage filters leave the list empty.
-- [ ] Reuse `EmptyState` for filtered results: title "No matching candidates", a short hint, and `actionLabel="Clear filters"` with `onAction` resetting search, status, and stage.
-- [ ] Check: status and stage filters are driven by URL query parameters. Refresh the page and open a copied URL to confirm both restore.
-- [ ] Check: name and email searches update results without a full page reload.
-- [ ] Check: on page 5, apply a filter with few results and confirm the list returns to page 1. Open `/?page=99` and `/?page=abc` and confirm both land on a valid page showing candidates.
-- [ ] Check (mobile): load several pages, change a filter, and confirm the cards reset to the first page of matching results with no leftover candidates.
-- [ ] Keep filter/search state in the list view or a small hook, without prop drilling through unrelated components.
+- [x] Reuse GET `/records` from step 3; add documented query parameters if the API handles filtering or search.
+- [x] Add Status and Stage filters using the backend's allowed values.
+- [x] Use the [README.md mappings](README.md#api-and-data) for filter options: display UI labels, but use raw API values for filter logic, URL parameters, and API queries.
+- [x] Add a search box that matches name or email, ignoring letter case.
+- [x] Keep the search string in local `useState`. For client-side search, filter the loaded candidates using case-insensitive `includes` on name and email. If the official API documentation supports a search query parameter, refetch with that parameter instead where appropriate. Typing must update results without a full page reload.
+- [x] Make search and both filters work together without a full page reload.
+- [x] Store status and stage in the URL so refreshing keeps them; preserve unrelated URL parameters.
+- [x] Read status and stage using `useSearchParams`; follow the installed Next.js guidance for any required Suspense boundary.
+- [x] On a filter change, copy the current query into `URLSearchParams`, set the changed filter value, or delete its key when empty. Keep unrelated parameters.
+- [x] Navigate with `router.push` or `router.replace`, using `usePathname` for the current path. Append `?${params.toString()}` only when parameters remain, so an empty query does not leave a trailing `?`.
+- [x] Add Clear filters to reset search, status, and stage.
+- [x] Reset pagination to page 1 whenever search, status, or stage changes, and show accurate result counts.
+- [x] Mobile: when search, status, or stage changes, clear the loaded cards and start again from page 1. Ignore replies from older requests that arrive late, so old results never mix into the new list.
+- [x] Correct out-of-range or invalid pages: if the requested page is beyond the last page while `total > 0` (for example `?page=99`, an old bookmark, or fewer results after a change), jump to the last valid page; treat invalid values such as `?page=abc` or `?page=-3` as page 1. Never show an empty page while matching candidates exist.
+- [x] Tell empty results apart using `total`: `total === 0` with no filters shows "No candidates yet"; `total === 0` with filters shows "No matching candidates" with Clear filters; an empty page with `total > 0` is corrected automatically, not shown as empty.
+- [x] Search/filter all loaded candidates before client pagination. If the backend paginates, use its documented search/filter support to search beyond the current page; record a blocker if that support is missing.
+- [x] Show a “No matching candidates” empty state when search or status/stage filters leave the list empty.
+- [x] Reuse `EmptyState` for filtered results: title "No matching candidates", a short hint, and `actionLabel="Clear filters"` with `onAction` resetting search, status, and stage.
+- [x] Check: status and stage filters are driven by URL query parameters. Refresh the page and open a copied URL to confirm both restore.
+- [x] Check: name and email searches update results without a full page reload.
+- [x] Check: on page 5, apply a filter with few results and confirm the list returns to page 1. Open `/?page=99` and `/?page=abc` and confirm both land on a valid page showing candidates.
+- [x] Check (mobile): load several pages, change a filter, and confirm the cards reset to the first page of matching results with no leftover candidates.
+- [x] Keep filter/search state in the list view or a small hook, without prop drilling through unrelated components.
 
 ## 5. Open candidate details and edit the candidate
 

@@ -1,4 +1,5 @@
 import { STAGE_LABELS, STATUS_LABELS } from "@/lib/constants";
+import type { CandidateStage, CandidateStatus } from "@/types/candidate";
 
 const SELECT_CLASSES =
   "h-12 w-full appearance-none rounded-lg border border-slate-200 bg-white pl-4 pr-10 text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20";
@@ -20,9 +21,27 @@ function Chevron() {
   );
 }
 
+type CandidateFiltersProps = {
+  search: string;
+  onSearchChange: (value: string) => void;
+  status?: CandidateStatus;
+  stage?: CandidateStage;
+  onFilterChange: (key: "status" | "stage", value: string) => void;
+  hasActiveFilters: boolean;
+  onClear: () => void;
+};
+
 // Search box, Status and Stage filters, and Clear filters.
 // Options show UI labels; option values are the raw API values.
-export default function CandidateFilters() {
+export default function CandidateFilters({
+  search,
+  onSearchChange,
+  status,
+  stage,
+  onFilterChange,
+  hasActiveFilters,
+  onClear,
+}: CandidateFiltersProps) {
   return (
     <div className="space-y-3">
       <div className="flex flex-col gap-3 md:flex-row md:gap-5">
@@ -41,6 +60,8 @@ export default function CandidateFilters() {
           </svg>
           <input
             type="search"
+            value={search}
+            onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search by name or email..."
             className="h-12 w-full rounded-lg border border-slate-200 bg-white pl-12 pr-4 text-slate-900 shadow-sm placeholder:text-slate-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
           />
@@ -49,7 +70,11 @@ export default function CandidateFilters() {
         <div className="grid grid-cols-2 gap-3 md:flex md:gap-5">
           <label className="relative block md:w-56">
             <span className="sr-only">Filter by status</span>
-            <select defaultValue="" className={SELECT_CLASSES}>
+            <select
+              value={status ?? ""}
+              onChange={(e) => onFilterChange("status", e.target.value)}
+              className={SELECT_CLASSES}
+            >
               <option value="">All statuses</option>
               {Object.entries(STATUS_LABELS).map(([value, label]) => (
                 <option key={value} value={value}>
@@ -62,7 +87,11 @@ export default function CandidateFilters() {
 
           <label className="relative block md:w-56">
             <span className="sr-only">Filter by stage</span>
-            <select defaultValue="" className={SELECT_CLASSES}>
+            <select
+              value={stage ?? ""}
+              onChange={(e) => onFilterChange("stage", e.target.value)}
+              className={SELECT_CLASSES}
+            >
               <option value="">All stages</option>
               {Object.entries(STAGE_LABELS).map(([value, label]) => (
                 <option key={value} value={value}>
@@ -78,7 +107,9 @@ export default function CandidateFilters() {
       <div className="flex justify-end">
         <button
           type="button"
-          className="inline-flex items-center gap-2 whitespace-nowrap rounded-md px-2 py-1 text-sm text-slate-500 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-blue-500 md:text-base"
+          onClick={onClear}
+          disabled={!hasActiveFilters} // nothing to clear: stays in place, greyed out
+          className="inline-flex items-center gap-2 whitespace-nowrap rounded-md px-2 py-1 text-sm text-slate-500 enabled:hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-50 md:text-base"
         >
           <svg
             aria-hidden="true"
