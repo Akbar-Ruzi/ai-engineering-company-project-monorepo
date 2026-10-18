@@ -12,6 +12,7 @@ export type CandidateStage =
   | "offer_presented";
 
 // One candidate, as returned by GET /records and GET /records/:id
+// (backend schema RecordOut; also the response of PUT and PATCH /records/:id)
 export type Candidate = {
   id: string;
   full_name: string;
@@ -47,3 +48,19 @@ export type GetRecordsParams = {
 
 // Filters shared by the table and the mobile feed
 export type ListFilters = Pick<GetRecordsParams, "status" | "stage" | "search">;
+
+// Body for PUT /records/:id (backend schema RecordCreate, same as POST /records).
+// Replaces the candidate's general information from the Edit form.
+// Response: the updated Candidate.
+export type UpdateCandidatePayload = Omit<
+  Candidate,
+  "id" | "status" | "stage" | "applied_at" | "updated_at" | "notes_count"
+>;
+
+// Body for PATCH /records/:id (backend schema RecordPatch).
+// Changes status and/or stage only; send just the field that changed.
+// Response: the updated Candidate.
+export type UpdateCandidateStatusPayload = Partial<
+  Pick<Candidate, "status" | "stage">
+>;
+

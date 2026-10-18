@@ -24,6 +24,7 @@ components/
 lib/api/api-fetch.ts             # Shared fetch helper (buildUrl + apiFetch)
 lib/api/records.ts               # Typed candidate (records) endpoint functions
 lib/api/notes.ts                 # Typed notes endpoint functions
+lib/api/validators/              # Runtime type guards for API responses (common-, candidate-, note-guards.ts)
 lib/constants.ts                 # Status/stage UI labels and other fixed values
 types/                           # Candidate, note, payload, and response types
 .env.example                     # Documents NEXT_PUBLIC_API_URL
@@ -164,15 +165,15 @@ Drawer View      -> /?<carried query>&candidate=12
 Back to Candidates -> /?<carried query>
 ```
 
-- [ ] Confirm the full detail response fields, including phone, LinkedIn URL, CV URL, years of experience, and application date. Note missing or nullable values and extend the candidate/response types.
-- [ ] Confirm the PUT and PATCH request bodies and responses, reusing status/stage types from step 4.
-- [ ] GET `/records/:id`: define the full candidate detail response type, including optional or nullable fields.
-- [ ] PUT `/records/:id`: define the full-edit request payload and response type, including all fields required for replacement.
-- [ ] PATCH `/records/:id`: define the partial-update request payload and response type for status/stage changes.
-- [ ] Use these types in the detail/update API functions and component props without `any`; validate returned response shapes.
-- [ ] Implement GET `/records/:id` — get full candidate details — using the shared fetch helper.
-- [ ] Implement PATCH `/records/:id` — update status or stage — using the shared fetch helper.
-- [ ] Implement PUT `/records/:id` — save edited candidate information — using the shared fetch helper.
+- [x] Confirm the full detail response fields, including phone, LinkedIn URL, CV URL, years of experience, and application date. Note missing or nullable values and extend the candidate/response types.
+- [x] Confirm the PUT and PATCH request bodies and responses, reusing status/stage types from step 4.
+- [x] GET `/records/:id`: define the full candidate detail response type, including optional or nullable fields.
+- [x] PUT `/records/:id`: define the full-edit request payload and response type, including all fields required for replacement.
+- [x] PATCH `/records/:id`: define the partial-update request payload and response type for status/stage changes.
+- [x] Use these types in the detail/update API functions and component props without `any`; validate returned response shapes.
+- [x] Implement GET `/records/:id` — get full candidate details — using the shared fetch helper.
+- [x] Implement PATCH `/records/:id` — update status or stage — using the shared fetch helper.
+- [x] Implement PUT `/records/:id` — save edited candidate information — using the shared fetch helper.
 - [ ] Make each list candidate open their own details using GET `/records/:id`.
 - [ ] Read the candidate ID from `?candidate=` (drawer) or the `[id]` route segment (full page) and use it for GET `/records/:id`. Once notes are implemented in step 6, the record and notes requests can run in parallel with `Promise.all`.
 - [ ] Show name, email, phone, position, LinkedIn URL, CV URL, years of experience, status, stage, and application date.
@@ -220,13 +221,13 @@ Back to Candidates -> /?<carried query>
 
 Goal: add notes after calls or interviews and remove notes when they are no longer relevant.
 
-Files: candidate detail Notes tab, shared note components, and `lib/api/notes.ts`.
+Files: candidate detail Notes tab, shared note components, `lib/api/notes.ts`, and `lib/api/validators/note-guards.ts`.
 
 - [ ] Confirm note fields, the list response structure, the add-note payload, and the delete response.
 - [ ] GET `/records/:id/notes`: define the note type and notes list response type, including any wrapper.
 - [ ] POST `/records/:id/notes`: define the add-note request payload and response type.
 - [ ] DELETE `/records/:id/notes/:note_id`: define the documented delete response type, using `void` if no content is returned.
-- [ ] Use these types in the note API functions and component props without `any`; validate returned response shapes.
+- [ ] Use these types in the note API functions and component props without `any`; validate returned response shapes with type guards in `lib/api/validators/note-guards.ts`, reusing `isObject` from `common-guards.ts`.
 - [ ] Implement GET `/records/:id/notes` — list notes — using the shared fetch helper.
 - [ ] Implement POST `/records/:id/notes` — add a note — using the shared fetch helper.
 - [ ] Implement DELETE `/records/:id/notes/:note_id` — delete a note — using the shared fetch helper.

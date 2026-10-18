@@ -1,49 +1,15 @@
 import { apiFetch } from "./api-fetch";
-import { STAGE_LABELS, STATUS_LABELS } from "@/lib/constants";
 import type {
+  Candidate,
   CandidateListResponse,
   GetRecordsParams,
+  UpdateCandidatePayload,
+  UpdateCandidateStatusPayload,
 } from "@/types/candidate";
-
-// Type guard: an object whose fields can be read and checked one by one.
-// Record<string, unknown> = any key may be read; each value is unknown until checked.
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-// A candidate has everything the list displays: id, name, position,
-// and a status/stage we have a UI label for.
-function isListCandidate(item: unknown): boolean {
-  return (
-    isObject(item) &&
-    typeof item.id === "string" &&
-    typeof item.full_name === "string" &&
-    typeof item.position === "string" &&
-    typeof item.status === "string" &&
-    Object.hasOwn(STATUS_LABELS, item.status) &&
-    typeof item.stage === "string" &&
-    Object.hasOwn(STAGE_LABELS, item.stage)
-  );
-}
-
-/**
- * Checks that the response really has the shape we expect,
- * so a broken API answer shows an error instead of a blank list.
- * This is a type guard. It checks at runtime that data from your
- * API actually has the shape your TypeScript types claim it has.
- */
-function isCandidateListResponse(
-  value: unknown,
-): value is CandidateListResponse {
-  return (
-    isObject(value) &&
-    typeof value.total === "number" &&
-    typeof value.page === "number" &&
-    typeof value.limit === "number" &&
-    Array.isArray(value.data) &&
-    value.data.every(isListCandidate)
-  );
-}
+import {
+  isCandidate,
+  isCandidateListResponse,
+} from "./validators/candidate-guards";
 
 // GET /records: one page of candidates, optionally filtered
 export async function getRecords(
@@ -61,6 +27,51 @@ export async function getRecords(
 
   if (!isCandidateListResponse(data)) {
     throw new Error("The candidate list came back in an unexpected format.");
+  }
+  return data;
+}
+
+// GET /records/:id: one candidate's full details
+export async function getRecord(id: string): Promise<Candidate> {
+  const data = await apiFetch<unknown>(`/records/${encodeURIComponent(id)}`);
+  if (!isCandidate(data)) {
+    throw new Error("The candidate details came back in an unexpected format.");
+  }
+  return data;
+}
+
+// PATCH /records/:id: change status and/or stage only
+export async function updateRecordStatus({
+  id,
+  payload,
+}: {
+  id: string;
+  payload: UpdateCandidateStatusPayload;
+}): Promise<Candidate> {
+  const data = await apiFetch<unknown>(`/records/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+  if (!isCandidate(data)) {
+    throw new Error("The updated candidate came back in an unexpected format.");
+  }
+  return data;
+}
+
+// PUT /records/:id: replace the candidate's general information
+export async function updateRecord({
+  id,
+  payload,
+}: {
+  id: string;
+  payload: UpdateCandidatePayload;
+}): Promise<Candidate> {
+  const data = await apiFetch<unknown>(`/records/${encodeURIComponent(id)}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+  if (!isCandidate(data)) {
+    throw new Error("The updated candidate came back in an unexpected format.");
   }
   return data;
 }
