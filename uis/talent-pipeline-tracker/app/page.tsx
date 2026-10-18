@@ -4,6 +4,7 @@ import AppHeader from "@/components/shared/app-header";
 import CandidatesHeader from "@/components/candidate-list/candidates-header";
 import CandidateList from "@/components/candidate-list/candidate-list";
 import CandidateListSkeleton from "@/components/candidate-list/candidate-list-skeleton";
+import CandidateDrawer from "@/components/candidate-detail/candidate-drawer";
 
 export default function Home() {
   return (
@@ -18,6 +19,11 @@ export default function Home() {
           <CandidateList />
         </Suspense>
       </main>
+
+      {/* Opens when the URL has ?candidate=<id>; also reads the URL */}
+      <Suspense fallback={null}>
+        <CandidateDrawer />
+      </Suspense>
     </div>
   );
 }

@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { StageBadge, StatusBadge } from "@/components/shared/candidate-badges";
+import { useCandidateDrawerHref } from "@/hooks/useCandidateDrawerHref";
 import type { Candidate } from "@/types/candidate";
 
 // Mobile view (below md). Tablet and desktop use CandidateTable.
@@ -8,12 +11,15 @@ export default function CandidateCards({
 }: {
   candidates: Candidate[];
 }) {
+  const getCandidateDrawerHref = useCandidateDrawerHref();
+
   return (
     <ul className="space-y-4">
       {candidates.map((candidate) => (
         <li key={candidate.id}>
           <Link
-            href={`/candidates/${candidate.id}`}
+            href={getCandidateDrawerHref(candidate.id)}
+            scroll={false}
             className="block rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:border-slate-300 focus-visible:outline-2 focus-visible:outline-blue-500"
           >
             <div className="flex items-start justify-between gap-3">

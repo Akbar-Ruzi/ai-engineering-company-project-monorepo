@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { StageBadge, StatusBadge } from "@/components/shared/candidate-badges";
+import { useCandidateDrawerHref } from "@/hooks/useCandidateDrawerHref";
 
 import type { Candidate } from "@/types/candidate";
 
@@ -9,6 +12,8 @@ export default function CandidateTable({
 }: {
   candidates: Candidate[];
 }) {
+  const getCandidateDrawerHref = useCandidateDrawerHref();
+
   return (
     <table className="w-full text-left">
       <thead className="border-b border-slate-200">
@@ -36,7 +41,8 @@ export default function CandidateTable({
             <td className="px-6 py-5 lg:px-8">
               {/* The ::after overlay makes the whole row clickable */}
               <Link
-                href={`/candidates/${candidate.id}`}
+                href={getCandidateDrawerHref(candidate.id)}
+                scroll={false}
                 className="text-slate-900 after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:-outline-offset-2 focus-visible:after:outline-blue-500"
               >
                 {candidate.full_name}
