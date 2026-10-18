@@ -11,15 +11,9 @@ import {
   listHref,
   toListQuery,
 } from "@/lib/utils/candidate-urls";
-import type { CandidateStage, CandidateStatus } from "@/types/candidate";
-
-// Placeholder until GET /records/:id is wired up
-const MOCK_CANDIDATE = {
-  full_name: "Emily Chen",
-  position: "Software Engineer",
-  status: "in_progress" as CandidateStatus,
-  stage: "technical_interview" as CandidateStage,
-};
+import { getInitials } from "@/lib/utils/candidate-format";
+import CandidateOverview from "@/components/candidate-detail/candidate-overview";
+import { MOCK_CANDIDATE } from "@/components/candidate-detail/mock-candidate";
 
 // Opens over the list when the URL has ?candidate=<id>.
 // The list stays mounted underneath, so filters, page, and scroll are kept.
@@ -56,12 +50,7 @@ export default function CandidateDrawer() {
   if (!candidateId) return null; // If candidateId is null, React renders nothing for this component.
 
   const candidate = MOCK_CANDIDATE;
-  const initials = candidate.full_name
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+  const initials = getInitials(candidate.full_name);
 
   return (
     <div className="fixed inset-0 z-50">
@@ -144,15 +133,15 @@ export default function CandidateDrawer() {
             </span>
             <span className="flex items-center gap-2 pb-3 text-slate-500">
               Notes
-              <span className="rounded-full bg-slate-100 px-2 text-sm">0</span>
+              <span className="rounded-full bg-slate-100 px-2 text-sm">
+                {candidate.notes_count}
+              </span>
             </span>
           </nav>
         </header>
 
         <div className="flex-1 overflow-y-auto p-5 sm:p-8">
-          <p className="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center text-slate-500">
-            Overview content goes here (candidate {candidateId})
-          </p>
+          <CandidateOverview candidate={candidate} layout="drawer" />
         </div>
       </aside>
     </div>

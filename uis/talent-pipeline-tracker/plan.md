@@ -202,7 +202,7 @@ Back to Candidates -> /?<carried query>
 - [ ] Full page `/candidates/[id]` (see expanded mockups): "← Back to Candidates" and "Drawer View" buttons instead of Expand/Close. Mobile shows only Back to Candidates. Back goes to `/?<carried query>`; Drawer View goes to `/?<carried query>&candidate=[id]`. General Information uses 3 columns on desktop/tablet, 1 on mobile.
 - [ ] Opening `/?candidate=[id]` or `/candidates/[id]` directly (refresh, shared link) shows the same view; an unknown ID shows `ErrorState` in that view.
 - [ ] Preserve list filters, pagination, scroll position, and unsaved changes when switching views.
-- [ ] Mobile: when coming back from the full page with Back to Candidates or browser Back, restore the loaded pages and scroll position, so the user does not jump back to the top.
+- [x] Mobile: when coming back from the full page with Back to Candidates or browser Back, restore the loaded pages and scroll position, so the user does not jump back to the top.
 - [ ] Drawer accessibility: `role="dialog"`, `aria-modal`, labelled by the candidate name; focus moves into the drawer on open, stays inside while open, Escape closes it, and focus returns to the row that opened it. Lock page scroll behind the drawer.
 - [ ] Check: clicking a row (tablet/desktop) opens the drawer, and tapping a card (mobile) opens the full page without Drawer View; both show the correct record and keep search, status, stage, and page in the URL.
 - [ ] Check: Close, Escape, and browser Back close the drawer without resetting filters, page, or scroll.

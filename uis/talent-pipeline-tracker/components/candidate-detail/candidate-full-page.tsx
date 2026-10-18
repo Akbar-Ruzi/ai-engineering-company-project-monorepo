@@ -2,15 +2,9 @@ import Link from "next/link";
 
 import { StageBadge, StatusBadge } from "@/components/shared/candidate-badges";
 import { drawerHref, listHref } from "@/lib/utils/candidate-urls";
-import type { CandidateStage, CandidateStatus } from "@/types/candidate";
-
-// Placeholder until GET /records/:id is wired up
-const MOCK_CANDIDATE = {
-  full_name: "Emily Chen",
-  position: "Software Engineer",
-  status: "in_progress" as CandidateStatus,
-  stage: "technical_interview" as CandidateStage,
-};
+import { getInitials } from "@/lib/utils/candidate-format";
+import CandidateOverview from "@/components/candidate-detail/candidate-overview";
+import { MOCK_CANDIDATE } from "@/components/candidate-detail/mock-candidate";
 
 // Shared look for the Back to Candidates and Drawer View buttons
 const NAV_BUTTON =
@@ -26,12 +20,7 @@ export default function CandidateFullPage({
   listQuery: string;
 }) {
   const candidate = MOCK_CANDIDATE;
-  const initials = candidate.full_name
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+  const initials = getInitials(candidate.full_name);
 
   return (
     <>
@@ -81,11 +70,20 @@ export default function CandidateFullPage({
               <h1 className="text-2xl font-semibold text-slate-900">
                 {candidate.full_name}
               </h1>
-              <StatusBadge status={candidate.status} />
-              <StageBadge stage={candidate.stage} />
+              {/* Tablet/desktop: badges beside the name */}
+              <div className="flex gap-2 max-md:hidden">
+                <StatusBadge status={candidate.status} />
+                <StageBadge stage={candidate.stage} />
+              </div>
             </div>
             <p className="text-slate-500">{candidate.position}</p>
           </div>
+        </div>
+
+        {/* Mobile: badges on one full-width row under the name and position */}
+        <div className="mt-3 flex gap-2 md:hidden">
+          <StatusBadge status={candidate.status} />
+          <StageBadge stage={candidate.stage} />
         </div>
 
         {/* Tabs: visual only for now; Notes comes in step 6 */}
@@ -98,14 +96,16 @@ export default function CandidateFullPage({
           </span>
           <span className="flex items-center gap-2 pb-3 text-slate-500">
             Notes
-            <span className="rounded-full bg-slate-100 px-2 text-sm">0</span>
+            <span className="rounded-full bg-slate-100 px-2 text-sm">
+              {candidate.notes_count}
+            </span>
           </span>
         </nav>
       </section>
 
-      <p className="mt-5 rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center text-slate-500">
-        Overview content goes here (candidate {id})
-      </p>
+      <div className="mt-5">
+        <CandidateOverview candidate={candidate} layout="page" />
+      </div>
     </>
   );
 }
