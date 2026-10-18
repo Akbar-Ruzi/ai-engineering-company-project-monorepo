@@ -156,7 +156,8 @@ Navigation (query-param drawer, not intercepting routes):
 /?status=x&page=2&candidate=12       list + drawer for candidate 12
 /candidates/12?status=x&page=2       full page (list query kept for the way back)
 
-Row/card click   -> /?<current query>&candidate=12        (drawer opens)
+Row click (tablet/desktop) -> /?<current query>&candidate=12   (drawer opens)
+Card tap (mobile)          -> /candidates/12?<current query>   (full page, no drawer)
 Close (×), Esc   -> /?<current query without candidate>   (drawer closes)
 Expand (⤢)       -> /candidates/12?<current query without candidate>
 Drawer View      -> /?<carried query>&candidate=12
@@ -192,19 +193,19 @@ Back to Candidates -> /?<carried query>
 - [ ] Update the detail and list labels after successful changes.
 - [ ] After a successful PUT edit, update local candidate state or refetch the record and synchronize the list so corrected information appears without a full document reload.
 - [ ] Build one shared detail content component (header with avatar initials, name, position, status/stage badges; Overview/Notes tabs; Recruitment Progress card; General Information card with Edit). Both the drawer and the full page render it; only the wrapper and the header buttons differ.
-- [ ] Drawer (default view): change the list row/card links from `/candidates/[id]` to the current list URL plus `?candidate=[id]`, keeping search, status, stage, and page. On `/`, read `candidate` with `useSearchParams` and render the drawer over the list when it is set.
+- [ ] Drawer (default view on tablet/desktop): change the list row links from `/candidates/[id]` to the current list URL plus `?candidate=[id]`, keeping search, status, stage, and page. On `/`, read `candidate` with `useSearchParams` and render the drawer over the list when it is set.
   - Desktop/tablet: right-side panel over a dimmed, blurred list (see drawer mockups); the list stays mounted underneath.
-  - Mobile: the drawer fills the whole screen.
+  - Mobile: no drawer. Cards link straight to the full page `/candidates/[id]` with the list query.
   - Header buttons: Expand (⤢) and Close (×).
 - [ ] Close: remove only `candidate` from the URL with `router.push` (keep every other parameter), so the list, filters, and page are unchanged. Browser Back also closes the drawer.
 - [ ] Expand: `Link` to `/candidates/[id]` carrying the list query (minus `candidate`), so the full page can lead back to the same list.
-- [ ] Full page `/candidates/[id]` (see expanded mockups): "← Back to Candidates" link and a "Drawer View" button instead of Expand/Close. Back goes to `/?<carried query>`; Drawer View goes to `/?<carried query>&candidate=[id]`. General Information uses 3 columns on desktop/tablet, 1 on mobile.
+- [ ] Full page `/candidates/[id]` (see expanded mockups): "← Back to Candidates" and "Drawer View" buttons instead of Expand/Close. Mobile shows only Back to Candidates. Back goes to `/?<carried query>`; Drawer View goes to `/?<carried query>&candidate=[id]`. General Information uses 3 columns on desktop/tablet, 1 on mobile.
 - [ ] Opening `/?candidate=[id]` or `/candidates/[id]` directly (refresh, shared link) shows the same view; an unknown ID shows `ErrorState` in that view.
 - [ ] Preserve list filters, pagination, scroll position, and unsaved changes when switching views.
-- [ ] Mobile: closing the drawer keeps every loaded card page and the scroll position, because the list never unmounts. When coming back from the full page, restore the loaded pages and scroll position, so the user does not jump back to the top.
-- [ ] Drawer accessibility: `role="dialog"`, `aria-modal`, labelled by the candidate name; focus moves into the drawer on open, stays inside while open, Escape closes it, and focus returns to the row/card that opened it. Lock page scroll behind the drawer.
-- [ ] Check: clicking a row/card opens the drawer with the correct record, and the URL keeps search, status, stage, and page.
-- [ ] Check: Close, Escape, and browser Back close the drawer without resetting filters, page, or mobile scroll.
+- [ ] Mobile: when coming back from the full page with Back to Candidates or browser Back, restore the loaded pages and scroll position, so the user does not jump back to the top.
+- [ ] Drawer accessibility: `role="dialog"`, `aria-modal`, labelled by the candidate name; focus moves into the drawer on open, stays inside while open, Escape closes it, and focus returns to the row that opened it. Lock page scroll behind the drawer.
+- [ ] Check: clicking a row (tablet/desktop) opens the drawer, and tapping a card (mobile) opens the full page without Drawer View; both show the correct record and keep search, status, stage, and page in the URL.
+- [ ] Check: Close, Escape, and browser Back close the drawer without resetting filters, page, or scroll.
 - [ ] Check: Expand opens `/candidates/[id]`; Drawer View and Back to Candidates return to the same list (with the drawer for Drawer View).
 - [ ] Check: `/candidates/[id]` and `/?candidate=[id]` load the correct record and show every required field, including when opened directly.
 - [ ] Check: navigation uses Next.js App Router `Link` and dynamic segments.

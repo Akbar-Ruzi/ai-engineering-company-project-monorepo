@@ -2,24 +2,29 @@
 
 import Link from "next/link";
 import { StageBadge, StatusBadge } from "@/components/shared/candidate-badges";
-import { useCandidateDrawerHref } from "@/hooks/useCandidateDrawerHref";
+import { useSearchParams } from "next/navigation";
+import { fullPageHref, toListQuery } from "@/lib/utils/candidate-urls";
 import type { Candidate } from "@/types/candidate";
 
 // Mobile view (below md). Tablet and desktop use CandidateTable.
+// Cards open the full page directly (no drawer on mobile), carrying the
+// list query so Back to Candidates returns to the same list.
 export default function CandidateCards({
   candidates,
+  onOpen,
 }: {
   candidates: Candidate[];
+  onOpen: () => void; // remembers the scroll position before leaving the list
 }) {
-  const getCandidateDrawerHref = useCandidateDrawerHref();
+  const listQuery = toListQuery(useSearchParams());
 
   return (
     <ul className="space-y-4">
       {candidates.map((candidate) => (
         <li key={candidate.id}>
           <Link
-            href={getCandidateDrawerHref(candidate.id)}
-            scroll={false}
+            href={fullPageHref(listQuery, candidate.id)}
+            onClick={onOpen}
             className="block rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:border-slate-300 focus-visible:outline-2 focus-visible:outline-blue-500"
           >
             <div className="flex items-start justify-between gap-3">

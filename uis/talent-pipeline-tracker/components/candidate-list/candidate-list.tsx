@@ -92,7 +92,10 @@ export default function CandidateList() {
             <p className="mb-3 text-sm font-semibold text-slate-500">
               {feed.total} candidates
             </p>
-            <CandidateCards candidates={feed.candidates} />
+            <CandidateCards
+              candidates={feed.candidates}
+              onOpen={feed.rememberScroll}
+            />
             <div ref={loadMoreAreaRef} className="mt-6">
               <LoadMore
                 loaded={feed.candidates.length}

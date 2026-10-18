@@ -51,7 +51,11 @@ export default function CandidateFullPage({
           </svg>
           Back to Candidates
         </Link>
-        <Link href={drawerHref(listQuery, id)} className={NAV_BUTTON}>
+        {/* Tablet/desktop only: mobile has no drawer */}
+        <Link
+          href={drawerHref(listQuery, id)}
+          className={`${NAV_BUTTON} max-md:hidden`}
+        >
           <svg
             aria-hidden="true"
             viewBox="0 0 20 20"

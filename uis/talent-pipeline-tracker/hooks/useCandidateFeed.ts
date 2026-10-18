@@ -25,6 +25,12 @@ export function useCandidateFeed({ status, stage, search }: ListFilters) {
   // Which list is current. Bumped each time the first page reloads, so a
   // loadMore reply that started for an older list can tell it's out of date.
   const listIdRef = useRef(0);
+  // cacheComponents keeps this page alive (hidden in React <Activity>) while the
+  // user is on a candidate's full page. State survives, but effects re-run when
+  // the page shows again. loadedKeyRef remembers which filters page 1 was loaded
+  // for, so that re-run doesn't refetch page 1 and throw away the extra pages.
+  const loadedKeyRef = useRef<string | null>(null);
+  const savedScrollRef = useRef<number | null>(null); // scroll position when a card was opened
 
   // Search or filters changed → throw away the old cards and show the skeleton.
   // Done during render (not in an effect), so old cards are never shown under the new filters.
@@ -44,13 +50,19 @@ export function useCandidateFeed({ status, stage, search }: ListFilters) {
 
   // First page: its own request, independent of the table
   useEffect(() => {
+    // Page shown again after the full page: the cards are still here, keep them
+    const loadKey = `${filterKey}|${reloadKey}`;
+    if (loadedKeyRef.current === loadKey) return;
+
     listIdRef.current += 1; // a new list starts; older loadMore replies no longer belong to it
     loadingMoreRef.current = false; // an old loadMore still in flight must not block the new list
     let ignore = false; // only the latest request updates the feed
+
     async function load() {
       try {
         const response = await getRecords({ page: 1, limit: PAGE_SIZE, status, stage, search });
         if (!ignore) {
+          loadedKeyRef.current = loadKey;
           setCandidates(response.data);
           setTotal(response.total);
           setLastPage(1);
@@ -72,7 +84,29 @@ export function useCandidateFeed({ status, stage, search }: ListFilters) {
     return () => {
       ignore = true;
     };
-  }, [reloadKey, status, stage, search]);
+  }, [reloadKey, status, stage, search, filterKey]);
+
+  // Runs on mount and again each time the page shows after the full page.
+  // Navigation scrolls to the top, so scroll back to where the card was opened.
+  // Two frames, so it runs after the navigation's own scroll.
+  useEffect(() => {
+    const y = savedScrollRef.current;
+    if (y === null) return;
+    // Not cleared here: in dev React runs this effect twice, and the first
+    // run's cleanup cancels the frame. Clearing late lets the second run scroll.
+    let frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(() => {
+        savedScrollRef.current = null; // cleared only once it has scrolled
+        window.scrollTo(0, y);
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  // Called when a card opens the full page
+  const rememberScroll = () => {
+    savedScrollRef.current = window.scrollY;
+  };
 
   const loadMore = async () => {
     // Guards: one request at a time, stop at the end
@@ -151,6 +185,7 @@ export function useCandidateFeed({ status, stage, search }: ListFilters) {
     loadingMore,
     loadMoreError,
     loadMore,
+    rememberScroll, // call when a card opens the full page
     loadMoreAreaRef, // attach to the wrapper around <LoadMore>
   };
 }
