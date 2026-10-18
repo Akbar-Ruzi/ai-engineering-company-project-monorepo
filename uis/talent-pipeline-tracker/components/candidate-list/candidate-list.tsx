@@ -2,7 +2,7 @@
 
 import { PAGE_SIZE } from "@/lib/constants";
 import { useCandidateFeed } from "@/hooks/useCandidateFeed";
-import { useCandidatePage } from "@/hooks/useCandidatePage";
+import { useCandidateTable } from "@/hooks/useCandidateTable";
 import { useRecordsFilters } from "@/hooks/useRecordsFilters";
 
 import CandidateCards from "@/components/candidate-list/candidate-cards";
@@ -35,7 +35,11 @@ export default function CandidateList() {
 
   // tablet/desktop: one page at a time, page number from the URL (?page=…).
   // A page past the end jumps to a valid one (setPage updates the URL).
-  const table = useCandidatePage({ ...filters, page, onPageOutOfRange: setPage });
+  const table = useCandidateTable({
+    ...filters,
+    page,
+    onPageOutOfRange: setPage,
+  });
 
   // mobile: grows as the user scrolls. The ref is kept separate from `feed`,
   // so reading feed's state during render isn't treated as reading a ref.

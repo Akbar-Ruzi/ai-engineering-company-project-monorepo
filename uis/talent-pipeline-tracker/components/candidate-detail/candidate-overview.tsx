@@ -7,6 +7,8 @@ import {
   formatDate,
   formatDateTime,
   formatYears,
+  textOrNull,
+  webUrlOrNull,
 } from "@/lib/utils/candidate-format";
 import type { Candidate } from "@/types/candidate";
 
@@ -20,6 +22,14 @@ export default function CandidateOverview({
   layout: "drawer" | "page";
 }) {
   const isPage = layout === "page";
+
+  // Optional or user-entered values: null means "show Not provided"
+  const email = textOrNull(candidate.email);
+  const phone = textOrNull(candidate.phone);
+  const linkedinUrl = webUrlOrNull(candidate.linkedin_url);
+  const cvUrl = webUrlOrNull(candidate.cv_url);
+  const appliedAt = formatDate(candidate.applied_at);
+  const updatedAt = formatDateTime(candidate.updated_at);
 
   return (
     <div className="space-y-5">
@@ -73,26 +83,28 @@ export default function CandidateOverview({
           <Field label="Full Name">{candidate.full_name}</Field>
           <Field label="Position Applied For">{candidate.position}</Field>
           <Field label="Email Address">
-            <a href={`mailto:${candidate.email}`} className={LINK}>
-              {candidate.email}
-            </a>
+            {email ? (
+              <a href={`mailto:${email}`} className={LINK}>
+                {email}
+              </a>
+            ) : (
+              <Missing />
+            )}
           </Field>
-          <Field label="Phone">{candidate.phone || <Missing />}</Field>
+          <Field label="Phone">{phone ?? <Missing />}</Field>
           <Field label="Years of Experience">
             {formatYears(candidate.experience_years)}
           </Field>
-          <Field label="Application Date">
-            {formatDate(candidate.applied_at)}
-          </Field>
+          <Field label="Application Date">{appliedAt ?? <Missing />}</Field>
           <Field label="LinkedIn Profile">
-            {candidate.linkedin_url ? (
+            {linkedinUrl ? (
               <a
-                href={candidate.linkedin_url}
+                href={linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`${LINK} inline-flex items-center gap-1`}
               >
-                {displayUrl(candidate.linkedin_url)}
+                {displayUrl(linkedinUrl)}
                 <ExternalIcon />
                 <span className="sr-only">(opens in a new tab)</span>
               </a>
@@ -101,15 +113,15 @@ export default function CandidateOverview({
             )}
           </Field>
           <Field label="CV / Resume">
-            {candidate.cv_url ? (
+            {cvUrl ? (
               <a
-                href={candidate.cv_url}
+                href={cvUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`${LINK} inline-flex items-center gap-1`}
               >
                 <FileIcon />
-                {fileNameFromUrl(candidate.cv_url)}
+                {fileNameFromUrl(cvUrl)}
                 <span className="sr-only">(opens in a new tab)</span>
               </a>
             ) : (
@@ -118,18 +130,14 @@ export default function CandidateOverview({
           </Field>
           {/* Page: one more grid item. Drawer: a footer row (below). */}
           {isPage && (
-            <Field label="Last Updated">
-              {formatDateTime(candidate.updated_at)}
-            </Field>
+            <Field label="Last Updated">{updatedAt ?? <Missing />}</Field>
           )}
         </dl>
 
         {!isPage && (
           <div className="mt-5 flex items-center justify-between gap-4 border-t border-slate-100 pt-4 text-sm">
             <span className="text-slate-500">Last Updated</span>
-            <span className="text-slate-700">
-              {formatDateTime(candidate.updated_at)}
-            </span>
+            <span className="text-slate-700">{updatedAt ?? <Missing />}</span>
           </div>
         )}
       </Card>

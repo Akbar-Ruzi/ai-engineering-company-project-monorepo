@@ -105,7 +105,7 @@ Files: `app/page.tsx`, candidate list components in `components/candidate-list/`
 - [x] Check: a successful fetch visibly renders the loaded list or empty result, completing the loading/success/error states for list fetching.
 - [x] Keep list state near the components that use it; avoid passing state through unrelated intermediate components solely to reach a child (prop drilling).
 - [x] Once the mobile auto-load works, move each view's data logic out of `app/page.tsx` into its own hook, so the two views no longer share state:
-  - `hooks/useCandidatePage.ts` (tablet/desktop table): `result`, `loading`, `error`, `page`, `setPage`, `retry`.
+  - `hooks/useCandidateTable.ts` (tablet/desktop table): `result`, `loading`, `error`, `page`, `setPage`, `retry`.
   - `hooks/useCandidateFeed.ts` (mobile cards): `candidates`, `total`, `loading`, `loadingMore`, `error`, `loadMore`, `retry`. It fetches its own page 1, which removes the `if (page === 1)` link inside the table's effect.
   - `app/page.tsx` only calls the two hooks and renders the components. Accept the extra page-1 request on first load (both views are always mounted).
   - Do this before step 4, so search and filters can be passed to both hooks as input.
@@ -174,11 +174,11 @@ Back to Candidates -> /?<carried query>
 - [x] Implement GET `/records/:id` — get full candidate details — using the shared fetch helper.
 - [x] Implement PATCH `/records/:id` — update status or stage — using the shared fetch helper.
 - [x] Implement PUT `/records/:id` — save edited candidate information — using the shared fetch helper.
-- [ ] Make each list candidate open their own details using GET `/records/:id`.
-- [ ] Read the candidate ID from `?candidate=` (drawer) or the `[id]` route segment (full page) and use it for GET `/records/:id`. Once notes are implemented in step 6, the record and notes requests can run in parallel with `Promise.all`.
-- [ ] Show name, email, phone, position, LinkedIn URL, CV URL, years of experience, status, stage, and application date.
-- [ ] Keep exact API property names in the detail types and map them to display labels from the assigned HealthCore CONTEXT. Render LinkedIn and CV as usable links when valid URLs are present.
-- [ ] Display readable placeholders for missing optional values and loading/error feedback.
+- [x] Make each list candidate open their own details using GET `/records/:id`.
+- [x] Read the candidate ID from `?candidate=` (drawer) or the `[id]` route segment (full page) and use it for GET `/records/:id`. Once notes are implemented in step 6, the record and notes requests can run in parallel with `Promise.all`.
+- [x] Show name, email, phone, position, LinkedIn URL, CV URL, years of experience, status, stage, and application date.
+- [x] Keep exact API property names in the detail types and map them to display labels from the assigned HealthCore CONTEXT. Render LinkedIn and CV as usable links when valid URLs are present.
+- [x] Display readable placeholders for missing optional values and loading/error feedback.
 - [ ] Reuse `ErrorState` (with Retry) for failed GET `/records/:id` and failed PUT/PATCH saves, and add a detail-shaped loading skeleton.
 - [ ] Add status and stage controls and save only the intended changes through PATCH `/records/:id`.
 - [ ] Use the [README.md mappings](README.md#api-and-data) in detail controls and labels: send raw API values in PATCH bodies, but show only UI labels in the interface.
@@ -313,7 +313,7 @@ Mockup: `public/ui-ux/future/pipeline-summary.png`. Draft components already exi
 Today both views are mounted and CSS hides one (step 3), so first load sends two page-1 requests. Optional alternative: decide the view in JavaScript and mount only one.
 
 - [ ] Add `hooks/useIsMobile.ts`: `useSyncExternalStore` with `window.matchMedia("(max-width: 767px)")`, listening to `change`. Return `null` on the server (`getServerSnapshot`), since the server cannot know the screen size.
-- [ ] Move each view out of `app/page.tsx` into its own component, which calls its own hook: `mobile-candidate-list.tsx` (`useCandidateFeed`, cards, LoadMore) and `desktop-candidate-list.tsx` (`useCandidatePage`, table, Pagination). Hooks cannot be chosen with a condition, so choose the component instead.
+- [ ] Move each view out of `app/page.tsx` into its own component, which calls its own hook: `mobile-candidate-list.tsx` (`useCandidateFeed`, cards, LoadMore) and `desktop-candidate-list.tsx` (`useCandidateTable`, table, Pagination). Hooks cannot be chosen with a condition, so choose the component instead.
 - [ ] In `app/page.tsx`, render `CandidateListSkeleton` while `useIsMobile()` is `null`, then only `MobileCandidateList` or `DesktopCandidateList`.
 - [ ] Keep the 767px query in sync with Tailwind's `md:` breakpoint (768px).
 - [ ] Accept that crossing 768px (window resize, tablet rotation) remounts the view: the table returns to page 1 and the mobile feed reloads from page 1. Filters stay, because they live in the URL (step 4).

@@ -3,7 +3,7 @@ import type { CandidateListResponse, ListFilters } from "@/types/candidate";
 import { getRecords } from "@/lib/api/records";
 import { PAGE_SIZE } from "@/lib/constants";
 
-type CandidatePageOptions = ListFilters & {
+type CandidateTableOptions = ListFilters & {
   page: number; // from the URL (?page=…)
   onPageOutOfRange: (page: number) => void; // called with a valid page to jump to
 };
@@ -14,13 +14,13 @@ type CandidatePageOptions = ListFilters & {
  * The page comes from the URL; this hook only fetches it.
  * Changing the page replaces the rows; nothing is kept from the previous page.
  */
-export function useCandidatePage({
+export function useCandidateTable({
   status,
   stage,
   search,
   page,
   onPageOutOfRange,
-}: CandidatePageOptions) {
+}: CandidateTableOptions) {
   const [result, setResult] = useState<CandidateListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +41,13 @@ export function useCandidatePage({
     let ignore = false; // only the latest request updates the table
     async function load() {
       try {
-        const response = await getRecords({ page, limit: PAGE_SIZE, status, stage, search });
+        const response = await getRecords({
+          page,
+          limit: PAGE_SIZE,
+          status,
+          stage,
+          search,
+        });
         if (!ignore) {
           setResult(response);
           setError(null);
@@ -71,7 +77,9 @@ export function useCandidatePage({
     result.total > 0 &&
     result.data.length === 0 &&
     page > 1;
-  const lastPage = result ? Math.max(1, Math.ceil(result.total / PAGE_SIZE)) : 1;
+  const lastPage = result
+    ? Math.max(1, Math.ceil(result.total / PAGE_SIZE))
+    : 1;
 
   // useEffectEvent: always calls the latest onPageOutOfRange without re-running the effect
   const reportOutOfRange = useEffectEvent((validPage: number) =>

@@ -13,7 +13,14 @@ import {
 } from "@/lib/utils/candidate-urls";
 import { getInitials } from "@/lib/utils/candidate-format";
 import CandidateOverview from "@/components/candidate-detail/candidate-overview";
-import { MOCK_CANDIDATE } from "@/components/candidate-detail/mock-candidate";
+import ErrorState from "@/components/shared/error-state";
+import {
+  AvatarSkeleton,
+  CandidateHeaderSkeleton,
+  CandidateOverviewSkeleton,
+  SkeletonBar,
+} from "@/components/candidate-detail/candidate-detail-skeleton";
+import { useCandidateDetail } from "@/hooks/useCandidateDetail";
 
 // Opens over the list when the URL has ?candidate=<id>.
 // The list stays mounted underneath, so filters, page, and scroll are kept.
@@ -21,6 +28,9 @@ export default function CandidateDrawer() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const candidateId = getDrawerCandidateId(searchParams);
+
+  // GET /records/:id; null while the drawer is closed, so nothing is fetched
+  const { candidate, loading, error, retry } = useCandidateDetail(candidateId);
 
   // The list query without ?candidate, used by Close and Expand
   const listQuery = toListQuery(searchParams);
@@ -49,9 +59,6 @@ export default function CandidateDrawer() {
 
   if (!candidateId) return null; // If candidateId is null, React renders nothing for this component.
 
-  const candidate = MOCK_CANDIDATE;
-  const initials = getInitials(candidate.full_name);
-
   return (
     <div className="fixed inset-0 z-50">
       {/* Backdrop: dims and blurs the list; clicking it closes the drawer */}
@@ -69,17 +76,33 @@ export default function CandidateDrawer() {
       >
         <header className="border-b border-slate-200 bg-white px-5 pt-6 sm:px-8">
           <div className="flex items-start gap-4">
-            <span className="flex size-14 shrink-0 items-center justify-center rounded-full border border-blue-100 bg-blue-50 text-lg font-semibold text-blue-700">
-              {initials}
-            </span>
+            {loading && <AvatarSkeleton className="size-14" />}
+            {candidate && (
+              <span className="flex size-14 shrink-0 items-center justify-center rounded-full border border-blue-100 bg-blue-50 text-lg font-semibold text-blue-700">
+                {getInitials(candidate.full_name)}
+              </span>
+            )}
             <div className="min-w-0 flex-1">
+              {/* Always rendered: the dialog is labelled by this heading */}
               <h2
                 id="candidate-drawer-title"
                 className="truncate text-2xl font-semibold text-slate-900"
               >
-                {candidate.full_name}
+                {candidate ? (
+                  candidate.full_name
+                ) : loading ? (
+                  <>
+                    <span className="sr-only">Loading candidate…</span>
+                    <SkeletonBar className="mt-1 h-7 w-48" />
+                  </>
+                ) : (
+                  "Candidate details"
+                )}
               </h2>
-              <p className="truncate text-slate-500">{candidate.position}</p>
+              {candidate && (
+                <p className="truncate text-slate-500">{candidate.position}</p>
+              )}
+              {loading && <SkeletonBar className="mt-3 h-4 w-32" />}
             </div>
             <div className="flex shrink-0 items-center gap-1">
               <Link
@@ -121,27 +144,45 @@ export default function CandidateDrawer() {
             </div>
           </div>
 
-          <div className="mt-3 flex flex-wrap gap-2">
-            <StatusBadge status={candidate.status} />
-            <StageBadge stage={candidate.stage} />
-          </div>
+          {candidate ? (
+            <>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <StatusBadge status={candidate.status} />
+                <StageBadge stage={candidate.stage} />
+              </div>
 
-          {/* Tabs: visual only for now; Notes comes in step 6 */}
-          <nav className="mt-5 flex gap-8" aria-label="Candidate sections">
-            <span className="border-b-2 border-blue-600 pb-3 font-medium text-blue-600">
-              Overview
-            </span>
-            <span className="flex items-center gap-2 pb-3 text-slate-500">
-              Notes
-              <span className="rounded-full bg-slate-100 px-2 text-sm">
-                {candidate.notes_count}
-              </span>
-            </span>
-          </nav>
+              {/* Tabs: visual only for now; Notes comes in step 6 */}
+              <nav className="mt-5 flex gap-8" aria-label="Candidate sections">
+                <span className="border-b-2 border-blue-600 pb-3 font-medium text-blue-600">
+                  Overview
+                </span>
+                <span className="flex items-center gap-2 pb-3 text-slate-500">
+                  Notes
+                  <span className="rounded-full bg-slate-100 px-2 text-sm">
+                    {candidate.notes_count}
+                  </span>
+                </span>
+              </nav>
+            </>
+          ) : loading ? (
+            <CandidateHeaderSkeleton tabsClassName="mt-5" />
+          ) : (
+            <div className="pb-6" />
+          )}
         </header>
 
         <div className="flex-1 overflow-y-auto p-5 sm:p-8">
-          <CandidateOverview candidate={candidate} layout="drawer" />
+          {loading ? (
+            <CandidateOverviewSkeleton layout="drawer" />
+          ) : error ? (
+            <ErrorState
+              title="Could not load candidate"
+              message={error}
+              onRetry={retry}
+            />
+          ) : candidate ? (
+            <CandidateOverview candidate={candidate} layout="drawer" />
+          ) : null}
         </div>
       </aside>
     </div>
