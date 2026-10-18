@@ -30,7 +30,8 @@ export default function CandidateDrawer() {
   const candidateId = getDrawerCandidateId(searchParams);
 
   // GET /records/:id; null while the drawer is closed, so nothing is fetched
-  const { candidate, loading, error, retry } = useCandidateDetail(candidateId);
+  const { candidate, loading, error, retry, replaceCandidate } =
+    useCandidateDetail(candidateId);
 
   // The list query without ?candidate, used by Close and Expand
   const listQuery = toListQuery(searchParams);
@@ -181,7 +182,11 @@ export default function CandidateDrawer() {
               onRetry={retry}
             />
           ) : candidate ? (
-            <CandidateOverview candidate={candidate} layout="drawer" />
+            <CandidateOverview
+              candidate={candidate}
+              layout="drawer"
+              onCandidateChange={replaceCandidate}
+            />
           ) : null}
         </div>
       </aside>

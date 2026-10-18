@@ -63,5 +63,13 @@ export function useCandidateDetail(id: string | null) {
     setReloadKey((k) => k + 1); // new value → the effect runs again
   };
 
-  return { candidate, loading, error, retry };
+  // After a save (PATCH/PUT), show the server's updated candidate.
+  // Ignored if another candidate was opened while the save was running.
+  const replaceCandidate = (updated: Candidate) => {
+    setCandidate((current) =>
+      current && current.id === updated.id ? updated : current,
+    );
+  };
+
+  return { candidate, loading, error, retry, replaceCandidate };
 }

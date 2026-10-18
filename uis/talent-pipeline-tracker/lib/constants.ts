@@ -19,5 +19,8 @@ export const PAGE_SIZE = 10;
 // Wait this long after the last keystroke before searching
 export const SEARCH_DELAY_MS = 300;
 
+// How long a success message (e.g. "Recruitment progress saved.") stays visible
+export const SUCCESS_MESSAGE_MS = 3000;
+
 // URL parameter that holds the open drawer's candidate ID (/?candidate=<id>)
 export const DRAWER_PARAM = "candidate";

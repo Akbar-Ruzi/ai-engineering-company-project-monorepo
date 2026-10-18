@@ -63,7 +63,7 @@ export function CandidateOverviewSkeleton({
           {[1, 2].map((select) => (
             <div key={select}>
               <SkeletonBar className="h-4 w-32" />
-              <SkeletonBar className="mt-3 h-11 w-full rounded-lg" />
+              <SkeletonBar className="mt-3 h-6 w-32" />
             </div>
           ))}
         </div>
@@ -94,7 +94,7 @@ export function CandidateOverviewSkeleton({
   );
 }
 
-// Same box as Overview's Card: title bar, optional action (Edit) bar, content
+// Same box as DetailCard: title bar, optional action (Edit) bar, content
 function CardSkeleton({
   action = false,
   children,

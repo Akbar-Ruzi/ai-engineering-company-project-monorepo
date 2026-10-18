@@ -180,9 +180,9 @@ Back to Candidates -> /?<carried query>
 - [x] Keep exact API property names in the detail types and map them to display labels from the assigned HealthCore CONTEXT. Render LinkedIn and CV as usable links when valid URLs are present.
 - [x] Display readable placeholders for missing optional values and loading/error feedback.
 - [ ] Reuse `ErrorState` (with Retry) for failed GET `/records/:id` and failed PUT/PATCH saves, and add a detail-shaped loading skeleton.
-- [ ] Add status and stage controls and save only the intended changes through PATCH `/records/:id`.
-- [ ] Use the [README.md mappings](README.md#api-and-data) in detail controls and labels: send raw API values in PATCH bodies, but show only UI labels in the interface.
-- [ ] Send the minimal PATCH body documented by the API. After success, update local candidate state or refetch the record so the changed status/stage appears without a full document reload.
+- [x] Add status and stage controls and save only the intended changes through PATCH `/records/:id`.
+- [x] Use the [README.md mappings](README.md#api-and-data) in detail controls and labels: send raw API values in PATCH bodies, but show only UI labels in the interface.
+- [x] Send the minimal PATCH body documented by the API. After success, update local candidate state or refetch the record so the changed status/stage appears without a full document reload.
 - [ ] Add an Edit action on the candidate details page that opens a form populated with their existing information.
 - [ ] Place the edit form on the detail page or a separate edit route reached from that page. Submit PUT `/records/:id` with the full resource or exact replacement shape required by the API.
 - [ ] Build a reusable form with Full Name, Email, Phone, Position, LinkedIn URL, CV URL, and Years of Experience. CV is a URL field.

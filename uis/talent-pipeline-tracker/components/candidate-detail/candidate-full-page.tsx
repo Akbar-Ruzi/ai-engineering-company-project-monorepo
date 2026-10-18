@@ -30,7 +30,8 @@ export default function CandidateFullPage({
   listQuery: string;
 }) {
   // GET /records/:id for the [id] in the URL
-  const { candidate, loading, error, retry } = useCandidateDetail(id);
+  const { candidate, loading, error, retry, replaceCandidate } =
+    useCandidateDetail(id);
 
   return (
     <>
@@ -141,7 +142,11 @@ export default function CandidateFullPage({
           </section>
 
           <div className="mt-5">
-            <CandidateOverview candidate={candidate} layout="page" />
+            <CandidateOverview
+              candidate={candidate}
+              layout="page"
+              onCandidateChange={replaceCandidate}
+            />
           </div>
         </>
       ) : null}
