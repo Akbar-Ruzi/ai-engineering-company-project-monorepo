@@ -13,6 +13,7 @@ import {
   CandidateOverviewSkeleton,
   SkeletonBar,
 } from "@/components/candidate-detail/candidate-detail-skeleton";
+import { useCandidateDrafts } from "@/context/candidate-drafts";
 import { useCandidateDetail } from "@/hooks/useCandidateDetail";
 
 // Shared look for the Back to Candidates and Drawer View buttons
@@ -33,10 +34,18 @@ export default function CandidateFullPage({
   const { candidate, loading, error, retry, replaceCandidate } =
     useCandidateDetail(id);
 
+  // Back to Candidates leaves the detail views, so it discards unsaved edits
+  // (like Close in the drawer); only Drawer View carries them across
+  const { clearAllDrafts } = useCandidateDrafts();
+
   return (
     <>
       <div className="flex items-center justify-between gap-4">
-        <Link href={listHref(listQuery)} className={NAV_BUTTON}>
+        <Link
+          href={listHref(listQuery)}
+          onClick={() => clearAllDrafts(id)}
+          className={NAV_BUTTON}
+        >
           <svg
             aria-hidden="true"
             viewBox="0 0 20 20"

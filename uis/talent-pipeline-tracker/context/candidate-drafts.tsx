@@ -14,8 +14,9 @@ import type { Candidate, CandidateFormValues } from "@/types/candidate";
 // Unsaved edits, by candidate ID. The drawer and the full page each render
 // their own cards, so a draft kept inside one card would be lost on Expand or
 // Drawer View. Kept here (above both routes), the other view opens the same
-// form with the same values. Cancel or a successful save removes the draft;
-// a page reload forgets all drafts.
+// form with the same values. Cancel or a successful save removes the draft,
+// leaving the detail views (drawer Close, full page Back to Candidates)
+// discards all of that candidate's drafts, and a page reload forgets them all.
 export type CandidateDraft = {
   general?: CandidateFormValues; // General information form
   progress?: Pick<Candidate, "status" | "stage">; // Recruitment progress form
@@ -30,6 +31,7 @@ type CandidateDrafts = {
     values: NonNullable<CandidateDraft[K]>,
   ) => void;
   clearDraft: (id: string, part: DraftPart) => void;
+  clearAllDrafts: (id: string) => void; // every part, e.g. when the drawer closes
 };
 
 const CandidateDraftsContext = createContext<CandidateDrafts | null>(null);
@@ -60,10 +62,19 @@ export function CandidateDraftsProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const clearAllDrafts = useCallback((id: string) => {
+    setDrafts((current) => {
+      if (!(id in current)) return current; // no drafts: nothing to change
+      const next = { ...current };
+      delete next[id];
+      return next;
+    });
+  }, []);
+
   // Same object between renders unless a draft changes
   const value = useMemo(
-    () => ({ drafts, setDraft, clearDraft }),
-    [drafts, setDraft, clearDraft],
+    () => ({ drafts, setDraft, clearDraft, clearAllDrafts }),
+    [drafts, setDraft, clearDraft, clearAllDrafts],
   );
 
   return (

@@ -20,6 +20,7 @@ import {
   CandidateOverviewSkeleton,
   SkeletonBar,
 } from "@/components/candidate-detail/candidate-detail-skeleton";
+import { useCandidateDrafts } from "@/context/candidate-drafts";
 import { useCandidateDetail } from "@/hooks/useCandidateDetail";
 
 // The dialog is labelled by the heading with this id (in every state)
@@ -70,9 +71,13 @@ export default function CandidateDrawer() {
   // The list query without ?candidate, used by Close and Expand
   const listQuery = toListQuery(searchParams);
 
+  // Close (×), Escape, and the backdrop discard unsaved edits; only Expand
+  // carries them to the full page
+  const { clearAllDrafts } = useCandidateDrafts();
   const close = useCallback(() => {
+    if (candidateId) clearAllDrafts(candidateId);
     router.push(listHref(listQuery), { scroll: false });
-  }, [router, listQuery]);
+  }, [router, listQuery, candidateId, clearAllDrafts]);
 
   const dialogRef = useRef<HTMLElement>(null);
   const isOpen = candidateId !== null;
