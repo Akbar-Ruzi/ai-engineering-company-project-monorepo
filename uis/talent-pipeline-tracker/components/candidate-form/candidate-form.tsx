@@ -81,6 +81,7 @@ const FIELDS: {
 // failed save. It checks the values first and only calls onSubmit when they
 // are valid; the parent decides what Save does (PUT or POST).
 export default function CandidateForm({
+  id,
   initialValues,
   layout,
   submitLabel,
@@ -89,6 +90,7 @@ export default function CandidateForm({
   onCancel,
   feedback,
 }: {
+  id?: string; // lets the parent submit the form, e.g. from a Retry button
   initialValues: CandidateFormValues;
   layout: "drawer" | "page";
   submitLabel: string; // e.g. "Save changes" or "Add candidate"
@@ -128,6 +130,7 @@ export default function CandidateForm({
 
   return (
     <form
+      id={id}
       // noValidate: our own messages replace the browser's pop-up bubbles
       noValidate
       onSubmit={(event) => {

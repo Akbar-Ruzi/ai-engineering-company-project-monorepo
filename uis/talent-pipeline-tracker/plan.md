@@ -179,7 +179,7 @@ Back to Candidates -> /?<carried query>
 - [x] Show name, email, phone, position, LinkedIn URL, CV URL, years of experience, status, stage, and application date.
 - [x] Keep exact API property names in the detail types and map them to display labels from the assigned HealthCore CONTEXT. Render LinkedIn and CV as usable links when valid URLs are present.
 - [x] Display readable placeholders for missing optional values and loading/error feedback.
-- [ ] Reuse `ErrorState` (with Retry) for failed GET `/records/:id` and failed PUT/PATCH saves, and add a detail-shaped loading skeleton.
+- [x] Reuse `ErrorState` (with Retry) for failed GET `/records/:id` and failed PUT/PATCH saves, and add a detail-shaped loading skeleton.
 - [x] Add status and stage controls and save only the intended changes through PATCH `/records/:id`.
 - [x] Use the [README.md mappings](README.md#api-and-data) in detail controls and labels: send raw API values in PATCH bodies, but show only UI labels in the interface.
 - [x] Send the minimal PATCH body documented by the API. After success, update local candidate state or refetch the record so the changed status/stage appears without a full document reload.
@@ -188,7 +188,7 @@ Back to Candidates -> /?<carried query>
 - [x] Build a reusable form with Full Name, Email, Phone, Position, LinkedIn URL, CV URL, and Years of Experience. CV is a URL field.
 - [x] Validate required fields and formats against the backend documentation.
 - [x] Save corrected information through PUT `/records/:id`, preserving required data outside the form.
-- [ ] Add Cancel and retain entered values after a failed save. Keep form actions reachable on mobile.
+- [x] Add Cancel and retain entered values after a failed save. Keep form actions reachable on mobile.
 - [x] Prevent duplicate submissions and show saving, success, and failure feedback.
 - [x] Show inline or banner success feedback after a successful edit submission and error feedback after a failed attempt.
 - [x] Update the detail and list labels after successful changes.

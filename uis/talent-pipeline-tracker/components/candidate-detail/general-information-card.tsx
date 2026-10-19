@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import type { ReactNode } from "react";
 
 import {
@@ -47,6 +47,14 @@ export default function GeneralInformationCard({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const formId = useId();
+
+  // Retry submits the form again, so it re-checks and sends the values that
+  // are in the form now (the user may have fixed something after the error)
+  const retry = () => {
+    const form = document.getElementById(formId);
+    if (form instanceof HTMLFormElement) form.requestSubmit();
+  };
 
   // Hide the success message after a few seconds
   useEffect(() => {
@@ -110,6 +118,7 @@ export default function GeneralInformationCard({
     >
       {editing ? (
         <CandidateForm
+          id={formId}
           // Filled in from the saved candidate each time Edit is opened
           initialValues={toCandidateFormValues(candidate)}
           layout={layout}
@@ -119,7 +128,11 @@ export default function GeneralInformationCard({
           onCancel={cancel}
           feedback={
             error && (
-              <ErrorState title="Could not save the changes" message={error} />
+              <ErrorState
+                title="Could not save the changes"
+                message={error}
+                onRetry={retry}
+              />
             )
           }
         />
