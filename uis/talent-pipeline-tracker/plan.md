@@ -142,7 +142,7 @@ Files: candidate list page and its filter/search components.
 - [x] Check (mobile): load several pages, change a filter, and confirm the cards reset to the first page of matching results with no leftover candidates.
 - [x] Keep filter/search state in the list view or a small hook, without prop drilling through unrelated components.
 
-## 5. Open candidate details and edit the candidate
+## 5. Open candidate details and edit the candidate ✅
 
 Goal: open a candidate's full details in a drawer over the list, expand them to a full page, update their status or stage, and correct their information.
 
@@ -195,28 +195,28 @@ Back to Candidates -> /?<carried query>
 - [x] After a successful PUT edit, update local candidate state or refetch the record and synchronize the list so corrected information appears without a full document reload.
 - [x] Build shared detail content components: `CandidateHeader` (avatar initials, name, position, status/stage badges), `CandidateTabs` (Overview/Notes), and `CandidateOverview` (Recruitment Progress card; General Information card with Edit). Both the drawer and the full page render them; only the wrapper and the header buttons differ.
   - No single wrapper component (`candidate-detail-content.tsx`): the drawer keeps its header and tabs in a fixed area above a separate scroll area for the overview, so each wrapper places the three shared pieces itself.
-- [ ] Drawer (default view on tablet/desktop): change the list row links from `/candidates/[id]` to the current list URL plus `?candidate=[id]`, keeping search, status, stage, and page. On `/`, read `candidate` with `useSearchParams` and render the drawer over the list when it is set.
+- [x] Drawer (default view on tablet/desktop): change the list row links from `/candidates/[id]` to the current list URL plus `?candidate=[id]`, keeping search, status, stage, and page. On `/`, read `candidate` with `useSearchParams` and render the drawer over the list when it is set.
   - Desktop/tablet: right-side panel over a dimmed, blurred list (see drawer mockups); the list stays mounted underneath.
   - Mobile: no drawer. Cards link straight to the full page `/candidates/[id]` with the list query.
   - Header buttons: Expand (⤢) and Close (×).
-- [ ] Close: remove only `candidate` from the URL with `router.push` (keep every other parameter), so the list, filters, and page are unchanged. Browser Back also closes the drawer.
-- [ ] Expand: `Link` to `/candidates/[id]` carrying the list query (minus `candidate`), so the full page can lead back to the same list.
-- [ ] Full page `/candidates/[id]` (see expanded mockups): "← Back to Candidates" and "Drawer View" buttons instead of Expand/Close. Mobile shows only Back to Candidates. Back goes to `/?<carried query>`; Drawer View goes to `/?<carried query>&candidate=[id]`. General Information uses 3 columns on desktop/tablet, 1 on mobile.
-- [ ] Opening `/?candidate=[id]` or `/candidates/[id]` directly (refresh, shared link) shows the same view; an unknown ID shows `ErrorState` in that view.
-- [ ] Preserve list filters, pagination, scroll position, and unsaved changes when switching views.
+- [x] Close: remove only `candidate` from the URL with `router.push` (keep every other parameter), so the list, filters, and page are unchanged. Browser Back also closes the drawer.
+- [x] Expand: `Link` to `/candidates/[id]` carrying the list query (minus `candidate`), so the full page can lead back to the same list.
+- [x] Full page `/candidates/[id]` (see expanded mockups): "← Back to Candidates" and "Drawer View" buttons instead of Expand/Close. Mobile shows only Back to Candidates. Back goes to `/?<carried query>`; Drawer View goes to `/?<carried query>&candidate=[id]`. General Information uses 3 columns on desktop/tablet, 1 on mobile.
+- [x] Opening `/?candidate=[id]` or `/candidates/[id]` directly (refresh, shared link) shows the same view; an unknown ID shows `ErrorState` in that view.
+- [x] Preserve list filters, pagination, scroll position, and unsaved changes when switching views.
 - [x] Mobile: when coming back from the full page with Back to Candidates or browser Back, restore the loaded pages and scroll position, so the user does not jump back to the top.
-- [ ] Drawer accessibility: `role="dialog"`, `aria-modal`, labelled by the candidate name; focus moves into the drawer on open, stays inside while open, Escape closes it, and focus returns to the row that opened it. Lock page scroll behind the drawer.
-- [ ] Check: clicking a row (tablet/desktop) opens the drawer, and tapping a card (mobile) opens the full page without Drawer View; both show the correct record and keep search, status, stage, and page in the URL.
-- [ ] Check: Close, Escape, and browser Back close the drawer without resetting filters, page, or scroll.
-- [ ] Check: Expand opens `/candidates/[id]`; Drawer View and Back to Candidates return to the same list (with the drawer for Drawer View).
-- [ ] Check: `/candidates/[id]` and `/?candidate=[id]` load the correct record and show every required field, including when opened directly.
-- [ ] Check: navigation uses Next.js App Router `Link` and dynamic segments.
-- [ ] Check: status and stage updates send PATCH requests from the detail view and persist after refresh.
-- [ ] Check: the edit form validates required fields, sends PUT, and shows saving, success, and error feedback.
-- [ ] Check: loading/error feedback is visible for detail requests, and terminology matches HealthCore CONTEXT.
-- [ ] Check: HTTP errors and malformed responses from GET, PUT, and PATCH are displayed in the detail/edit UI.
-- [ ] Check: successful detail fetching displays the correct loaded record, completing the loading/success/error states.
-- [ ] Keep detail and edit state scoped to their shared view/components; avoid prop drilling through unrelated components.
+- [x] Drawer accessibility: `role="dialog"`, `aria-modal`, labelled by the candidate name; focus moves into the drawer on open, stays inside while open, Escape closes it, and focus returns to the row that opened it. Lock page scroll behind the drawer.
+- [x] Check: clicking a row (tablet/desktop) opens the drawer, and tapping a card (mobile) opens the full page without Drawer View; both show the correct record and keep search, status, stage, and page in the URL.
+- [x] Check: Close, Escape, and browser Back close the drawer without resetting filters, page, or scroll.
+- [x] Check: Expand opens `/candidates/[id]`; Drawer View and Back to Candidates return to the same list (with the drawer for Drawer View).
+- [x] Check: `/candidates/[id]` and `/?candidate=[id]` load the correct record and show every required field, including when opened directly.
+- [x] Check: navigation uses Next.js App Router `Link` and dynamic segments.
+- [x] Check: status and stage updates send PATCH requests from the detail view and persist after refresh.
+- [x] Check: the edit form validates required fields, sends PUT, and shows saving, success, and error feedback.
+- [x] Check: loading/error feedback is visible for detail requests, and terminology matches HealthCore CONTEXT.
+- [x] Check: HTTP errors and malformed responses from GET, PUT, and PATCH are displayed in the detail/edit UI.
+- [x] Check: successful detail fetching displays the correct loaded record, completing the loading/success/error states.
+- [x] Keep detail and edit state scoped to their shared view/components; avoid prop drilling through unrelated components.
 
 ## 6. Add and remove internal notes
 
