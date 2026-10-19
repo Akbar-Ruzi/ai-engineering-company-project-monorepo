@@ -76,13 +76,15 @@ const FIELDS: {
   },
 ];
 
-// Reusable candidate form: edit (step 5, filled in) and create (step 7, empty).
-// It keeps what the user types in its own state, so the values survive a
-// failed save. It checks the values first and only calls onSubmit when they
-// are valid; the parent decides what Save does (PUT or POST).
+// Reusable candidate form: edit  and create .
+// Controlled: the parent holds the values and gets every change (onChange),
+// so it can keep them after a failed save or when switching views.
+// It checks the values first and only calls onSubmit when they are valid;
+// the parent decides what Save does (PUT or POST).
 export default function CandidateForm({
   id,
-  initialValues,
+  values,
+  onChange,
   layout,
   submitLabel,
   saving,
@@ -91,7 +93,8 @@ export default function CandidateForm({
   feedback,
 }: {
   id?: string; // lets the parent submit the form, e.g. from a Retry button
-  initialValues: CandidateFormValues;
+  values: CandidateFormValues;
+  onChange: (values: CandidateFormValues) => void;
   layout: "drawer" | "page";
   submitLabel: string; // e.g. "Save changes" or "Add candidate"
   saving: boolean; // disables the form while the request runs
@@ -99,13 +102,12 @@ export default function CandidateForm({
   onCancel: () => void;
   feedback?: ReactNode; // e.g. an ErrorState after a failed save
 }) {
-  const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<CandidateFormErrors>({});
   const idPrefix = useId(); // unique ids, so each label points at its own input
   const inputId = (name: FieldName) => `${idPrefix}-${name}`;
 
   const setField = (name: FieldName, value: string) => {
-    setValues((current) => ({ ...current, [name]: value }));
+    onChange({ ...values, [name]: value });
     // Editing a field clears its message; the rest stay until the next Save
     setErrors((current) => {
       if (!current[name]) return current; // no message: nothing to change

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { DetailCard, EditButton } from "@/components/candidate-detail/detail-card";
 import { StageBadge, StatusBadge } from "@/components/shared/candidate-badges";
 import ErrorState from "@/components/shared/error-state";
+import { useCandidateDrafts } from "@/context/candidate-drafts";
 import SuccessMessage from "@/components/shared/success-message";
 import { updateRecordStatus } from "@/lib/api/records";
 import {
@@ -21,7 +22,8 @@ import type {
 
 // Current status and stage. Read-only until the user clicks Edit, so a
 // misclick can't change a hiring decision. Save sends PATCH /records/:id
-// with only the fields that changed.
+// with only the fields that changed. The choices while editing are a draft in
+// CandidateDraftsProvider, so they survive Expand / Drawer View.
 export default function RecruitmentProgressCard({
   candidate,
   layout,
@@ -33,10 +35,16 @@ export default function RecruitmentProgressCard({
 }) {
   const isPage = layout === "page";
 
-  const [editing, setEditing] = useState(false);
   // The user's choices while editing; the candidate only changes after Save
-  const [status, setStatus] = useState<CandidateStatus>(candidate.status);
-  const [stage, setStage] = useState<CandidateStage>(candidate.stage);
+  const { drafts, setDraft, clearDraft } = useCandidateDrafts();
+  const draft = drafts[candidate.id]?.progress;
+  const editing = draft !== undefined; // a draft means the form is open
+  const status = draft?.status ?? candidate.status;
+  const stage = draft?.stage ?? candidate.stage;
+  const setStatus = (next: CandidateStatus) =>
+    setDraft(candidate.id, "progress", { status: next, stage });
+  const setStage = (next: CandidateStage) =>
+    setDraft(candidate.id, "progress", { status, stage: next });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -49,15 +57,16 @@ export default function RecruitmentProgressCard({
   }, [saved]);
 
   const startEditing = () => {
-    setStatus(candidate.status); // start from the saved values
-    setStage(candidate.stage);
     setError(null);
     setSaved(false);
-    setEditing(true);
+    setDraft(candidate.id, "progress", {
+      status: candidate.status, // start from the saved values
+      stage: candidate.stage,
+    });
   };
 
   const cancel = () => {
-    setEditing(false);
+    clearDraft(candidate.id, "progress");
     setError(null);
   };
 
@@ -68,7 +77,7 @@ export default function RecruitmentProgressCard({
     if (stage !== candidate.stage) payload.stage = stage;
 
     if (Object.keys(payload).length === 0) {
-      setEditing(false); // nothing changed: no request
+      clearDraft(candidate.id, "progress"); // nothing changed: no request
       return;
     }
 
@@ -77,7 +86,7 @@ export default function RecruitmentProgressCard({
     try {
       const updated = await updateRecordStatus({ id: candidate.id, payload });
       onSaved(updated);
-      setEditing(false);
+      clearDraft(candidate.id, "progress"); // closes the form
       setSaved(true);
     } catch (err) {
       // Stay in edit mode with the user's choices, so they can retry

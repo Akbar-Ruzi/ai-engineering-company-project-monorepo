@@ -8,6 +8,7 @@ import {
   EditButton,
 } from "@/components/candidate-detail/detail-card";
 import CandidateForm from "@/components/candidate-form/candidate-form";
+import { useCandidateDrafts } from "@/context/candidate-drafts";
 import ErrorState from "@/components/shared/error-state";
 import SuccessMessage from "@/components/shared/success-message";
 import { updateRecord } from "@/lib/api/records";
@@ -34,6 +35,8 @@ import type {
 // The candidate's contact and application details.
 // Read-only until Edit, which swaps the details for the candidate form.
 // Save sends PUT /records/:id with the full general information.
+// The form's values are a draft in CandidateDraftsProvider, so an edit in
+// progress survives Expand / Drawer View (the other view opens it as is).
 export default function GeneralInformationCard({
   candidate,
   layout,
@@ -43,7 +46,9 @@ export default function GeneralInformationCard({
   layout: "drawer" | "page";
   onSaved: (updated: Candidate) => void; // the PUT response, shown everywhere
 }) {
-  const [editing, setEditing] = useState(false);
+  const { drafts, setDraft, clearDraft } = useCandidateDrafts();
+  const draft = drafts[candidate.id]?.general;
+  const editing = draft !== undefined; // a draft means the form is open
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -66,11 +71,11 @@ export default function GeneralInformationCard({
   const startEditing = () => {
     setError(null);
     setSaved(false); // no old "saved" message next to the open form
-    setEditing(true);
+    setDraft(candidate.id, "general", toCandidateFormValues(candidate)); // start from the saved values
   };
 
   const cancel = () => {
-    setEditing(false);
+    clearDraft(candidate.id, "general"); // throw the unsaved edits away
     setError(null);
   };
 
@@ -83,7 +88,7 @@ export default function GeneralInformationCard({
     // added spaces don't count as a change.
     const keys = Object.keys(payload) as (keyof UpdateCandidatePayload)[];
     if (keys.every((key) => payload[key] === candidate[key])) {
-      setEditing(false);
+      clearDraft(candidate.id, "general");
       return;
     }
 
@@ -95,7 +100,7 @@ export default function GeneralInformationCard({
         payload,
       });
       onSaved(updated); // show the server's version, not the form's values
-      setEditing(false);
+      clearDraft(candidate.id, "general"); // closes the form
       setSaved(true); // success: green message under the details, auto-hides
     } catch (err) {
       // The form stays open with the user's values, so they can fix and retry
@@ -119,8 +124,8 @@ export default function GeneralInformationCard({
       {editing ? (
         <CandidateForm
           id={formId}
-          // Filled in from the saved candidate each time Edit is opened
-          initialValues={toCandidateFormValues(candidate)}
+          values={draft}
+          onChange={(values) => setDraft(candidate.id, "general", values)}
           layout={layout}
           submitLabel="Save changes"
           saving={saving}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+import { CandidateDraftsProvider } from "@/context/candidate-drafts";
 import { CandidateUpdatesProvider } from "@/context/candidate-updates";
 
 const geistSans = Geist({
@@ -28,7 +29,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         {/* Shares saved candidates between the details and the list (all routes) */}
-        <CandidateUpdatesProvider>{children}</CandidateUpdatesProvider>
+        <CandidateUpdatesProvider>
+          {/* Keeps unsaved edits when switching between drawer and full page */}
+          <CandidateDraftsProvider>{children}</CandidateDraftsProvider>
+        </CandidateUpdatesProvider>
       </body>
     </html>
   );
