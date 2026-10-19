@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import {
   fullPageHref,
@@ -25,6 +25,37 @@ import { useCandidateDetail } from "@/hooks/useCandidateDetail";
 // The dialog is labelled by the heading with this id (in every state)
 const TITLE_ID = "candidate-drawer-title";
 
+// Everything inside the drawer that Tab can reach
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+// Tab past the last control goes back to the first, and Shift+Tab before the
+// first goes to the last, so keyboard focus never reaches the list behind.
+// The controls are looked up on every Tab, since Edit swaps details for inputs.
+function trapTab(event: KeyboardEvent, root: HTMLElement) {
+  const focusable = Array.from(
+    root.querySelectorAll<HTMLElement>(FOCUSABLE),
+  ).filter((element) => element.getClientRects().length > 0); // visible only
+  if (focusable.length === 0) {
+    event.preventDefault();
+    root.focus();
+    return;
+  }
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  const active = document.activeElement;
+  const outside = !root.contains(active);
+
+  if (event.shiftKey && (active === first || active === root || outside)) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && (active === last || outside)) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
 // Opens over the list when the URL has ?candidate=<id>.
 // The list stays mounted underneath, so filters, page, and scroll are kept.
 export default function CandidateDrawer() {
@@ -43,12 +74,30 @@ export default function CandidateDrawer() {
     router.push(listHref(listQuery), { scroll: false });
   }, [router, listQuery]);
 
-  // Escape closes; the page behind must not scroll while the drawer is open
+  const dialogRef = useRef<HTMLElement>(null);
+  const isOpen = candidateId !== null;
+
+  // On open: move focus into the drawer, so the next Tab reaches its buttons.
+  // On close: give focus back to what had it before (the row that opened it).
+  useEffect(() => {
+    if (!isOpen) return;
+    const previous = document.activeElement;
+    dialogRef.current?.focus();
+    return () => {
+      if (previous instanceof HTMLElement) previous.focus();
+    };
+  }, [isOpen]);
+
+  // Escape closes, Tab stays inside, and the page behind must not scroll
+  // while the drawer is open
   useEffect(() => {
     if (!candidateId) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") close();
+      if (event.key === "Tab" && dialogRef.current) {
+        trapTab(event, dialogRef.current);
+      }
     };
     document.addEventListener("keydown", onKeyDown);
 
@@ -115,10 +164,13 @@ export default function CandidateDrawer() {
       />
 
       <aside
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={TITLE_ID}
-        className="absolute inset-y-0 right-0 flex w-full flex-col bg-slate-50 shadow-xl md:max-w-xl lg:max-w-2xl"
+        // -1: focusable from code (on open), but not a Tab stop itself
+        tabIndex={-1}
+        className="absolute inset-y-0 right-0 flex w-full flex-col bg-slate-50 shadow-xl outline-none md:max-w-xl lg:max-w-2xl"
       >
         <header className="border-b border-slate-200 bg-white px-5 pt-6 sm:px-8">
           {candidate ? (
