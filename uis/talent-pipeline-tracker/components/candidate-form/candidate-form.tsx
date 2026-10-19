@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 import type { HTMLInputTypeAttribute, ReactNode } from "react";
 
+import { MAX_EXPERIENCE_YEARS } from "@/lib/constants";
 import { validateCandidateForm } from "@/lib/utils/candidate-form";
 import type {
   CandidateFormErrors,
@@ -165,7 +166,11 @@ export default function CandidateForm({
                 placeholder={field.placeholder}
                 value={values[field.name]}
                 onChange={(event) => setField(field.name, event.target.value)}
-                {...(field.type === "number" && { min: 0, step: "any" })}
+                {...(field.type === "number" && {
+                  min: 0,
+                  max: MAX_EXPERIENCE_YEARS,
+                  step: "any",
+                })}
                 // Screen readers hear "invalid" and the message with the field
                 aria-invalid={error ? true : undefined}
                 aria-describedby={error ? errorId : undefined}
@@ -185,25 +190,30 @@ export default function CandidateForm({
         })}
       </fieldset>
 
-      {feedback}
+      {/* Sticky: on a long form or a small screen, the buttons stay in reach.
+          The feedback sits in the same bar, so a failed save is never hidden
+          below the fold or behind the buttons. */}
+      <div className="sticky bottom-0 -mx-5 -mb-5 mt-6 space-y-4 rounded-b-2xl border-t border-slate-100 bg-white px-5 py-4 sm:-mx-6 sm:-mb-6 sm:px-6">
+        {/* *:mt-0 removes ErrorState's own top margin inside the bar */}
+        {feedback && <div className="*:mt-0">{feedback}</div>}
 
-      {/* Sticky: on a long form or a small screen, the buttons stay in reach */}
-      <div className="sticky bottom-0 -mx-5 -mb-5 mt-6 flex justify-end gap-3 rounded-b-2xl border-t border-slate-100 bg-white px-5 py-4 sm:-mx-6 sm:-mb-6 sm:px-6">
-        <button
-          type="button"
-          onClick={onCancel}
-          disabled={saving}
-          className="h-10 rounded-lg border border-slate-300 bg-white px-4 font-semibold text-slate-700 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 disabled:opacity-50"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={saving}
-          className="h-10 rounded-lg bg-blue-600 px-4 font-semibold text-white hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 disabled:opacity-60"
-        >
-          {saving ? "Saving…" : submitLabel}
-        </button>
+        <div className="flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={saving}
+            className="h-10 rounded-lg border border-slate-300 bg-white px-4 font-semibold text-slate-700 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={saving}
+            className="h-10 rounded-lg bg-blue-600 px-4 font-semibold text-white hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 disabled:opacity-60"
+          >
+            {saving ? "Saving…" : submitLabel}
+          </button>
+        </div>
       </div>
     </form>
   );

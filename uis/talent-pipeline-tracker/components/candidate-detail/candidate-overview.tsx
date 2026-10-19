@@ -20,7 +20,11 @@ export default function CandidateOverview({
         layout={layout}
         onSaved={onCandidateChange}
       />
-      <GeneralInformationCard candidate={candidate} layout={layout} />
+      <GeneralInformationCard
+        candidate={candidate}
+        layout={layout}
+        onSaved={onCandidateChange}
+      />
     </div>
   );
 }

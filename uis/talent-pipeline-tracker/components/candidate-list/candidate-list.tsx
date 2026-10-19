@@ -1,5 +1,6 @@
 "use client";
 
+import { useCandidateUpdates } from "@/context/candidate-updates";
 import { PAGE_SIZE } from "@/lib/constants";
 import { useCandidateFeed } from "@/hooks/useCandidateFeed";
 import { useCandidateTable } from "@/hooks/useCandidateTable";
@@ -30,6 +31,9 @@ export default function CandidateList() {
     clearFilters,
   } = useRecordsFilters();
 
+  // Goes up after each save in the drawer or full page → both lists refetch
+  const { saveCount } = useCandidateUpdates();
+
   // Both lists get searchQuery (sent after typing pauses), not search (every keystroke)
   const filters = { status, stage, search: searchQuery };
 
@@ -38,12 +42,16 @@ export default function CandidateList() {
   const table = useCandidateTable({
     ...filters,
     page,
+    saveCount,
     onPageOutOfRange: setPage,
   });
 
   // mobile: grows as the user scrolls. The ref is kept separate from `feed`,
   // so reading feed's state during render isn't treated as reading a ref.
-  const { loadMoreAreaRef, ...feed } = useCandidateFeed(filters);
+  const { loadMoreAreaRef, ...feed } = useCandidateFeed({
+    ...filters,
+    saveCount,
+  });
 
   // total 0 means two different things: nothing in the database yet,
   // or nothing matches. Uses searchQuery (what was sent), not search (what's typed),

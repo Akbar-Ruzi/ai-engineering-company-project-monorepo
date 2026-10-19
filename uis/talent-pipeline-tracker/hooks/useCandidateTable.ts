@@ -5,6 +5,7 @@ import { PAGE_SIZE } from "@/lib/constants";
 
 type CandidateTableOptions = ListFilters & {
   page: number; // from the URL (?page=…)
+  saveCount: number; // changes after a candidate is saved → refetch this page
   onPageOutOfRange: (page: number) => void; // called with a valid page to jump to
 };
 
@@ -19,6 +20,7 @@ export function useCandidateTable({
   stage,
   search,
   page,
+  saveCount,
   onPageOutOfRange,
 }: CandidateTableOptions) {
   const [result, setResult] = useState<CandidateListResponse | null>(null);
@@ -27,6 +29,8 @@ export function useCandidateTable({
   const [reloadKey, setReloadKey] = useState(0);
 
   // Page, search or filters changed → show the skeleton.
+  // saveCount is left out on purpose: after a save the current rows stay on
+  // screen and are swapped for the fresh ones when they arrive (no flash).
   // Done during render (not in an effect), so the old rows never show under the new request.
   // Going back to page 1 on a filter change is done in the URL (useRecordsFilters).
   const requestKey = `${status ?? ""}|${stage ?? ""}|${search ?? ""}|${page}`;
@@ -66,7 +70,7 @@ export function useCandidateTable({
     return () => {
       ignore = true;
     };
-  }, [reloadKey, page, status, stage, search]);
+  }, [reloadKey, page, status, stage, search, saveCount]);
 
   // Out of range: candidates exist (total > 0) but this page came back empty,
   // e.g. ?page=99, an old bookmark, or fewer results after candidates were removed.

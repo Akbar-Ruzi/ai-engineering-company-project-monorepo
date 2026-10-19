@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
 import {
@@ -8,7 +8,14 @@ import {
   EditButton,
 } from "@/components/candidate-detail/detail-card";
 import CandidateForm from "@/components/candidate-form/candidate-form";
-import { toCandidateFormValues } from "@/lib/utils/candidate-form";
+import ErrorState from "@/components/shared/error-state";
+import SuccessMessage from "@/components/shared/success-message";
+import { updateRecord } from "@/lib/api/records";
+import { SUCCESS_MESSAGE_MS } from "@/lib/constants";
+import {
+  toCandidateFormValues,
+  toUpdatePayload,
+} from "@/lib/utils/candidate-form";
 import {
   displayUrl,
   fileNameFromUrl,
@@ -18,22 +25,78 @@ import {
   textOrNull,
   webUrlOrNull,
 } from "@/lib/utils/candidate-format";
-import type { Candidate, CandidateFormValues } from "@/types/candidate";
+import type {
+  Candidate,
+  CandidateFormValues,
+  UpdateCandidatePayload,
+} from "@/types/candidate";
 
 // The candidate's contact and application details.
 // Read-only until Edit, which swaps the details for the candidate form.
+// Save sends PUT /records/:id with the full general information.
 export default function GeneralInformationCard({
   candidate,
   layout,
+  onSaved,
 }: {
   candidate: Candidate;
   layout: "drawer" | "page";
+  onSaved: (updated: Candidate) => void; // the PUT response, shown everywhere
 }) {
   const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
 
-  // Save is wired to PUT /records/:id next (validation + save subtasks)
-  const handleSubmit = (values: CandidateFormValues) => {
-    void values;
+  // Hide the success message after a few seconds
+  useEffect(() => {
+    if (!saved) return;
+    const timer = setTimeout(() => setSaved(false), SUCCESS_MESSAGE_MS);
+    return () => clearTimeout(timer);
+  }, [saved]);
+
+  const startEditing = () => {
+    setError(null);
+    setSaved(false); // no old "saved" message next to the open form
+    setEditing(true);
+  };
+
+  const cancel = () => {
+    setEditing(false);
+    setError(null);
+  };
+
+  // Called by the form only after its values pass validation
+  const handleSubmit = async (values: CandidateFormValues) => {
+    const payload = toUpdatePayload(values);
+
+    // Nothing changed: close the form without a request (same as the
+    // Recruitment progress card). Compares the cleaned values, so only
+    // added spaces don't count as a change.
+    const keys = Object.keys(payload) as (keyof UpdateCandidatePayload)[];
+    if (keys.every((key) => payload[key] === candidate[key])) {
+      setEditing(false);
+      return;
+    }
+
+    setSaving(true); // disables the form while the request runs
+    setError(null);
+    try {
+      const updated = await updateRecord({
+        id: candidate.id,
+        payload,
+      });
+      onSaved(updated); // show the server's version, not the form's values
+      setEditing(false);
+      setSaved(true); // success: green message under the details, auto-hides
+    } catch (err) {
+      // The form stays open with the user's values, so they can fix and retry
+      setError(
+        err instanceof Error ? err.message : "Could not save the changes.",
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -41,10 +104,7 @@ export default function GeneralInformationCard({
       title="General information"
       action={
         editing ? null : (
-          <EditButton
-            label="Edit general information"
-            onClick={() => setEditing(true)}
-          />
+          <EditButton label="Edit general information" onClick={startEditing} />
         )
       }
     >
@@ -54,12 +114,27 @@ export default function GeneralInformationCard({
           initialValues={toCandidateFormValues(candidate)}
           layout={layout}
           submitLabel="Save changes"
-          saving={false}
+          saving={saving}
           onSubmit={handleSubmit}
-          onCancel={() => setEditing(false)}
+          onCancel={cancel}
+          feedback={
+            error && (
+              <ErrorState title="Could not save the changes" message={error} />
+            )
+          }
         />
       ) : (
-        <CandidateDetails candidate={candidate} layout={layout} />
+        <>
+          <CandidateDetails candidate={candidate} layout={layout} />
+          {saved && (
+            // Sticky bar in the same spot as the form's Cancel/Save buttons,
+            // so the message shows where the user just clicked, not off-screen
+            // at the bottom of the card. *:mt-0 drops SuccessMessage's margin.
+            <div className="sticky bottom-0 -mx-5 -mb-5 mt-6 rounded-b-2xl border-t border-slate-100 bg-white px-5 py-4 *:mt-0 sm:-mx-6 sm:-mb-6 sm:px-6">
+              <SuccessMessage message="General information saved." />
+            </div>
+          )}
+        </>
       )}
     </DetailCard>
   );

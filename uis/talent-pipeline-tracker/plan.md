@@ -184,15 +184,15 @@ Back to Candidates -> /?<carried query>
 - [x] Use the [README.md mappings](README.md#api-and-data) in detail controls and labels: send raw API values in PATCH bodies, but show only UI labels in the interface.
 - [x] Send the minimal PATCH body documented by the API. After success, update local candidate state or refetch the record so the changed status/stage appears without a full document reload.
 - [x] Add an Edit action on the candidate details page that opens a form populated with their existing information.
-- [ ] Place the edit form on the detail page or a separate edit route reached from that page. Submit PUT `/records/:id` with the full resource or exact replacement shape required by the API.
+- [x] Place the edit form on the detail page or a separate edit route reached from that page. Submit PUT `/records/:id` with the full resource or exact replacement shape required by the API.
 - [x] Build a reusable form with Full Name, Email, Phone, Position, LinkedIn URL, CV URL, and Years of Experience. CV is a URL field.
 - [x] Validate required fields and formats against the backend documentation.
-- [ ] Save corrected information through PUT `/records/:id`, preserving required data outside the form.
+- [x] Save corrected information through PUT `/records/:id`, preserving required data outside the form.
 - [ ] Add Cancel and retain entered values after a failed save. Keep form actions reachable on mobile.
-- [ ] Prevent duplicate submissions and show saving, success, and failure feedback.
-- [ ] Show inline or banner success feedback after a successful edit submission and error feedback after a failed attempt.
-- [ ] Update the detail and list labels after successful changes.
-- [ ] After a successful PUT edit, update local candidate state or refetch the record and synchronize the list so corrected information appears without a full document reload.
+- [x] Prevent duplicate submissions and show saving, success, and failure feedback.
+- [x] Show inline or banner success feedback after a successful edit submission and error feedback after a failed attempt.
+- [x] Update the detail and list labels after successful changes.
+- [x] After a successful PUT edit, update local candidate state or refetch the record and synchronize the list so corrected information appears without a full document reload.
 - [ ] Build one shared detail content component (header with avatar initials, name, position, status/stage badges; Overview/Notes tabs; Recruitment Progress card; General Information card with Edit). Both the drawer and the full page render it; only the wrapper and the header buttons differ.
 - [ ] Drawer (default view on tablet/desktop): change the list row links from `/candidates/[id]` to the current list URL plus `?candidate=[id]`, keeping search, status, stage, and page. On `/`, read `candidate` with `useSearchParams` and render the drawer over the list when it is set.
   - Desktop/tablet: right-side panel over a dimmed, blurred list (see drawer mockups); the list stays mounted underneath.

@@ -19,6 +19,10 @@ export const PAGE_SIZE = 10;
 // Wait this long after the last keystroke before searching
 export const SEARCH_DELAY_MS = 300;
 
+// Highest Years of Experience the candidate form accepts. Our own rule:
+// the API only requires a number, so it would also accept e.g. 814.
+export const MAX_EXPERIENCE_YEARS = 60;
+
 // How long a success message (e.g. "Recruitment progress saved.") stays visible
 export const SUCCESS_MESSAGE_MS = 3000;
 

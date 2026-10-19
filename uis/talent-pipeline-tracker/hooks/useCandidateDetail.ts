@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Candidate } from "@/types/candidate";
+import { useCandidateUpdates } from "@/context/candidate-updates";
 import { getRecord } from "@/lib/api/records";
 
 /**
@@ -14,6 +15,7 @@ export function useCandidateDetail(id: string | null) {
   const [loading, setLoading] = useState(id !== null);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
+  const { notifyCandidateSaved } = useCandidateUpdates();
 
   // Another candidate opened → forget the old one and show the skeleton.
   // Done during render (not in an effect), so the previous candidate's
@@ -64,11 +66,13 @@ export function useCandidateDetail(id: string | null) {
   };
 
   // After a save (PATCH/PUT), show the server's updated candidate.
-  // Ignored if another candidate was opened while the save was running.
+  // Ignored here if another candidate was opened while the save was running.
+  // The list always refetches, since the saved candidate may be one of its rows.
   const replaceCandidate = (updated: Candidate) => {
     setCandidate((current) =>
       current && current.id === updated.id ? updated : current,
     );
+    notifyCandidateSaved();
   };
 
   return { candidate, loading, error, retry, replaceCandidate };

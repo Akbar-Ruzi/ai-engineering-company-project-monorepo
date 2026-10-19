@@ -8,7 +8,16 @@ import { PAGE_SIZE } from "@/lib/constants";
  * a feed that grows as the user scrolls.
  * Each new page is added to the end; already-loaded cards stay.
  */
-export function useCandidateFeed({ status, stage, search }: ListFilters) {
+type CandidateFeedOptions = ListFilters & {
+  saveCount: number; // changes after a candidate is saved → reload the loaded pages
+};
+
+export function useCandidateFeed({
+  status,
+  stage,
+  search,
+  saveCount,
+}: CandidateFeedOptions) {
   const [candidates, setCandidates] = useState<Candidate[]>([]); //  holds all cards loaded so far, and only grows.
   const [total, setTotal] = useState(0);// is the count from the API (100), used to know when to stop.
   const [lastPage, setLastPage] = useState(0); // the last page added, so the next request is lastPage + 1.
@@ -31,6 +40,9 @@ export function useCandidateFeed({ status, stage, search }: ListFilters) {
   // for, so that re-run doesn't refetch page 1 and throw away the extra pages.
   const loadedKeyRef = useRef<string | null>(null);
   const savedScrollRef = useRef<number | null>(null); // scroll position when a card was opened
+  // The saveCount the cards were last loaded for; a different value means a
+  // candidate was saved since, so the shown pages need a refresh
+  const refreshedCountRef = useRef(saveCount);
 
   // Search or filters changed → throw away the old cards and show the skeleton.
   // Done during render (not in an effect), so old cards are never shown under the new filters.
@@ -85,6 +97,39 @@ export function useCandidateFeed({ status, stage, search }: ListFilters) {
       ignore = true;
     };
   }, [reloadKey, status, stage, search, filterKey]);
+
+  // After a save: reload every page already shown (1…lastPage) in place.
+  // Reloading only page 1 would drop the extra pages and lose the scroll spot.
+  // While the full page is open this page is hidden and its effects are off,
+  // so this runs when the user comes back, before they see the old cards.
+  useEffect(() => {
+    if (refreshedCountRef.current === saveCount) return; // nothing saved since
+    if (lastPage === 0) return; // page 1 is still loading: it gets fresh data anyway
+
+    const listId = listIdRef.current;
+    let ignore = false;
+    async function refresh() {
+      try {
+        const pages = await Promise.all(
+          Array.from({ length: lastPage }, (_, index) =>
+            getRecords({ page: index + 1, limit: PAGE_SIZE, status, stage, search }),
+          ),
+        );
+        if (ignore || listId !== listIdRef.current) return; // filters changed meanwhile
+        // Marked done only after it worked. In dev React runs effects twice;
+        // marking it at the start would let the cancelled first run block the second.
+        refreshedCountRef.current = saveCount;
+        setCandidates(pages.flatMap((response) => response.data));
+        setTotal(pages[0].total);
+      } catch {
+        // Keep the cards on screen: they are only out of date, not wrong to show
+      }
+    }
+    refresh();
+    return () => {
+      ignore = true; // e.g. loadMore added a page: the next run reloads it too
+    };
+  }, [saveCount, lastPage, status, stage, search]);
 
   // Runs on mount and again each time the page shows after the full page.
   // Navigation scrolls to the top, so scroll back to where the card was opened.

@@ -1,11 +1,13 @@
 // Converts between a Candidate and the candidate form's input values,
 // and checks the values before they are sent.
 
-import { webUrlOrNull } from "@/lib/utils/candidate-format";
+import { MAX_EXPERIENCE_YEARS } from "@/lib/constants";
+import { textOrNull, webUrlOrNull } from "@/lib/utils/candidate-format";
 import type {
   Candidate,
   CandidateFormErrors,
   CandidateFormValues,
+  UpdateCandidatePayload,
 } from "@/types/candidate";
 
 // Something@something.something, no spaces. A light check: the API does the strict one.
@@ -56,8 +58,12 @@ export function validateCandidateForm(
   const years = values.experience_years.trim();
   if (!years) {
     errors.experience_years = "Enter the years of experience.";
-  } else if (!Number.isFinite(Number(years)) || Number(years) < 0) {
-    errors.experience_years = "Enter a number of years, 0 or more.";
+  } else if (
+    !Number.isFinite(Number(years)) ||
+    Number(years) < 0 ||
+    Number(years) > MAX_EXPERIENCE_YEARS // our limit; the API has none
+  ) {
+    errors.experience_years = `Enter a number of years between 0 and ${MAX_EXPERIENCE_YEARS}.`;
   }
 
   // Same rule the details view uses to show a link, so a saved URL always works
@@ -69,4 +75,20 @@ export function validateCandidateForm(
   }
 
   return errors;
+}
+
+// Saving: the form's input values → the PUT /records/:id body.
+// Call after validateCandidateForm passes, so experience_years is a valid number.
+export function toUpdatePayload(
+  values: CandidateFormValues,
+): UpdateCandidatePayload {
+  return {
+    full_name: values.full_name.trim(),
+    email: values.email.trim(),
+    phone: values.phone.trim(),
+    position: values.position.trim(),
+    linkedin_url: textOrNull(values.linkedin_url), // empty input → null, as the API stores it
+    cv_url: textOrNull(values.cv_url),
+    experience_years: Number(values.experience_years.trim()),
+  };
 }
