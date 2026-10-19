@@ -1,8 +1,5 @@
 export type CandidateStatus =
-  | "received"
-  | "in_progress"
-  | "selected"
-  | "discarded";
+  "received" | "in_progress" | "selected" | "discarded";
 
 export type CandidateStage =
   | "pending"
@@ -64,3 +61,16 @@ export type UpdateCandidateStatusPayload = Partial<
   Pick<Candidate, "status" | "stage">
 >;
 
+// Edit form (PUT) and create form (POST, step 7)
+// What the form's inputs hold while the user types. Every value is a string,
+// because that's what <input> gives back (even type="number").
+// They are turned into the API payload (numbers, null for empty URLs) on save.
+export type CandidateFormValues = {
+  full_name: string;
+  email: string;
+  phone: string;
+  position: string;
+  linkedin_url: string;
+  cv_url: string;
+  experience_years: string;
+};

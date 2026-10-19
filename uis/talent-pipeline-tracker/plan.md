@@ -183,9 +183,9 @@ Back to Candidates -> /?<carried query>
 - [x] Add status and stage controls and save only the intended changes through PATCH `/records/:id`.
 - [x] Use the [README.md mappings](README.md#api-and-data) in detail controls and labels: send raw API values in PATCH bodies, but show only UI labels in the interface.
 - [x] Send the minimal PATCH body documented by the API. After success, update local candidate state or refetch the record so the changed status/stage appears without a full document reload.
-- [ ] Add an Edit action on the candidate details page that opens a form populated with their existing information.
+- [x] Add an Edit action on the candidate details page that opens a form populated with their existing information.
 - [ ] Place the edit form on the detail page or a separate edit route reached from that page. Submit PUT `/records/:id` with the full resource or exact replacement shape required by the API.
-- [ ] Build a reusable form with Full Name, Email, Phone, Position, LinkedIn URL, CV URL, and Years of Experience. CV is a URL field.
+- [x] Build a reusable form with Full Name, Email, Phone, Position, LinkedIn URL, CV URL, and Years of Experience. CV is a URL field.
 - [ ] Validate required fields and formats against the backend documentation.
 - [ ] Save corrected information through PUT `/records/:id`, preserving required data outside the form.
 - [ ] Add Cancel and retain entered values after a failed save. Keep form actions reachable on mobile.
