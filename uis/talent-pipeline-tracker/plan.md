@@ -186,7 +186,7 @@ Back to Candidates -> /?<carried query>
 - [x] Add an Edit action on the candidate details page that opens a form populated with their existing information.
 - [ ] Place the edit form on the detail page or a separate edit route reached from that page. Submit PUT `/records/:id` with the full resource or exact replacement shape required by the API.
 - [x] Build a reusable form with Full Name, Email, Phone, Position, LinkedIn URL, CV URL, and Years of Experience. CV is a URL field.
-- [ ] Validate required fields and formats against the backend documentation.
+- [x] Validate required fields and formats against the backend documentation.
 - [ ] Save corrected information through PUT `/records/:id`, preserving required data outside the form.
 - [ ] Add Cancel and retain entered values after a failed save. Keep form actions reachable on mobile.
 - [ ] Prevent duplicate submissions and show saving, success, and failure feedback.

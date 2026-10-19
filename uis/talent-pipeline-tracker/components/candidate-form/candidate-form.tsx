@@ -3,7 +3,11 @@
 import { useId, useState } from "react";
 import type { HTMLInputTypeAttribute, ReactNode } from "react";
 
-import type { CandidateFormValues } from "@/types/candidate";
+import { validateCandidateForm } from "@/lib/utils/candidate-form";
+import type {
+  CandidateFormErrors,
+  CandidateFormValues,
+} from "@/types/candidate";
 
 type FieldName = keyof CandidateFormValues;
 
@@ -73,7 +77,8 @@ const FIELDS: {
 
 // Reusable candidate form: edit (step 5, filled in) and create (step 7, empty).
 // It keeps what the user types in its own state, so the values survive a
-// failed save. The parent decides what Save does (PUT or POST).
+// failed save. It checks the values first and only calls onSubmit when they
+// are valid; the parent decides what Save does (PUT or POST).
 export default function CandidateForm({
   initialValues,
   layout,
@@ -92,17 +97,41 @@ export default function CandidateForm({
   feedback?: ReactNode; // e.g. an ErrorState after a failed save
 }) {
   const [values, setValues] = useState(initialValues);
+  const [errors, setErrors] = useState<CandidateFormErrors>({});
   const idPrefix = useId(); // unique ids, so each label points at its own input
+  const inputId = (name: FieldName) => `${idPrefix}-${name}`;
 
   const setField = (name: FieldName, value: string) => {
     setValues((current) => ({ ...current, [name]: value }));
+    // Editing a field clears its message; the rest stay until the next Save
+    setErrors((current) => {
+      if (!current[name]) return current; // no message: nothing to change
+      const next = { ...current };
+      delete next[name];
+      return next;
+    });
+  };
+
+  const handleSubmit = () => {
+    const found = validateCandidateForm(values);
+    setErrors(found);
+
+    // Invalid: send nothing, and move focus to the first field to fix
+    const firstInvalid = FIELDS.find((field) => found[field.name]);
+    if (firstInvalid) {
+      document.getElementById(inputId(firstInvalid.name))?.focus();
+      return;
+    }
+    onSubmit(values);
   };
 
   return (
     <form
+      // noValidate: our own messages replace the browser's pop-up bubbles
+      noValidate
       onSubmit={(event) => {
         event.preventDefault(); // stay on the page; the parent saves with fetch
-        onSubmit(values);
+        handleSubmit();
       }}
     >
       {/* disabled on a fieldset disables every input inside it */}
@@ -113,7 +142,9 @@ export default function CandidateForm({
         }`}
       >
         {FIELDS.map((field) => {
-          const id = `${idPrefix}-${field.name}`;
+          const id = inputId(field.name);
+          const error = errors[field.name];
+          const errorId = `${id}-error`;
           return (
             <div key={field.name} className="min-w-0">
               <label htmlFor={id} className="text-sm text-slate-500">
@@ -135,8 +166,20 @@ export default function CandidateForm({
                 value={values[field.name]}
                 onChange={(event) => setField(field.name, event.target.value)}
                 {...(field.type === "number" && { min: 0, step: "any" })}
-                className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-900 shadow-sm placeholder:text-slate-400 focus-visible:outline-2 focus-visible:outline-blue-500 disabled:bg-slate-100 disabled:text-slate-500"
+                // Screen readers hear "invalid" and the message with the field
+                aria-invalid={error ? true : undefined}
+                aria-describedby={error ? errorId : undefined}
+                className={`mt-1 w-full rounded-lg border bg-white px-3 py-2 text-slate-900 shadow-sm placeholder:text-slate-400 focus-visible:outline-2 disabled:bg-slate-100 disabled:text-slate-500 ${
+                  error
+                    ? "border-rose-400 focus-visible:outline-rose-500"
+                    : "border-slate-200 focus-visible:outline-blue-500"
+                }`}
               />
+              {error && (
+                <p id={errorId} className="mt-1 text-sm text-rose-600">
+                  {error}
+                </p>
+              )}
             </div>
           );
         })}

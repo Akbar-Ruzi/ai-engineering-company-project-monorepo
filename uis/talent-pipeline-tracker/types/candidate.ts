@@ -74,3 +74,8 @@ export type CandidateFormValues = {
   cv_url: string;
   experience_years: string;
 };
+
+// One message per invalid field; a field with no entry is valid
+export type CandidateFormErrors = Partial<
+  Record<keyof CandidateFormValues, string>
+>;
