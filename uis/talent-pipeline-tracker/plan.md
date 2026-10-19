@@ -146,7 +146,7 @@ Files: candidate list page and its filter/search components.
 
 Goal: open a candidate's full details in a drawer over the list, expand them to a full page, update their status or stage, and correct their information.
 
-Files: `app/page.tsx`, `app/candidates/[id]/page.tsx`, `components/candidate-detail/` (shared detail content, drawer, full-page wrapper), `components/candidate-form/`, `components/candidate-list/` (row/card links), and `lib/api/records.ts`.
+Files: `app/page.tsx`, `app/candidates/[id]/page.tsx`, `components/candidate-detail/` (shared header, tabs, and overview; drawer; full-page wrapper), `components/candidate-form/`, `components/candidate-list/` (row/card links), and `lib/api/records.ts`.
 
 Mockups: `public/ui-ux/candidate-detail/drawer/overview/` and `public/ui-ux/candidate-detail/expanded/overview/`.
 
@@ -193,7 +193,8 @@ Back to Candidates -> /?<carried query>
 - [x] Show inline or banner success feedback after a successful edit submission and error feedback after a failed attempt.
 - [x] Update the detail and list labels after successful changes.
 - [x] After a successful PUT edit, update local candidate state or refetch the record and synchronize the list so corrected information appears without a full document reload.
-- [ ] Build one shared detail content component (header with avatar initials, name, position, status/stage badges; Overview/Notes tabs; Recruitment Progress card; General Information card with Edit). Both the drawer and the full page render it; only the wrapper and the header buttons differ.
+- [x] Build shared detail content components: `CandidateHeader` (avatar initials, name, position, status/stage badges), `CandidateTabs` (Overview/Notes), and `CandidateOverview` (Recruitment Progress card; General Information card with Edit). Both the drawer and the full page render them; only the wrapper and the header buttons differ.
+  - No single wrapper component (`candidate-detail-content.tsx`): the drawer keeps its header and tabs in a fixed area above a separate scroll area for the overview, so each wrapper places the three shared pieces itself.
 - [ ] Drawer (default view on tablet/desktop): change the list row links from `/candidates/[id]` to the current list URL plus `?candidate=[id]`, keeping search, status, stage, and page. On `/`, read `candidate` with `useSearchParams` and render the drawer over the list when it is set.
   - Desktop/tablet: right-side panel over a dimmed, blurred list (see drawer mockups); the list stays mounted underneath.
   - Mobile: no drawer. Cards link straight to the full page `/candidates/[id]` with the list query.

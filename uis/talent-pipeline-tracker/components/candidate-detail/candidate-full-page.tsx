@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 
-import { StageBadge, StatusBadge } from "@/components/shared/candidate-badges";
 import { drawerHref, listHref } from "@/lib/utils/candidate-urls";
-import { getInitials } from "@/lib/utils/candidate-format";
+import CandidateHeader from "@/components/candidate-detail/candidate-header";
 import CandidateOverview from "@/components/candidate-detail/candidate-overview";
+import CandidateTabs from "@/components/candidate-detail/candidate-tabs";
 import ErrorState from "@/components/shared/error-state";
 import {
   AvatarSkeleton,
@@ -99,46 +99,9 @@ export default function CandidateFullPage({
       ) : candidate ? (
         <>
           <section className="mt-5 rounded-2xl border border-slate-200 bg-white px-5 pt-6 shadow-sm sm:px-6">
-            <div className="flex items-center gap-4">
-              <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-blue-600 font-semibold text-white">
-                {getInitials(candidate.full_name)}
-              </span>
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-2xl font-semibold text-slate-900">
-                    {candidate.full_name}
-                  </h1>
-                  {/* Tablet/desktop: badges beside the name */}
-                  <div className="flex gap-2 max-md:hidden">
-                    <StatusBadge status={candidate.status} />
-                    <StageBadge stage={candidate.stage} />
-                  </div>
-                </div>
-                <p className="text-slate-500">{candidate.position}</p>
-              </div>
-            </div>
+            <CandidateHeader candidate={candidate} layout="page" />
 
-            {/* Mobile: badges on one full-width row under the name and position */}
-            <div className="mt-3 flex gap-2 md:hidden">
-              <StatusBadge status={candidate.status} />
-              <StageBadge stage={candidate.stage} />
-            </div>
-
-            {/* Tabs: visual only for now; Notes comes in step 6 */}
-            <nav
-              className="mt-5 flex gap-8 border-t border-slate-100 pt-3"
-              aria-label="Candidate sections"
-            >
-              <span className="border-b-2 border-blue-600 pb-3 font-medium text-blue-600">
-                Overview
-              </span>
-              <span className="flex items-center gap-2 pb-3 text-slate-500">
-                Notes
-                <span className="rounded-full bg-slate-100 px-2 text-sm">
-                  {candidate.notes_count}
-                </span>
-              </span>
-            </nav>
+            <CandidateTabs notesCount={candidate.notes_count} layout="page" />
           </section>
 
           <div className="mt-5">
