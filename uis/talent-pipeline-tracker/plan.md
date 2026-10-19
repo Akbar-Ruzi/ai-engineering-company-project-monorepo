@@ -224,14 +224,21 @@ Goal: add notes after calls or interviews and remove notes when they are no long
 
 Files: candidate detail Notes tab, shared note components, `lib/api/notes.ts`, and `lib/api/validators/note-guards.ts`.
 
-- [ ] Confirm note fields, the list response structure, the add-note payload, and the delete response.
-- [ ] GET `/records/:id/notes`: define the note type and notes list response type, including any wrapper.
-- [ ] POST `/records/:id/notes`: define the add-note request payload and response type.
-- [ ] DELETE `/records/:id/notes/:note_id`: define the documented delete response type, using `void` if no content is returned.
-- [ ] Use these types in the note API functions and component props without `any`; validate returned response shapes with type guards in `lib/api/validators/note-guards.ts`, reusing `isObject` from `common-guards.ts`.
-- [ ] Implement GET `/records/:id/notes` — list notes — using the shared fetch helper.
-- [ ] Implement POST `/records/:id/notes` — add a note — using the shared fetch helper.
-- [ ] Implement DELETE `/records/:id/notes/:note_id` — delete a note — using the shared fetch helper.
+- [x] Confirm note fields, the list response structure, the add-note payload, and the delete response.
+- [x] Types and guards for notes:
+  - [x] Create `types/note.ts`, following the style of `types/candidate.ts` (a comment naming the endpoint and backend schema above each type).
+  - [x] GET `/records/:id/notes`: define `Note` (one note, with the fields confirmed above; optional fields typed as `string | null`).
+  - [x] GET `/records/:id/notes`: define `NoteListResponse` — the wrapper object if the API returns one, or `Note[]` if it returns a plain array.
+  - [x] POST `/records/:id/notes`: define `CreateNotePayload` (the request body); the response reuses `Note` if the API returns the created note.
+  - [x] DELETE `/records/:id/notes/:note_id`: write down the documented response — `void` if no content is returned (e.g. 204), otherwise a small response type.
+  - [x] Create `lib/api/validators/note-guards.ts`, importing `isObject` (and `isStringOrNull` if needed) from `common-guards.ts`.
+  - [x] Add `isNote`: checks every `Note` field and its type.
+  - [x] Add `isNoteListResponse`: checks the wrapper fields (if any) and runs `isNote` on every item.
+  - [x] Reuse `isNote` for the POST response; add a DELETE guard only if the delete response has a body.
+- [ ] Use these types in the note API functions and component props without `any`.
+- [x] Implement GET `/records/:id/notes` — list notes — using the shared fetch helper.
+- [x] Implement POST `/records/:id/notes` — add a note — using the shared fetch helper.
+- [x] Implement DELETE `/records/:id/notes/:note_id` — delete a note — using the shared fetch helper.
 - [ ] Add Overview and Notes tabs and load notes through GET `/records/:id/notes`.
 - [ ] Show notes only within the candidate detail view, in both drawer and expanded presentations.
 - [ ] Use the same candidate ID for record and notes requests. Optionally load GET `/records/:id` and GET `/records/:id/notes` in parallel with `Promise.all`, while making request failures visible.
