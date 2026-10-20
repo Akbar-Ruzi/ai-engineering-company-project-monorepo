@@ -27,8 +27,10 @@ export type CandidateDraft = {
   general?: CandidateFormValues; // General information form
   progress?: Pick<Candidate, "status" | "stage">; // Recruitment progress form
   tab?: CandidateTab; // Overview / Notes; missing means Overview
+  noteDraft?: string; // New note text; present (even "") means the composer is open
+  deletingNoteId?: string; // The note whose delete confirmation is open
 };
-type DraftPart = keyof CandidateDraft; // "general" | "progress" | "tab"
+type DraftPart = keyof CandidateDraft; // "general" | "progress" | "tab" | ...
 
 type CandidateDrafts = {
   drafts: Record<string, CandidateDraft>;
@@ -62,7 +64,8 @@ export function CandidateDraftsProvider({ children }: { children: ReactNode }) {
 
   const clearDraft = useCallback((id: string, part: DraftPart) => {
     setDrafts((current) => {
-      if (!current[id]?.[part]) return current; // no draft: nothing to change
+      // no draft: nothing to change ("" is still a draft: an open, empty composer)
+      if (current[id]?.[part] === undefined) return current;
       const next = { ...current, [id]: { ...current[id] } };
       delete next[id][part];
       return next;

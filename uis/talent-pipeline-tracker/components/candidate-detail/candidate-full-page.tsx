@@ -150,6 +150,7 @@ export default function CandidateFullPage({
               />
             ) : (
               <CandidateNotes
+                candidateId={id}
                 notes={notes.notes}
                 loading={notes.loading}
                 error={notes.error}

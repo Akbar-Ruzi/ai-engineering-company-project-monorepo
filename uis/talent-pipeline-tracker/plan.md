@@ -218,7 +218,7 @@ Back to Candidates -> /?<carried query>
 - [x] Check: successful detail fetching displays the correct loaded record, completing the loading/success/error states.
 - [x] Keep detail and edit state scoped to their shared view/components; avoid prop drilling through unrelated components.
 
-## 6. Add and remove internal notes
+## 6. Add and remove internal notes ✅
 
 Goal: add notes after calls or interviews and remove notes when they are no longer relevant.
 
@@ -253,12 +253,12 @@ Files: candidate detail Notes tab, shared note components, `lib/api/notes.ts`, a
 - [x] Prevent duplicate requests and show saving/deleting, success, and failure feedback.
 - [x] Retain note text after a failed save and retain the existing note after a failed delete.
 - [x] Keep note counts synchronized and preserve the selected tab and unsaved note text between drawer and expanded views.
-- [ ] Check: notes load with GET, save with POST, and delete with DELETE; the list and count update without a full page reload.
-- [ ] Check: note requests show loading or pending feedback, successful mutations show success feedback, and failures show errors.
-- [ ] Check: note labels match HealthCore CONTEXT and note types match the API structures.
-- [ ] Check: HTTP errors and malformed responses from note requests are displayed in the Notes UI.
-- [ ] Check: successful notes fetching displays the notes or empty result, completing the loading/success/error states.
-- [ ] Keep note and composer state within the detail/notes components or a small shared hook; avoid prop drilling through unrelated components.
+- [x] Check: notes load with GET, save with POST, and delete with DELETE; the list and count update without a full page reload.
+- [x] Check: note requests show loading or pending feedback, successful mutations show success feedback, and failures show errors.
+- [x] Check: note labels match HealthCore CONTEXT and note types match the API structures.
+- [x] Check: HTTP errors and malformed responses from note requests are displayed in the Notes UI.
+- [x] Check: successful notes fetching displays the notes or empty result, completing the loading/success/error states.
+- [x] Keep note and composer state within the detail/notes components or a small shared hook; avoid prop drilling through unrelated components.
 
 ## 7. Create a new candidate
 

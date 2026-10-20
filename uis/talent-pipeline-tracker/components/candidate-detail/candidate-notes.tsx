@@ -4,24 +4,16 @@ import type { SubmitEvent } from "react";
 import EmptyState from "@/components/shared/empty-state";
 import ErrorState from "@/components/shared/error-state";
 import SuccessMessage from "@/components/shared/success-message";
+import { useCandidateDrafts } from "@/context/candidate-drafts";
 import { SUCCESS_MESSAGE_MS } from "@/lib/constants";
 import { formatNoteDate } from "@/lib/utils/candidate-format";
 import type { Note } from "@/types/note";
-
-// The one unfinished action in the Notes tab. A single value (not a flag per
-// form) means a new note and a delete confirmation, or two confirmations,
-// can never be open at the same time.
-type PendingAction =
-  | { type: "none" }
-  | { type: "adding" } // the composer is open
-  | { type: "deleting"; noteId: string }; // this note's confirmation is open
-
-const NO_ACTION: PendingAction = { type: "none" };
 
 // Notes tab body, shared by the drawer and the full page.
 // The parent loads the notes (useCandidateNotes), so switching tabs
 // doesn't refetch them.
 export default function CandidateNotes({
+  candidateId,
   notes,
   loading,
   error,
@@ -29,6 +21,7 @@ export default function CandidateNotes({
   onSave,
   onDelete,
 }: {
+  candidateId: string; // whose note draft to read and write
   notes: Note[];
   loading: boolean;
   error: string | null;
@@ -36,17 +29,23 @@ export default function CandidateNotes({
   onSave: (content: string) => Promise<void>; // POST + add to the list
   onDelete: (note: Note) => Promise<void>; // DELETE + remove from the list
 }) {
-  const [pending, setPending] = useState<PendingAction>(NO_ACTION);
-  const composerOpen = pending.type === "adding";
+  // The note being typed and the open delete confirmation live in the drafts
+  // context, so Expand and Drawer View keep them open (with the same text)
+  const { drafts, setDraft, clearDraft } = useCandidateDrafts();
+  const draft = drafts[candidateId]?.noteDraft;
+  const composerOpen = draft !== undefined;
+  // One ID (not a flag per card), so two confirmations can't be open at once
+  const confirmingId = drafts[candidateId]?.deletingNoteId;
+  const closeConfirmation = () => clearDraft(candidateId, "deletingNoteId");
 
   // Add Note opens the inline composer (text box + Cancel / Save Note),
   // closing any open delete confirmation
-  const [draft, setDraft] = useState(""); // the note being typed
-  const openComposer = () => setPending({ type: "adding" });
-  const closeComposer = () => {
-    setPending(NO_ACTION);
-    setDraft(""); // Cancel (or a successful save) clears the typed text
+  const openComposer = () => {
+    closeConfirmation();
+    setDraft(candidateId, "noteDraft", "");
   };
+  // Cancel (or a successful save) closes it and clears the typed text
+  const closeComposer = () => clearDraft(candidateId, "noteDraft");
 
   // "Note saved." / "Note deleted." banner, hidden again after a few seconds.
   // A new object each time, so a second delete restarts the timer.
@@ -71,7 +70,7 @@ export default function CandidateNotes({
 
   const handleDelete = async (note: Note) => {
     await onDelete(note);
-    setPending(NO_ACTION); // the confirmation is gone with the card
+    closeConfirmation(); // the confirmation is gone with the card
     setSuccess({ text: "Note deleted." });
     headingRef.current?.focus();
   };
@@ -79,7 +78,7 @@ export default function CandidateNotes({
   const composer = composerOpen && (
     <NoteComposer
       value={draft}
-      onChange={setDraft}
+      onChange={(value) => setDraft(candidateId, "noteDraft", value)}
       onCancel={closeComposer}
       onSave={handleSave}
     />
@@ -141,16 +140,14 @@ export default function CandidateNotes({
           <NoteCard
             key={note.id}
             note={note}
-            confirming={
-              pending.type === "deleting" && pending.noteId === note.id
-            }
+            confirming={confirmingId === note.id}
             // While a new note is being typed, no deletes: finish that first
             canDelete={!composerOpen}
             // Opening one confirmation closes any other
             onDeleteStart={() =>
-              setPending({ type: "deleting", noteId: note.id })
+              setDraft(candidateId, "deletingNoteId", note.id)
             }
-            onDeleteCancel={() => setPending(NO_ACTION)}
+            onDeleteCancel={closeConfirmation}
             onDeleteConfirm={() => handleDelete(note)}
           />
         ))}
