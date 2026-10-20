@@ -17,7 +17,7 @@ export default function CandidateTable({
   return (
     <table className="w-full text-left">
       <thead className="border-b border-slate-200">
-        <tr className="text-xs font-semibold uppercase tracking-wider text-slate-500 lg:text-sm">
+        <tr className="whitespace-nowrap text-xs font-semibold uppercase tracking-wider text-slate-500 lg:text-sm">
           <th scope="col" className="px-6 py-5 lg:px-8">
             Name
           </th>
