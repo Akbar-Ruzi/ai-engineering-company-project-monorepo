@@ -149,10 +149,12 @@ export default function CandidateFullPage({
               />
             ) : (
               <CandidateNotes
+                candidateId={candidate.id}
                 notes={notes.notes}
                 loading={notes.loading}
                 error={notes.error}
                 onRetry={notes.retry}
+                onNoteAdded={notes.addNote}
               />
             )}
           </div>

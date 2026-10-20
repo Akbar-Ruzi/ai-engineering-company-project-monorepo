@@ -243,10 +243,10 @@ Files: candidate detail Notes tab, shared note components, `lib/api/notes.ts`, a
 - [x] Show notes only within the candidate detail view, in both drawer and expanded presentations.
 - [x] Use the same candidate ID for record and notes requests. Optionally load GET `/records/:id` and GET `/records/:id/notes` in parallel with `Promise.all`, while making request failures visible.
 - [x] Show notes, their actual count, and an empty state. Show dates/authors only when supplied by the API.
-- [ ] Reuse `EmptyState` for "No notes yet" (with an Add Note action) and `ErrorState` for failed note requests, with Retry for GET `/records/:id/notes`.
+- [x] Reuse `EmptyState` for "No notes yet" (with an Add Note action) and `ErrorState` for failed note requests, with Retry for GET `/records/:id/notes`.
 - [ ] Pick one note card layout before building it and use it in both drawer and expanded views. The screenshots show three versions (text with date and trash; author with relative time and no trash; author with date and trash); choose based on which fields the notes API returns, and keep a delete action on every card.
-- [ ] Make Add Note open an inline text box with Cancel and Save Note.
-- [ ] Reject blank notes and save through POST `/records/:id/notes` using the documented payload.
+- [x] Make Add Note open an inline text box with Cancel and Save Note.
+- [x] Reject blank notes and save through POST `/records/:id/notes` using the documented payload.
 - [ ] Add inline Cancel and Delete Note confirmation before deletion.
 - [ ] Delete through DELETE `/records/:id/notes/:note_id` and remove the note only after success.
 - [ ] After a successful note POST, add the returned note to local state or refetch notes. After a successful DELETE using the selected note's ID, remove that note from state or refetch notes. Both operations must update the UI without a full document reload.

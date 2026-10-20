@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Note } from "@/types/note";
 import { getNotes } from "@/lib/api/notes";
 
@@ -15,6 +15,12 @@ export function useCandidateNotes(id: string | null) {
   const [loading, setLoading] = useState(id !== null);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
+
+  // The candidate shown now, read by addNote after a save finishes
+  const currentIdRef = useRef(id);
+  useEffect(() => {
+    currentIdRef.current = id;
+  }, [id]);
 
   // Another candidate opened → forget the old notes and show loading.
   // Done during render (not in an effect), so the previous candidate's
@@ -62,5 +68,12 @@ export function useCandidateNotes(id: string | null) {
     setReloadKey((k) => k + 1); // new value → the effect runs again
   };
 
-  return { notes, loading, error, retry };
+  // After a successful POST, show the server's new note (and +1 on the count).
+  // Ignored if another candidate was opened while the save was running.
+  const addNote = (note: Note) => {
+    if (note.record_id !== currentIdRef.current) return;
+    setNotes((current) => [...current, note]); // the API lists oldest first
+  };
+
+  return { notes, loading, error, retry, addNote };
 }
