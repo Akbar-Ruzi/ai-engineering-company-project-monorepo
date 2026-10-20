@@ -242,7 +242,7 @@ Files: candidate detail Notes tab, shared note components, `lib/api/notes.ts`, a
 - [x] Add Overview and Notes tabs and load notes through GET `/records/:id/notes`.
 - [x] Show notes only within the candidate detail view, in both drawer and expanded presentations.
 - [x] Use the same candidate ID for record and notes requests. Optionally load GET `/records/:id` and GET `/records/:id/notes` in parallel with `Promise.all`, while making request failures visible.
-- [ ] Show notes, their actual count, and an empty state. Show dates/authors only when supplied by the API.
+- [x] Show notes, their actual count, and an empty state. Show dates/authors only when supplied by the API.
 - [ ] Reuse `EmptyState` for "No notes yet" (with an Add Note action) and `ErrorState` for failed note requests, with Retry for GET `/records/:id/notes`.
 - [ ] Pick one note card layout before building it and use it in both drawer and expanded views. The screenshots show three versions (text with date and trash; author with relative time and no trash; author with date and trash); choose based on which fields the notes API returns, and keep a delete action on every card.
 - [ ] Make Add Note open an inline text box with Cancel and Save Note.

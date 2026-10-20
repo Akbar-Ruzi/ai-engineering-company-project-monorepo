@@ -198,7 +198,13 @@ export default function CandidateDrawer() {
                 actions={actions}
               />
               <CandidateTabs
-                notesCount={candidate.notes_count}
+                // The loaded notes are the real count (they change after add
+                // or delete); the record's notes_count fills in until then
+                notesCount={
+                  notes.loading || notes.error
+                    ? candidate.notes_count
+                    : notes.notes.length
+                }
                 layout="drawer"
                 activeTab={activeTab}
                 onTabChange={(tab) => setDraft(candidate.id, "tab", tab)}
