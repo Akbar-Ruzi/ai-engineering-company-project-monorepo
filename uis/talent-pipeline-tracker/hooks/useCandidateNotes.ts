@@ -14,6 +14,7 @@ export function useCandidateNotes(id: string | null) {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(id !== null);
   const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   // Another candidate opened → forget the old notes and show loading.
   // Done during render (not in an effect), so the previous candidate's
@@ -53,7 +54,13 @@ export function useCandidateNotes(id: string | null) {
     return () => {
       ignore = true;
     };
-  }, [id]);
+  }, [id, reloadKey]);
 
-  return { notes, loading, error };
+  const retry = () => {
+    setLoading(true); // show "Loading notes…" again
+    setError(null);
+    setReloadKey((k) => k + 1); // new value → the effect runs again
+  };
+
+  return { notes, loading, error, retry };
 }

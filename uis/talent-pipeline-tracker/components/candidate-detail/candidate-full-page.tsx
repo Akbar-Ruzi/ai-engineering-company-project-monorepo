@@ -152,6 +152,7 @@ export default function CandidateFullPage({
                 notes={notes.notes}
                 loading={notes.loading}
                 error={notes.error}
+                onRetry={notes.retry}
               />
             )}
           </div>

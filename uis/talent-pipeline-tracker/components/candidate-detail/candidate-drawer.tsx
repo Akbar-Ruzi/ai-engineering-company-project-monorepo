@@ -269,6 +269,7 @@ export default function CandidateDrawer() {
                   notes={notes.notes}
                   loading={notes.loading}
                   error={notes.error}
+                  onRetry={notes.retry}
                 />
               )}
             </div>

@@ -1,20 +1,21 @@
 import EmptyState from "@/components/shared/empty-state";
+import ErrorState from "@/components/shared/error-state";
 import { formatDateTime } from "@/lib/utils/candidate-format";
 import type { Note } from "@/types/note";
 
 // Notes tab body, shared by the drawer and the full page.
 // The parent loads the notes (useCandidateNotes), so switching tabs
 // doesn't refetch them.
-// First version: loading, error, and the note text only. The empty state,
-// Retry, note cards, and add/delete come in the next step 6 tasks.
 export default function CandidateNotes({
   notes,
   loading,
   error,
+  onRetry,
 }: {
   notes: Note[];
   loading: boolean;
   error: string | null;
+  onRetry: () => void; // GET /records/:id/notes again
 }) {
   if (loading) {
     return (
@@ -26,9 +27,11 @@ export default function CandidateNotes({
 
   if (error) {
     return (
-      <p role="alert" className="text-red-700">
-        {error}
-      </p>
+      <ErrorState
+        title="Could not load notes"
+        message={error}
+        onRetry={onRetry}
+      />
     );
   }
 
