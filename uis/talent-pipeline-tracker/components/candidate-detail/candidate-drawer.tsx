@@ -12,7 +12,11 @@ import {
 } from "@/lib/utils/candidate-urls";
 import CandidateHeader from "@/components/candidate-detail/candidate-header";
 import CandidateOverview from "@/components/candidate-detail/candidate-overview";
-import CandidateTabs from "@/components/candidate-detail/candidate-tabs";
+import CandidateNotes from "@/components/candidate-detail/candidate-notes";
+import CandidateTabs, {
+  tabId,
+  tabPanelId,
+} from "@/components/candidate-detail/candidate-tabs";
 import ErrorState from "@/components/shared/error-state";
 import {
   AvatarSkeleton,
@@ -22,6 +26,7 @@ import {
 } from "@/components/candidate-detail/candidate-detail-skeleton";
 import { useCandidateDrafts } from "@/context/candidate-drafts";
 import { useCandidateDetail } from "@/hooks/useCandidateDetail";
+import { useCandidateNotes } from "@/hooks/useCandidateNotes";
 
 // The dialog is labelled by the heading with this id (in every state)
 const TITLE_ID = "candidate-drawer-title";
@@ -68,16 +73,22 @@ export default function CandidateDrawer() {
   const { candidate, loading, error, retry, replaceCandidate } =
     useCandidateDetail(candidateId);
 
+  // GET /records/:id/notes for the same ID, loaded alongside the record
+  const notes = useCandidateNotes(candidateId);
+
   // The list query without ?candidate, used by Close and Expand
   const listQuery = toListQuery(searchParams);
 
   // Close (×), Escape, and the backdrop discard unsaved edits; only Expand
   // carries them to the full page
-  const { clearAllDrafts } = useCandidateDrafts();
+  const { drafts, setDraft, clearAllDrafts } = useCandidateDrafts();
   const close = useCallback(() => {
     if (candidateId) clearAllDrafts(candidateId);
     router.push(listHref(listQuery), { scroll: false });
   }, [router, listQuery, candidateId, clearAllDrafts]);
+
+  // Kept in the drafts context, so Expand opens the full page on the same tab
+  const activeTab = (candidateId && drafts[candidateId]?.tab) || "overview";
 
   const dialogRef = useRef<HTMLElement>(null);
   const isOpen = candidateId !== null;
@@ -189,6 +200,8 @@ export default function CandidateDrawer() {
               <CandidateTabs
                 notesCount={candidate.notes_count}
                 layout="drawer"
+                activeTab={activeTab}
+                onTabChange={(tab) => setDraft(candidate.id, "tab", tab)}
               />
             </>
           ) : (
@@ -234,11 +247,25 @@ export default function CandidateDrawer() {
               onRetry={retry}
             />
           ) : candidate ? (
-            <CandidateOverview
-              candidate={candidate}
-              layout="drawer"
-              onCandidateChange={replaceCandidate}
-            />
+            <div
+              role="tabpanel"
+              id={tabPanelId("drawer", activeTab)}
+              aria-labelledby={tabId("drawer", activeTab)}
+            >
+              {activeTab === "overview" ? (
+                <CandidateOverview
+                  candidate={candidate}
+                  layout="drawer"
+                  onCandidateChange={replaceCandidate}
+                />
+              ) : (
+                <CandidateNotes
+                  notes={notes.notes}
+                  loading={notes.loading}
+                  error={notes.error}
+                />
+              )}
+            </div>
           ) : null}
         </div>
       </aside>

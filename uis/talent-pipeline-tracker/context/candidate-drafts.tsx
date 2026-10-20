@@ -9,7 +9,11 @@ import {
 } from "react";
 import type { ReactNode } from "react";
 
-import type { Candidate, CandidateFormValues } from "@/types/candidate";
+import type {
+  Candidate,
+  CandidateFormValues,
+  CandidateTab,
+} from "@/types/candidate";
 
 // Unsaved edits, by candidate ID. The drawer and the full page each render
 // their own cards, so a draft kept inside one card would be lost on Expand or
@@ -17,11 +21,14 @@ import type { Candidate, CandidateFormValues } from "@/types/candidate";
 // form with the same values. Cancel or a successful save removes the draft,
 // leaving the detail views (drawer Close, full page Back to Candidates)
 // discards all of that candidate's drafts, and a page reload forgets them all.
+// The selected tab is kept here for the same reason, so Expand and Drawer View
+// open the tab the user was on (and leaving the views resets it to Overview).
 export type CandidateDraft = {
   general?: CandidateFormValues; // General information form
   progress?: Pick<Candidate, "status" | "stage">; // Recruitment progress form
+  tab?: CandidateTab; // Overview / Notes; missing means Overview
 };
-type DraftPart = keyof CandidateDraft; // "general" | "progress"
+type DraftPart = keyof CandidateDraft; // "general" | "progress" | "tab"
 
 type CandidateDrafts = {
   drafts: Record<string, CandidateDraft>;

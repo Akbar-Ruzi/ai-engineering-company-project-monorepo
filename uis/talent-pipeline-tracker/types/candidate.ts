@@ -79,3 +79,6 @@ export type CandidateFormValues = {
 export type CandidateFormErrors = Partial<
   Record<keyof CandidateFormValues, string>
 >;
+
+// The detail view's sections (drawer and full page)
+export type CandidateTab = "overview" | "notes";

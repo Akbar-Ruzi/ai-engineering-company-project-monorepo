@@ -5,7 +5,11 @@ import Link from "next/link";
 import { drawerHref, listHref } from "@/lib/utils/candidate-urls";
 import CandidateHeader from "@/components/candidate-detail/candidate-header";
 import CandidateOverview from "@/components/candidate-detail/candidate-overview";
-import CandidateTabs from "@/components/candidate-detail/candidate-tabs";
+import CandidateNotes from "@/components/candidate-detail/candidate-notes";
+import CandidateTabs, {
+  tabId,
+  tabPanelId,
+} from "@/components/candidate-detail/candidate-tabs";
 import ErrorState from "@/components/shared/error-state";
 import {
   AvatarSkeleton,
@@ -15,6 +19,7 @@ import {
 } from "@/components/candidate-detail/candidate-detail-skeleton";
 import { useCandidateDrafts } from "@/context/candidate-drafts";
 import { useCandidateDetail } from "@/hooks/useCandidateDetail";
+import { useCandidateNotes } from "@/hooks/useCandidateNotes";
 
 // Shared look for the Back to Candidates and Drawer View buttons
 const NAV_BUTTON =
@@ -34,9 +39,15 @@ export default function CandidateFullPage({
   const { candidate, loading, error, retry, replaceCandidate } =
     useCandidateDetail(id);
 
+  // GET /records/:id/notes for the same ID, loaded alongside the record
+  const notes = useCandidateNotes(id);
+
   // Back to Candidates leaves the detail views, so it discards unsaved edits
   // (like Close in the drawer); only Drawer View carries them across
-  const { clearAllDrafts } = useCandidateDrafts();
+  const { drafts, setDraft, clearAllDrafts } = useCandidateDrafts();
+
+  // Kept in the drafts context, so Drawer View opens the drawer on the same tab
+  const activeTab = drafts[id]?.tab ?? "overview";
 
   return (
     <>
@@ -110,15 +121,33 @@ export default function CandidateFullPage({
           <section className="mt-5 rounded-2xl border border-slate-200 bg-white px-5 pt-6 shadow-sm sm:px-6">
             <CandidateHeader candidate={candidate} layout="page" />
 
-            <CandidateTabs notesCount={candidate.notes_count} layout="page" />
+            <CandidateTabs
+              notesCount={candidate.notes_count}
+              layout="page"
+              activeTab={activeTab}
+              onTabChange={(tab) => setDraft(id, "tab", tab)}
+            />
           </section>
 
-          <div className="mt-5">
-            <CandidateOverview
-              candidate={candidate}
-              layout="page"
-              onCandidateChange={replaceCandidate}
-            />
+          <div
+            role="tabpanel"
+            id={tabPanelId("page", activeTab)}
+            aria-labelledby={tabId("page", activeTab)}
+            className="mt-5"
+          >
+            {activeTab === "overview" ? (
+              <CandidateOverview
+                candidate={candidate}
+                layout="page"
+                onCandidateChange={replaceCandidate}
+              />
+            ) : (
+              <CandidateNotes
+                notes={notes.notes}
+                loading={notes.loading}
+                error={notes.error}
+              />
+            )}
           </div>
         </>
       ) : null}
