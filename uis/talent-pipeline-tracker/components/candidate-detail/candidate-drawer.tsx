@@ -70,7 +70,7 @@ export default function CandidateDrawer() {
   const candidateId = getDrawerCandidateId(searchParams);
 
   // GET /records/:id; null while the drawer is closed, so nothing is fetched
-  const { candidate, loading, error, retry, replaceCandidate } =
+  const { candidate, loading, error, retry, updateStatus, updateInfo } =
     useCandidateDetail(candidateId);
 
   // GET /records/:id/notes for the same ID, loaded alongside the record
@@ -262,7 +262,8 @@ export default function CandidateDrawer() {
                 <CandidateOverview
                   candidate={candidate}
                   layout="drawer"
-                  onCandidateChange={replaceCandidate}
+                  onUpdateStatus={updateStatus}
+                  onUpdateInfo={updateInfo}
                 />
               ) : (
                 <CandidateNotes

@@ -11,7 +11,6 @@ import CandidateForm from "@/components/candidate-form/candidate-form";
 import { useCandidateDrafts } from "@/context/candidate-drafts";
 import ErrorState from "@/components/shared/error-state";
 import SuccessMessage from "@/components/shared/success-message";
-import { updateRecord } from "@/lib/api/records";
 import { SUCCESS_MESSAGE_MS } from "@/lib/constants";
 import {
   toCandidateFormValues,
@@ -40,11 +39,11 @@ import type {
 export default function GeneralInformationCard({
   candidate,
   layout,
-  onSaved,
+  onSave,
 }: {
   candidate: Candidate;
   layout: "drawer" | "page";
-  onSaved: (updated: Candidate) => void; // the PUT response, shown everywhere
+  onSave: (payload: UpdateCandidatePayload) => Promise<void>; // PUT, via useCandidateDetail
 }) {
   const { drafts, setDraft, clearDraft } = useCandidateDrafts();
   const draft = drafts[candidate.id]?.general;
@@ -95,11 +94,7 @@ export default function GeneralInformationCard({
     setSaving(true); // disables the form while the request runs
     setError(null);
     try {
-      const updated = await updateRecord({
-        id: candidate.id,
-        payload,
-      });
-      onSaved(updated); // show the server's version, not the form's values
+      await onSave(payload); // the hook sends it and shows the server's version
       clearDraft(candidate.id, "general"); // closes the form
       setSaved(true); // success: green message under the details, auto-hides
     } catch (err) {

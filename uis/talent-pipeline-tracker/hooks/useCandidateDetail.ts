@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
-import type { Candidate } from "@/types/candidate";
+import type {
+  Candidate,
+  UpdateCandidatePayload,
+  UpdateCandidateStatusPayload,
+} from "@/types/candidate";
 import { useCandidateUpdates } from "@/context/candidate-updates";
-import { getRecord } from "@/lib/api/records";
+import { getRecord, updateRecord, updateRecordStatus } from "@/lib/api/records";
 
 /**
  * ------------Drawer and full page------------
@@ -75,5 +79,21 @@ export function useCandidateDetail(id: string | null) {
     notifyCandidateSaved();
   };
 
-  return { candidate, loading, error, retry, replaceCandidate };
+  // The hook owns the writes too (API call + update); the cards only own their
+  // buttons and messages. Both throw on failure, so the card can show the
+  // error and keep the user's values.
+
+  // PATCH /records/:id: status and/or stage only
+  const updateStatus = async (payload: UpdateCandidateStatusPayload) => {
+    if (id === null) throw new Error("No candidate is open.");
+    replaceCandidate(await updateRecordStatus({ id, payload }));
+  };
+
+  // PUT /records/:id: the general information
+  const updateInfo = async (payload: UpdateCandidatePayload) => {
+    if (id === null) throw new Error("No candidate is open.");
+    replaceCandidate(await updateRecord({ id, payload }));
+  };
+
+  return { candidate, loading, error, retry, updateStatus, updateInfo };
 }

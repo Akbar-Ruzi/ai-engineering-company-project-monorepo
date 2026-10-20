@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 
-import { DetailCard, EditButton } from "@/components/candidate-detail/detail-card";
+import {
+  DetailCard,
+  EditButton,
+} from "@/components/candidate-detail/detail-card";
 import { StageBadge, StatusBadge } from "@/components/shared/candidate-badges";
 import ErrorState from "@/components/shared/error-state";
 import { useCandidateDrafts } from "@/context/candidate-drafts";
 import SuccessMessage from "@/components/shared/success-message";
-import { updateRecordStatus } from "@/lib/api/records";
 import {
   STAGE_LABELS,
   STATUS_LABELS,
@@ -27,11 +29,11 @@ import type {
 export default function RecruitmentProgressCard({
   candidate,
   layout,
-  onSaved,
+  onSave,
 }: {
   candidate: Candidate;
   layout: "drawer" | "page";
-  onSaved: (updated: Candidate) => void; // the PATCH response, shown everywhere
+  onSave: (payload: UpdateCandidateStatusPayload) => Promise<void>; // PATCH, via useCandidateDetail
 }) {
   const isPage = layout === "page";
 
@@ -84,8 +86,7 @@ export default function RecruitmentProgressCard({
     setSaving(true); // disables the controls, so it can't be sent twice
     setError(null);
     try {
-      const updated = await updateRecordStatus({ id: candidate.id, payload });
-      onSaved(updated);
+      await onSave(payload); // the hook sends it and shows the server's version
       clearDraft(candidate.id, "progress"); // closes the form
       setSaved(true);
     } catch (err) {

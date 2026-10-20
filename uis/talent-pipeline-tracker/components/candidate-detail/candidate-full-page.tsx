@@ -36,7 +36,7 @@ export default function CandidateFullPage({
   listQuery: string;
 }) {
   // GET /records/:id for the [id] in the URL
-  const { candidate, loading, error, retry, replaceCandidate } =
+  const { candidate, loading, error, retry, updateStatus, updateInfo } =
     useCandidateDetail(id);
 
   // GET /records/:id/notes for the same ID, loaded alongside the record
@@ -145,7 +145,8 @@ export default function CandidateFullPage({
               <CandidateOverview
                 candidate={candidate}
                 layout="page"
-                onCandidateChange={replaceCandidate}
+                onUpdateStatus={updateStatus}
+                onUpdateInfo={updateInfo}
               />
             ) : (
               <CandidateNotes
