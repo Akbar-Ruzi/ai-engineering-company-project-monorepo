@@ -155,6 +155,7 @@ export default function CandidateFullPage({
                 error={notes.error}
                 onRetry={notes.retry}
                 onNoteAdded={notes.addNote}
+                onNoteRemoved={notes.removeNote}
               />
             )}
           </div>

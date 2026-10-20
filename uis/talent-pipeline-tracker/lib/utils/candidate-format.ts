@@ -36,6 +36,18 @@ export function formatDateTime(iso: string): string | null {
   });
 }
 
+// "2024-10-14T14:30:00.000Z" → "Oct 14, 2024 · 2:30 PM" (note cards);
+// null if the date can't be read
+export function formatNoteDate(iso: string): string | null {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return null;
+  const time = date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+  return `${formatDate(iso)} · ${time}`;
+}
+
 // 1 → "1 year", 6 → "6 years"
 export function formatYears(years: number): string {
   return `${years} ${years === 1 ? "year" : "years"}`;

@@ -16,7 +16,7 @@ export function useCandidateNotes(id: string | null) {
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
 
-  // The candidate shown now, read by addNote after a save finishes
+  // The candidate shown now, read by addNote/removeNote after a request finishes
   const currentIdRef = useRef(id);
   useEffect(() => {
     currentIdRef.current = id;
@@ -75,5 +75,12 @@ export function useCandidateNotes(id: string | null) {
     setNotes((current) => [...current, note]); // the API lists oldest first
   };
 
-  return { notes, loading, error, retry, addNote };
+  // After a successful DELETE, drop that note (and -1 on the count).
+  // Takes the whole note, like addNote, so the same check applies.
+  const removeNote = (note: Note) => {
+    if (note.record_id !== currentIdRef.current) return;
+    setNotes((current) => current.filter((n) => n.id !== note.id));
+  };
+
+  return { notes, loading, error, retry, addNote, removeNote };
 }

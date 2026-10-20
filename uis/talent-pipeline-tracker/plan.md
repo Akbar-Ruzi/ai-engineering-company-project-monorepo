@@ -247,11 +247,11 @@ Files: candidate detail Notes tab, shared note components, `lib/api/notes.ts`, a
 - [ ] Pick one note card layout before building it and use it in both drawer and expanded views. The screenshots show three versions (text with date and trash; author with relative time and no trash; author with date and trash); choose based on which fields the notes API returns, and keep a delete action on every card.
 - [x] Make Add Note open an inline text box with Cancel and Save Note.
 - [x] Reject blank notes and save through POST `/records/:id/notes` using the documented payload.
-- [ ] Add inline Cancel and Delete Note confirmation before deletion.
-- [ ] Delete through DELETE `/records/:id/notes/:note_id` and remove the note only after success.
-- [ ] After a successful note POST, add the returned note to local state or refetch notes. After a successful DELETE using the selected note's ID, remove that note from state or refetch notes. Both operations must update the UI without a full document reload.
-- [ ] Prevent duplicate requests and show saving/deleting, success, and failure feedback.
-- [ ] Retain note text after a failed save and retain the existing note after a failed delete.
+- [x] Add inline Cancel and Delete Note confirmation before deletion.
+- [x] Delete through DELETE `/records/:id/notes/:note_id` and remove the note only after success.
+- [x] After a successful note POST, add the returned note to local state or refetch notes. After a successful DELETE using the selected note's ID, remove that note from state or refetch notes. Both operations must update the UI without a full document reload.
+- [x] Prevent duplicate requests and show saving/deleting, success, and failure feedback.
+- [x] Retain note text after a failed save and retain the existing note after a failed delete.
 - [ ] Keep note counts synchronized and preserve the selected tab and unsaved note text between drawer and expanded views.
 - [ ] Check: notes load with GET, save with POST, and delete with DELETE; the list and count update without a full page reload.
 - [ ] Check: note requests show loading or pending feedback, successful mutations show success feedback, and failures show errors.

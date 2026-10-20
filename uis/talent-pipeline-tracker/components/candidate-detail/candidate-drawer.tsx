@@ -272,6 +272,7 @@ export default function CandidateDrawer() {
                   error={notes.error}
                   onRetry={notes.retry}
                   onNoteAdded={notes.addNote}
+                  onNoteRemoved={notes.removeNote}
                 />
               )}
             </div>
