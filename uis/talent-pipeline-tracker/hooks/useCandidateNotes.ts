@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Note } from "@/types/note";
-import { getNotes } from "@/lib/api/notes";
+import { createNote, deleteNote, getNotes } from "@/lib/api/notes";
 
 /**
  * ------------Notes tab (drawer and full page)------------
@@ -9,6 +9,10 @@ import { getNotes } from "@/lib/api/notes";
  * drawer is closed, so nothing is fetched.
  * Called by the drawer and full page (not the Notes tab), so the notes load
  * once per candidate, alongside the record, and switching tabs doesn't refetch.
+ *
+ * Owns the notes data: loading them, and adding or deleting one (API call +
+ * list update). Components only own their buttons: saving/deleting state and
+ * error messages (the same split as React Query's useMutation).
  */
 export function useCandidateNotes(id: string | null) {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -16,7 +20,7 @@ export function useCandidateNotes(id: string | null) {
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
 
-  // The candidate shown now, read by addNote/removeNote after a request finishes
+  // The candidate shown now, read by saveNote/removeNote after a request finishes
   const currentIdRef = useRef(id);
   useEffect(() => {
     currentIdRef.current = id;
@@ -68,19 +72,26 @@ export function useCandidateNotes(id: string | null) {
     setReloadKey((k) => k + 1); // new value → the effect runs again
   };
 
-  // After a successful POST, show the server's new note (and +1 on the count).
-  // Ignored if another candidate was opened while the save was running.
-  const addNote = (note: Note) => {
-    if (note.record_id !== currentIdRef.current) return;
-    setNotes((current) => [...current, note]); // the API lists oldest first
+  // POST /records/:id/notes, then show the server's new note (+1 on the count).
+  // Throws on failure, so the caller can show the error and keep the text.
+  // The list is left alone if another candidate was opened during the save.
+  const saveNote = async (content: string) => {
+    if (id === null) throw new Error("No candidate is open.");
+    const note = await createNote({ id, payload: { content } });
+    if (note.record_id === currentIdRef.current) {
+      setNotes((current) => [...current, note]); // the API lists oldest first
+    }
   };
 
-  // After a successful DELETE, drop that note (and -1 on the count).
-  // Takes the whole note, like addNote, so the same check applies.
-  const removeNote = (note: Note) => {
-    if (note.record_id !== currentIdRef.current) return;
-    setNotes((current) => current.filter((n) => n.id !== note.id));
+  // DELETE /records/:id/notes/:note_id, then drop the note (-1 on the count).
+  // The note leaves the list only after the server confirms; a failure throws
+  // and the note stays.
+  const removeNote = async (note: Note) => {
+    await deleteNote({ id: note.record_id, noteId: note.id });
+    if (note.record_id === currentIdRef.current) {
+      setNotes((current) => current.filter((n) => n.id !== note.id));
+    }
   };
 
-  return { notes, loading, error, retry, addNote, removeNote };
+  return { notes, loading, error, retry, saveNote, removeNote };
 }

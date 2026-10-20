@@ -4,7 +4,6 @@ import type { SubmitEvent } from "react";
 import EmptyState from "@/components/shared/empty-state";
 import ErrorState from "@/components/shared/error-state";
 import SuccessMessage from "@/components/shared/success-message";
-import { createNote, deleteNote } from "@/lib/api/notes";
 import { SUCCESS_MESSAGE_MS } from "@/lib/constants";
 import { formatNoteDate } from "@/lib/utils/candidate-format";
 import type { Note } from "@/types/note";
@@ -23,21 +22,19 @@ const NO_ACTION: PendingAction = { type: "none" };
 // The parent loads the notes (useCandidateNotes), so switching tabs
 // doesn't refetch them.
 export default function CandidateNotes({
-  candidateId,
   notes,
   loading,
   error,
   onRetry,
-  onNoteAdded,
-  onNoteRemoved,
+  onSave,
+  onDelete,
 }: {
-  candidateId: string; // the same ID as GET /records/:id
   notes: Note[];
   loading: boolean;
   error: string | null;
   onRetry: () => void; // GET /records/:id/notes again
-  onNoteAdded: (note: Note) => void; // after a successful POST
-  onNoteRemoved: (note: Note) => void; // after a successful DELETE
+  onSave: (content: string) => Promise<void>; // POST + add to the list
+  onDelete: (note: Note) => Promise<void>; // DELETE + remove from the list
 }) {
   const [pending, setPending] = useState<PendingAction>(NO_ACTION);
   const composerOpen = pending.type === "adding";
@@ -64,20 +61,16 @@ export default function CandidateNotes({
   // (tabIndex -1: focusable from code, not a Tab stop) instead of the page top
   const headingRef = useRef<HTMLHeadingElement>(null);
 
-  // POST /records/:id/notes. Throws on failure, so the composer can show the
-  // error and keep the text.
-  const saveNote = async (content: string) => {
-    const note = await createNote({ id: candidateId, payload: { content } });
-    onNoteAdded(note);
+  // What the Notes tab does after the hook's request succeeds. A failure
+  // throws past these lines, so the composer / confirmation shows the error.
+  const handleSave = async (content: string) => {
+    await onSave(content);
     closeComposer();
     setSuccess({ text: "Note saved." });
   };
 
-  // DELETE /records/:id/notes/:note_id. The note leaves the list only after
-  // the server confirms; a failure throws and the note stays.
-  const removeNote = async (note: Note) => {
-    await deleteNote({ id: candidateId, noteId: note.id });
-    onNoteRemoved(note);
+  const handleDelete = async (note: Note) => {
+    await onDelete(note);
     setPending(NO_ACTION); // the confirmation is gone with the card
     setSuccess({ text: "Note deleted." });
     headingRef.current?.focus();
@@ -88,7 +81,7 @@ export default function CandidateNotes({
       value={draft}
       onChange={setDraft}
       onCancel={closeComposer}
-      onSave={saveNote}
+      onSave={handleSave}
     />
   );
 
@@ -158,7 +151,7 @@ export default function CandidateNotes({
               setPending({ type: "deleting", noteId: note.id })
             }
             onDeleteCancel={() => setPending(NO_ACTION)}
-            onDeleteConfirm={() => removeNote(note)}
+            onDeleteConfirm={() => handleDelete(note)}
           />
         ))}
       </ul>
