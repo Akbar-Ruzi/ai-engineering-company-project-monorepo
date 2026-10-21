@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://healthcore.example/telemetry/event-schemas.json",
+  "title": "HealthCore Telemetry Event Schemas",
+  "description": "JSON Schema (draft-07) for every HealthCore telemetry event. Every event is composed from eventEnvelope with allOf + $ref. Must stay in sync with telemetry-plan.md.",
+  "definitions": {
+    "eventEnvelope": {
+      "description": "The 8 fields every event carries (telemetry-plan.md, section 5). Only the content of properties changes between events.",
+      "type": "object",
+      "required": [
+        "eventId",
+        "timestamp",
+        "sessionId",
+        "userId",
+        "event_type",
+        "schemaVersion",
+        "requestId",
+        "properties"
+      ],
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "UUID v4 generated where the event is created. Used to drop duplicates."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the event happened, ISO 8601 in UTC with a Z suffix."
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Browser or API session. Scheduled jobs use their job run ID."
+        },
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Pseudonymised staff ID or a service account (e.g. system:expiry-job). Never a name, email or patient identifier."
+        },
+        "event_type": {
+          "type": "string",
+          "pattern": "^[a-z]+(_[a-z]+)+$",
+          "description": "Event name in entity_action snake_case, past tense."
+        },
+        "schemaVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Semantic version of the event schema, starting at 1.0.0."
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Correlation ID passed from frontend to API to logs (X-Request-Id header)."
+        },
+        "properties": {
+          "type": "object",
+          "description": "Event-specific payload. Each event restricts it to its own allowlist."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
