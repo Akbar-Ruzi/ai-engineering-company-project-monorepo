@@ -104,7 +104,47 @@ This catalogue lists every event in the plan, grouped by category and labeled **
 
 ## 5. Event Envelope
 
-_The mandatory fields every event carries._
+Every event carries the same 8 envelope fields, whatever its type. Only the content of `properties` changes from one event to another, and it is defined per event in section 6.
+
+| Field           | Type                   | Required | Notes                                                                                                          | Example                                |
+| --------------- | ---------------------- | -------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| `eventId`       | string (UUID v4)       | yes      | Unique ID generated where the event is created. Consumers use it to drop duplicates.                           | `3f8a2c1e-7b4d-4e9a-9c2f-1d5e6a7b8c90` |
+| `timestamp`     | string (ISO 8601, UTC) | yes      | When the event happened, always in UTC with a `Z` suffix.                                                      | `2026-10-21T14:05:00Z`                 |
+| `sessionId`     | string                 | yes      | The browser or API session. Scheduled jobs use their job run ID.                                               | `sess_8d21f0`                          |
+| `userId`        | string                 | yes      | Pseudonymised staff ID (never a name or email). System events use a service account.                           | `usr_a91c4e` / `system:expiry-job`     |
+| `event_type`    | string                 | yes      | Event name in `entity_action` snake_case, past tense. Must match an event in section 6.                        | `inbound_order_created`                |
+| `schemaVersion` | string (semver)        | yes      | Version of this event's schema. Starts at `1.0.0`.                                                             | `1.0.0`                                |
+| `requestId`     | string                 | yes      | Correlation ID passed from frontend to API to logs (`X-Request-Id` header). Scheduled jobs generate their own. | `req_5b7e2d`                           |
+| `properties`    | object                 | yes      | Event-specific payload. Only the keys on that event's allowlist are allowed.                                   | `{ "clinic_id": "us-tx-01", ... }`     |
+
+**Rules:**
+
+- All 8 fields are required on every event, and no other top-level fields are allowed. Anything event-specific goes inside `properties`.
+- The envelope never carries patient data or PHI. `userId` always identifies a staff member or a service account, never a patient.
+- The field names mix camelCase (`eventId`, `schemaVersion`) and snake_case (`event_type`) on purpose, to match the project README. They must be used exactly as written here and not renamed.
+
+**Example event: `inbound_order_created`** (fake values, no real data):
+
+```json
+{
+  "eventId": "3f8a2c1e-7b4d-4e9a-9c2f-1d5e6a7b8c90",
+  "timestamp": "2026-10-21T14:05:00Z",
+  "sessionId": "sess_8d21f0",
+  "userId": "usr_a91c4e",
+  "event_type": "inbound_order_created",
+  "schemaVersion": "1.0.0",
+  "requestId": "req_5b7e2d",
+  "properties": {
+    "clinic_id": "us-tx-01",
+    "country": "US",
+    "product_id": "prd_00412",
+    "product_category": "ppe",
+    "quantity": 500,
+    "vendor_id": "vnd_0031",
+    "order_id": "ord_20261021_0007"
+  }
+}
+```
 
 ## 6. Event catalog
 
