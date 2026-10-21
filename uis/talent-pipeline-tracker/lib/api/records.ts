@@ -2,6 +2,7 @@ import { apiFetch } from "./api-fetch";
 import type {
   Candidate,
   CandidateListResponse,
+  CreateCandidatePayload,
   GetRecordsParams,
   UpdateCandidatePayload,
   UpdateCandidateStatusPayload,
@@ -36,6 +37,20 @@ export async function getRecord(id: string): Promise<Candidate> {
   const data = await apiFetch<unknown>(`/records/${encodeURIComponent(id)}`);
   if (!isCandidate(data)) {
     throw new Error("The candidate details came back in an unexpected format.");
+  }
+  return data;
+}
+
+// POST /records: register a new candidate (starts as received / pending)
+export async function createRecord(
+  payload: CreateCandidatePayload,
+): Promise<Candidate> {
+  const data = await apiFetch<unknown>("/records", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+  if (!isCandidate(data)) {
+    throw new Error("The new candidate came back in an unexpected format.");
   }
   return data;
 }

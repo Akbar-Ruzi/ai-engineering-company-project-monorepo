@@ -260,31 +260,31 @@ Files: candidate detail Notes tab, shared note components, `lib/api/notes.ts`, a
 - [x] Check: successful notes fetching displays the notes or empty result, completing the loading/success/error states.
 - [x] Keep note and composer state within the detail/notes components or a small shared hook; avoid prop drilling through unrelated components.
 
-## 7. Create a new candidate
+## 7. Create a new candidate ✅
 
 Goal: create a candidate who comes through a referral.
 
 Files: `components/candidate-form/`, candidate list/create views, and `lib/api/records.ts`.
 
-- [ ] Confirm the required creation fields and POST response.
-- [ ] POST `/records`: define the create-candidate request payload and response type, marking required and optional fields according to the backend documentation. Reuse existing candidate types where appropriate.
-- [ ] Use these types in the creation API function and component props without `any`; validate the returned response shape.
-- [ ] Implement POST `/records` — create a candidate — using the shared fetch helper.
-- [ ] Add an Add Candidate action to the list.
-- [ ] Open the new-candidate form on the list page, in a modal/drawer, or on a dedicated create route. Validate required fields before submitting POST `/records`.
-- [ ] Reuse the candidate form from step 5 with empty fields for a new candidate.
-- [ ] Include every field required by the API in the registration form.
-- [ ] Validate required fields and formats against the backend documentation.
-- [ ] Open an empty form for a referred candidate and save through POST `/records`. Add referral metadata only if supported by the documented API.
-- [ ] Support drawer and expanded form views while preserving entered values.
-- [ ] Add Cancel and saving/success/error feedback; prevent duplicate submissions and retain input after a failed save.
-- [ ] Show inline or banner success feedback after a successful creation submission and error feedback after a failed attempt.
-- [ ] Show the new candidate in the list after saving and keep form actions reachable on mobile.
-- [ ] After a successful POST creation, update local list state or refetch candidates so the new candidate appears without a full document reload.
-- [ ] Check: the creation form validates required fields, sends POST, and shows saving, success, and error feedback.
-- [ ] Check: creation field labels match HealthCore CONTEXT, and request/response types match the API structures.
-- [ ] Check: HTTP errors and malformed creation responses are displayed in the create form UI.
-- [ ] Keep creation form state in the form or its owning view; avoid prop drilling through unrelated components.
+- [x] Confirm the required creation fields and POST response.
+- [x] POST `/records`: define the create-candidate request payload and response type, marking required and optional fields according to the backend documentation. Reuse existing candidate types where appropriate.
+- [x] Use these types in the creation API function and component props without `any`; validate the returned response shape.
+- [x] Implement POST `/records` — create a candidate — using the shared fetch helper.
+- [x] Add an Add Candidate action to the list.
+- [x] Open the new-candidate form on the list page, in a modal/drawer, or on a dedicated create route. Validate required fields before submitting POST `/records`.
+- [x] Reuse the candidate form from step 5 with empty fields for a new candidate.
+- [x] Include every field required by the API in the registration form.
+- [x] Validate required fields and formats against the backend documentation.
+- [x] Open an empty form for a referred candidate and save through POST `/records`. Add referral metadata only if supported by the documented API.
+- [x] Support drawer and expanded form views while preserving entered values.
+- [x] Add Cancel and saving/success/error feedback; prevent duplicate submissions and retain input after a failed save.
+- [x] Show inline or banner success feedback after a successful creation submission and error feedback after a failed attempt.
+- [x] Show the new candidate in the list after saving and keep form actions reachable on mobile.
+- [x] After a successful POST creation, update local list state or refetch candidates so the new candidate appears without a full document reload.
+- [x] Check: the creation form validates required fields, sends POST, and shows saving, success, and error feedback.
+- [x] Check: creation field labels match HealthCore CONTEXT, and request/response types match the API structures.
+- [x] Check: HTTP errors and malformed creation responses are displayed in the create form UI.
+- [x] Keep creation form state in the form or its owning view; avoid prop drilling through unrelated components.
 
 ## Final check
 

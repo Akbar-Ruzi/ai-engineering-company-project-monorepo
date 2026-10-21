@@ -1,8 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-import { drawerHref, listHref } from "@/lib/utils/candidate-urls";
+import { NEW_CANDIDATE_ID } from "@/lib/constants";
+import {
+  drawerHref,
+  fullPageHref,
+  listHref,
+} from "@/lib/utils/candidate-urls";
+import CreateCandidateForm from "@/components/candidate-form/create-candidate-form";
 import CandidateHeader from "@/components/candidate-detail/candidate-header";
 import CandidateOverview from "@/components/candidate-detail/candidate-overview";
 import CandidateNotes from "@/components/candidate-detail/candidate-notes";
@@ -25,8 +32,9 @@ import { useCandidateNotes } from "@/hooks/useCandidateNotes";
 const NAV_BUTTON =
   "inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 shadow-sm hover:border-slate-400 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500";
 
-// Expanded view at /candidates/[id]. listQuery is the list's search, filters,
-// and page, carried over so Back and Drawer View return to the same list.
+// Expanded view at /candidates/[id], or the create form at /candidates/new.
+// listQuery is the list's search, filters, and page, carried over so Back
+// and Drawer View return to the same list.
 // A client component: it fetches the candidate with useCandidateDetail.
 export default function CandidateFullPage({
   id,
@@ -35,12 +43,17 @@ export default function CandidateFullPage({
   id: string;
   listQuery: string;
 }) {
+  const router = useRouter();
+  const isCreate = id === NEW_CANDIDATE_ID;
+  // The record to load: none while creating
+  const recordId = isCreate ? null : id;
+
   // GET /records/:id for the [id] in the URL
   const { candidate, loading, error, retry, updateStatus, updateInfo } =
-    useCandidateDetail(id);
+    useCandidateDetail(recordId);
 
   // GET /records/:id/notes for the same ID, loaded alongside the record
-  const notes = useCandidateNotes(id);
+  const notes = useCandidateNotes(recordId);
 
   // Back to Candidates leaves the detail views, so it discards unsaved edits
   // (like Close in the drawer); only Drawer View carries them across
@@ -91,7 +104,28 @@ export default function CandidateFullPage({
         </Link>
       </div>
 
-      {loading ? (
+      {isCreate ? (
+        <>
+          <h1 className="mt-5 text-2xl font-semibold text-slate-900">
+            Create Candidate
+          </h1>
+          <div className="mt-5">
+            <CreateCandidateForm
+              layout="page"
+              // Show the new candidate's details on this page.
+              // replace: Back doesn't return to the (now empty) form.
+              onCreated={(created) =>
+                router.replace(fullPageHref(listQuery, created.id))
+              }
+              // Cancel leaves the form, like Back to Candidates
+              onCancel={() => {
+                clearAllDrafts(id);
+                router.push(listHref(listQuery));
+              }}
+            />
+          </div>
+        </>
+      ) : loading ? (
         <>
           {/* Same box as the header card below */}
           <section className="mt-5 rounded-2xl border border-slate-200 bg-white px-5 pt-6 shadow-sm sm:px-6">

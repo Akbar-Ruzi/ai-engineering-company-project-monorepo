@@ -1,5 +1,8 @@
 export type CandidateStatus =
-  "received" | "in_progress" | "selected" | "discarded";
+  | "received"
+  | "in_progress"
+  | "selected"
+  | "discarded";
 
 export type CandidateStage =
   | "pending"
@@ -21,7 +24,7 @@ export type Candidate = {
   status: CandidateStatus;
   stage: CandidateStage;
   experience_years: number;
-  applied_at: string; // ISO date, e.g. "2026-02-28T20:04:32.114Z"
+  applied_at: string; // ISO date, e.g. "2026-10-20T21:17:10.941390Z"
   updated_at: string;
   notes_count: number;
 };
@@ -46,13 +49,27 @@ export type GetRecordsParams = {
 // Filters shared by the table and the mobile feed
 export type ListFilters = Pick<GetRecordsParams, "status" | "stage" | "search">;
 
-// Body for PUT /records/:id (backend schema RecordCreate, same as POST /records).
+// Body for PUT /records/:id (backend schema RecordCreate, like POST /records).
 // Replaces the candidate's general information from the Edit form.
+// Unlike POST, every field is sent: an empty URL is null, so a removed link is cleared.
 // Response: the updated Candidate.
 export type UpdateCandidatePayload = Omit<
   Candidate,
   "id" | "status" | "stage" | "applied_at" | "updated_at" | "notes_count"
 >;
+
+// Body for POST /records (backend schema RecordCreate, same fields as PUT).
+// full_name, email, phone, position, experience_years are required;
+// linkedin_url and cv_url are optional: leave them out when empty
+// (the server stores null).
+// Response: the created Candidate (status "received", stage "pending").
+export type CreateCandidatePayload = Pick<
+  Candidate,
+  "full_name" | "email" | "phone" | "position" | "experience_years"
+> & {
+  linkedin_url?: string;
+  cv_url?: string;
+};
 
 // Body for PATCH /records/:id (backend schema RecordPatch).
 // Changes status and/or stage only; send just the field that changed.

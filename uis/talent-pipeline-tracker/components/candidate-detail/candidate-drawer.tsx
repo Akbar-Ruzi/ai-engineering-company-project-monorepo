@@ -4,12 +4,15 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef } from "react";
 
+import { NEW_CANDIDATE_ID } from "@/lib/constants";
 import {
+  drawerHref,
   fullPageHref,
   getDrawerCandidateId,
   listHref,
   toListQuery,
 } from "@/lib/utils/candidate-urls";
+import CreateCandidateForm from "@/components/candidate-form/create-candidate-form";
 import CandidateHeader from "@/components/candidate-detail/candidate-header";
 import CandidateOverview from "@/components/candidate-detail/candidate-overview";
 import CandidateNotes from "@/components/candidate-detail/candidate-notes";
@@ -62,19 +65,23 @@ function trapTab(event: KeyboardEvent, root: HTMLElement) {
   }
 }
 
-// Opens over the list when the URL has ?candidate=<id>.
+// Opens over the list when the URL has ?candidate=<id>,
+// or with the create form for ?candidate=new.
 // The list stays mounted underneath, so filters, page, and scroll are kept.
 export default function CandidateDrawer() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const candidateId = getDrawerCandidateId(searchParams);
+  const isCreate = candidateId === NEW_CANDIDATE_ID;
+  // The record to load: none while closed or creating
+  const recordId = isCreate ? null : candidateId;
 
   // GET /records/:id; null while the drawer is closed, so nothing is fetched
   const { candidate, loading, error, retry, updateStatus, updateInfo } =
-    useCandidateDetail(candidateId);
+    useCandidateDetail(recordId);
 
   // GET /records/:id/notes for the same ID, loaded alongside the record
-  const notes = useCandidateNotes(candidateId);
+  const notes = useCandidateNotes(recordId);
 
   // The list query without ?candidate, used by Close and Expand
   const listQuery = toListQuery(searchParams);
@@ -131,10 +138,11 @@ export default function CandidateDrawer() {
   // Expand and Close: shown while loading, on error, and once loaded
   const actions = (
     <div className="flex shrink-0 items-center gap-1">
+      {/* Tablet/desktop only: on mobile the drawer is already full screen */}
       <Link
         href={fullPageHref(listQuery, candidateId)}
         aria-label="Expand to full page"
-        className="rounded-md p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-2 focus-visible:outline-blue-500"
+        className="rounded-md p-2 max-md:hidden text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-2 focus-visible:outline-blue-500"
       >
         <svg
           aria-hidden="true"
@@ -189,7 +197,17 @@ export default function CandidateDrawer() {
         className="absolute inset-y-0 right-0 flex w-full flex-col bg-slate-50 shadow-xl outline-none md:max-w-xl lg:max-w-2xl"
       >
         <header className="border-b border-slate-200 bg-white px-5 pt-6 sm:px-8">
-          {candidate ? (
+          {isCreate ? (
+            <div className="flex items-start justify-between gap-4 pb-6">
+              <h2
+                id={TITLE_ID}
+                className="text-2xl font-semibold text-slate-900"
+              >
+                Create Candidate
+              </h2>
+              {actions}
+            </div>
+          ) : candidate ? (
             <>
               <CandidateHeader
                 candidate={candidate}
@@ -244,7 +262,19 @@ export default function CandidateDrawer() {
         </header>
 
         <div className="flex-1 overflow-y-auto p-5 sm:p-8">
-          {loading ? (
+          {isCreate ? (
+            <CreateCandidateForm
+              layout="drawer"
+              // Show the new candidate's details in the same drawer.
+              // replace: Back doesn't return to the (now empty) form.
+              onCreated={(created) =>
+                router.replace(drawerHref(listQuery, created.id), {
+                  scroll: false,
+                })
+              }
+              onCancel={close}
+            />
+          ) : loading ? (
             <CandidateOverviewSkeleton layout="drawer" />
           ) : error ? (
             <ErrorState

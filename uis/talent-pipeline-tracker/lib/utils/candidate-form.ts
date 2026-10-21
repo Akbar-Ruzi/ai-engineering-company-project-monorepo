@@ -7,11 +7,20 @@ import type {
   Candidate,
   CandidateFormErrors,
   CandidateFormValues,
+  CreateCandidatePayload,
   UpdateCandidatePayload,
 } from "@/types/candidate";
 
 // Something@something.something, no spaces. A light check: the API does the strict one.
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Digits with common separators (spaces, dashes, dots, brackets) and an
+// optional leading +, e.g. "+1 (555) 019-2034". Our own rule: the API takes any text.
+const PHONE_PATTERN = /^\+?[\d\s().-]+$/;
+// International numbers have at most 15 digits (E.164); fewer than 7 is
+// too short for a real number
+const MIN_PHONE_DIGITS = 7;
+const MAX_PHONE_DIGITS = 15;
 
 // Editing: start from the candidate's saved information (null URLs → empty inputs)
 export function toCandidateFormValues(
@@ -27,6 +36,17 @@ export function toCandidateFormValues(
     experience_years: String(candidate.experience_years),
   };
 }
+
+// Creating: every input starts empty
+export const EMPTY_CANDIDATE_FORM: CandidateFormValues = {
+  full_name: "",
+  email: "",
+  phone: "",
+  position: "",
+  linkedin_url: "",
+  cv_url: "",
+  experience_years: "",
+};
 
 // Checks the form against the API rules (backend schema RecordCreate):
 // full_name, email, phone, position, and experience_years are required;
@@ -51,8 +71,16 @@ export function validateCandidateForm(
     errors.email = "Enter a valid email address, like name@example.com.";
   }
 
-  if (!values.phone.trim()) {
+  const phone = values.phone.trim();
+  const phoneDigits = phone.replace(/\D/g, "").length; // separators don't count
+  if (!phone) {
     errors.phone = "Enter a phone number.";
+  } else if (
+    !PHONE_PATTERN.test(phone) ||
+    phoneDigits < MIN_PHONE_DIGITS ||
+    phoneDigits > MAX_PHONE_DIGITS
+  ) {
+    errors.phone = `Enter a valid phone number (${MIN_PHONE_DIGITS}–${MAX_PHONE_DIGITS} digits), like +1 555 0192.`;
   }
 
   const years = values.experience_years.trim();
@@ -90,5 +118,19 @@ export function toUpdatePayload(
     linkedin_url: textOrNull(values.linkedin_url), // empty input → null, as the API stores it
     cv_url: textOrNull(values.cv_url),
     experience_years: Number(values.experience_years.trim()),
+  };
+}
+
+// Saving a new candidate: the form's input values → the POST /records body.
+// Same cleaning as toUpdatePayload, but an empty URL is left out (not null):
+// there is no old link to clear.
+export function toCreatePayload(
+  values: CandidateFormValues,
+): CreateCandidatePayload {
+  const { linkedin_url, cv_url, ...required } = toUpdatePayload(values);
+  return {
+    ...required,
+    ...(linkedin_url && { linkedin_url }),
+    ...(cv_url && { cv_url }),
   };
 }

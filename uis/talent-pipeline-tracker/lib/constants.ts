@@ -28,3 +28,8 @@ export const SUCCESS_MESSAGE_MS = 3000;
 
 // URL parameter that holds the open drawer's candidate ID (/?candidate=<id>)
 export const DRAWER_PARAM = "candidate";
+
+// Stands in for a candidate ID to open the create form instead:
+// /?candidate=new (drawer) and /candidates/new (full page).
+// Real IDs are UUIDs, so it can't clash with a candidate.
+export const NEW_CANDIDATE_ID = "new";
