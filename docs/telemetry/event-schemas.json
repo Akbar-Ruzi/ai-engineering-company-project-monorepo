@@ -59,6 +59,39 @@
         }
       },
       "additionalProperties": false
+    },
+    "inbound_order_created": {
+      "description": "Mandatory · Inventory. An inbound order is committed and stock is incremented. Processing: batch.",
+      "allOf": [
+        { "$ref": "#/definitions/eventEnvelope" },
+        {
+          "properties": {
+            "event_type": { "const": "inbound_order_created" },
+            "properties": {
+              "type": "object",
+              "required": [
+                "clinic_id",
+                "country",
+                "product_id",
+                "product_category",
+                "quantity",
+                "vendor_id",
+                "order_id"
+              ],
+              "properties": {
+                "clinic_id": { "type": "string", "pattern": "^(us|uk)-[a-z]{2,3}-[0-9]{2}$" },
+                "country": { "type": "string", "enum": ["US", "UK"] },
+                "product_id": { "type": "string", "minLength": 1 },
+                "product_category": { "type": "string", "enum": ["medication", "ppe", "consumable", "equipment"] },
+                "quantity": { "type": "integer", "minimum": 1 },
+                "vendor_id": { "type": "string", "minLength": 1 },
+                "order_id": { "type": "string", "minLength": 1 }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
     }
   }
 }

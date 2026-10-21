@@ -148,7 +148,26 @@ Every event carries the same 8 envelope fields, whatever its type. Only the cont
 
 ## 6. Event catalog
 
-_Every event: hypothesis → decision, property allowlist, PII notes, and stream/batch rationale._
+Each event below lists its golden rule, its `properties` allowlist, its PII handling, and whether it is processed as a stream or in batch. Every event also carries the full envelope from section 5. The `properties` table is the allowlist: any key not listed is rejected. Each event has a matching definition in `event-schemas.json` under the same name.
+
+### `inbound_order_created`
+
+- **Class / Category:** mandatory · Inventory
+- **Description:** Fires once when an inbound order (receipt of supplies from a vendor at a clinic) is committed and the product's stock has been incremented.
+- **Golden rule:** We capture `inbound_order_created` because we need to know how much and what supply each clinic is purchasing, and from which vendor, which allows us to consolidate purchasing across clinics and negotiate better vendor terms.
+
+| Property           | Type    | Required | Allowlist | PII | Notes                                                                    |
+| ------------------ | ------- | -------- | --------- | --- | ------------------------------------------------------------------------ |
+| `clinic_id`        | string  | yes      | yes       | no  | Format `<country>-<region>-<nn>`, e.g. `us-tx-01`, `uk-lon-01`           |
+| `country`          | string  | yes      | yes       | no  | `US` or `UK`                                                             |
+| `product_id`       | string  | yes      | yes       | no  | Internal product ID, e.g. `prd_00412`                                    |
+| `product_category` | string  | yes      | yes       | no  | `medication`, `ppe`, `consumable` or `equipment`                         |
+| `quantity`         | integer | yes      | yes       | no  | Units received, ≥ 1                                                      |
+| `vendor_id`        | string  | yes      | yes       | no  | Internal vendor ID, e.g. `vnd_0031`. A vendor is a company, not a person |
+| `order_id`         | string  | yes      | yes       | no  | Internal inbound order ID, e.g. `ord_20261021_0007`                      |
+
+- **PII / sanitisation:** No PII. The event describes supplies and vendors only. No `department` is included, because a vendor delivery is not tied to a care activity. The staff user is identified only by the pseudonymised `userId` in the envelope.
+- **Processing:** batch (daily). Purchasing consolidation and vendor negotiation are weekly or monthly decisions, so no one needs to act on this event within minutes.
 
 ## 7. High-frequency strategy
 
