@@ -63,7 +63,24 @@ These 5 metrics are required by `healthcore-BRIEFING.md` and are labeled **manda
 
 ## 3. Flow mapping
 
-_The flow from authenticated access to inbound/outbound order completion, with at least 5 instrumentation points._
+This section maps the journey of a staff user from logging in to completing an inbound or outbound order, and marks every point where an event is emitted.
+
+```text
+Login → Open inventory → (Direct stock edit attempt) → Submit order → Validation → Order saved → Stock recalculated
+```
+
+| # | Step                       | What can happen                                                                  | Event fired                                        | Emitted by | Class      |
+| - | -------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------- | ---------- | ---------- |
+| 1 | Login                      | Credentials are wrong                                                            | `login_failed`                                     | Backend    | identified |
+| 2 | Any step after login       | The session expires before the order is finished                                 | `session_expired`                                  | Backend    | identified |
+| 3 | Open inventory section     | The user opens the inventory or orders screen                                    | `section_viewed`                                   | Frontend   | identified |
+| 4 | Direct stock edit          | The user tries to change stock directly; it is rejected                          | `direct_stock_edit_rejected`                       | Backend    | mandatory  |
+| 5 | Submit order               | The server rejects the order (missing field, invalid quantity, not enough stock) | `order_validation_failed`                          | Backend    | identified |
+| 6 | Order saved                | The order is saved successfully and stock is updated                             | `inbound_order_created` / `outbound_order_created` | Backend    | mandatory  |
+| 7 | Stock recalculated         | Stock crosses below the configured minimum                                       | `stock_threshold_triggered`                        | Backend    | mandatory  |
+| 8 | Every API call in the flow | The response time is measured                                                    | `api_latency_recorded`                             | Backend    | identified |
+
+Each order submission ends in exactly one outcome: `order_validation_failed` (nothing saved) or `inbound_order_created` / `outbound_order_created` (saved). A user who fixes the form and resubmits produces one event per attempt.
 
 ## 4. Broad opportunity catalogue
 
