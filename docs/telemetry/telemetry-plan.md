@@ -84,7 +84,23 @@ Each order submission ends in exactly one outcome: `order_validation_failed` (no
 
 ## 4. Broad opportunity catalogue
 
-_Opportunities beyond inventory (authentication, performance, frontend errors, navigation), labeled mandatory or identified opportunity._
+This catalogue lists every event in the plan, grouped by category and labeled **mandatory** (from the BRIEFING) or **identified** (proposed in this plan). The mandatory events are detailed in section 2; full property definitions for every event are in section 6.
+
+| `event_type`                 | Category       | Class      | Fires when                                                  | Why it matters                                              |
+| ---------------------------- | -------------- | ---------- | ----------------------------------------------------------- | ----------------------------------------------------------- |
+| `inbound_order_created`      | Inventory      | mandatory  | An inbound order is saved and stock is incremented          | Consolidate purchasing and negotiate vendor terms           |
+| `outbound_order_created`     | Inventory      | mandatory  | An outbound order is saved and stock is decremented         | Adjust automatic replenishment per clinic                   |
+| `stock_threshold_triggered`  | Inventory      | mandatory  | Stock at a clinic crosses below its configured minimum      | Prioritise urgent restocking, escalate to Marcus            |
+| `direct_stock_edit_rejected` | Inventory      | mandatory  | A direct stock edit is attempted and rejected               | Reinforce training or permissions at that clinic            |
+| `supply_expiry_flagged`      | Inventory      | mandatory  | A product in stock enters the 30-day window before expiry   | Use or dispose of supplies before they expire               |
+| `order_validation_failed`    | Inventory      | identified | The server rejects a submitted order (nothing is saved)     | Fix the form fields or rules that block staff most          |
+| `login_failed`               | Authentication | identified | A login attempt fails because of wrong credentials          | Detect repeated failures and alert Claire (compliance)      |
+| `session_expired`            | Authentication | identified | A session times out before the user logs out                | Tune the session timeout so staff don't lose unsaved orders |
+| `api_latency_recorded`       | Performance    | identified | An API request completes and its response time is measured  | Find and fix the slowest endpoints first                    |
+| `page_load_recorded`         | Performance    | identified | A backoffice screen finishes loading in the browser         | Find slow screens, separately from slow APIs                |
+| `frontend_error_caught`      | Errors         | identified | An uncaught error happens in the browser                    | Fix first the errors that affect the most clinics           |
+| `section_viewed`             | Navigation     | identified | A user opens a backoffice section                           | Decide which sections to improve, simplify or retire        |
+| `order_form_abandoned`       | Navigation     | identified | A user opens an order form and leaves without submitting it | Simplify the order forms where staff give up most           |
 
 ## 5. Event Envelope
 
