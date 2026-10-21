@@ -1,14 +1,16 @@
 ﻿# Talent Pipeline Tracker
 
-Frontend for HealthCore's recruitment pipeline, built with Next.js, React, TypeScript, and Tailwind CSS. Currently includes a basic landing page.
+Frontend for HealthCore's recruitment pipeline, built with Next.js 16, React 19, TypeScript, and Tailwind CSS 4. It replaces the shared spreadsheet the People team used for the Executive Assistant search at the Austin headquarters.
 
-## Planned features
+## Features
 
-- Show all candidates in a list with name, position, status, and stage visible immediately.
-- Filter by status and stage, and search by name or email without reloading the page.
-- Open a candidate's full details and update their status or stage from there.
-- Add internal notes after each call or interview, and remove them when they are no longer relevant.
-- Register candidates who come through referrals and correct their information from the candidate details page.
+- **Candidate list:** name, position, status, and stage for every candidate. A table with numbered pages on tablet and desktop; cards that load more as you scroll on mobile.
+- **Filter and search:** filter by status and stage, and search by name or email, without reloading the page. Filters live in the URL, so they survive a refresh and can be shared.
+- **Candidate details:** open a candidate in a drawer over the list, or expand it to a full page (`/candidates/<id>`). Update status and stage, and correct their general information.
+- **Internal notes:** add a note after a call or interview, and delete it (with confirmation) when it is no longer relevant. The note count updates right away.
+- **Create a candidate:** register a referred candidate with **Add candidate**, in a drawer or on a full page (`/candidates/new`). After saving, the new candidate's details open.
+- **Feedback everywhere:** every request shows loading, success, and error states; failed saves keep what the user typed and offer Retry.
+- **Unsaved work survives switching views:** form edits, a half-typed note, an open delete confirmation, and the selected tab are kept between the drawer and the full page.
 
 ## Context of the active search
 
@@ -50,14 +52,46 @@ See [plan.md](plan.md) for the ordered implementation steps and requirement chec
 
 ## Run locally
 
-Install Node.js and npm, then run these commands from this directory:
+Install Node.js and npm, then run these commands from this directory.
 
-```bash
-npm install
-npm run dev
-```
+1. Install the dependencies:
 
-Open [http://localhost:3000](http://localhost:3000).
+   ```bash
+   npm install
+   ```
+
+2. Configure the API. Copy `.env.example` to `.env.local` and set the backend's base URL:
+
+   ```bash
+   NEXT_PUBLIC_API_URL=https://<your-api-host>/api/v1
+   ```
+
+   Every request goes to this URL plus the endpoint path (for example `${NEXT_PUBLIC_API_URL}/records`). If it is missing, the app shows "API URL not configured" instead of loading candidates. `.env.local` is ignored by Git, so the real URL is never committed.
+
+3. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+4. Open [http://localhost:3000](http://localhost:3000).
+
+Restart `npm run dev` after changing `.env.local`: it is only read at startup. `NEXT_PUBLIC_` variables are built into the browser code, so don't put secrets in them.
+
+### API endpoints used
+
+| Method | Endpoint | Used for |
+| --- | --- | --- |
+| GET | `/records` | Candidate list (`page`, `limit`, `status`, `stage`, `search`) |
+| GET | `/records/:id` | Candidate details |
+| POST | `/records` | Create a candidate |
+| PUT | `/records/:id` | Correct general information |
+| PATCH | `/records/:id` | Change status and/or stage |
+| GET | `/records/:id/notes` | List notes |
+| POST | `/records/:id/notes` | Add a note |
+| DELETE | `/records/:id/notes/:note_id` | Delete a note |
+
+Every response body is checked at runtime against its TypeScript type, so a malformed response shows an error instead of breaking the page.
 
 ### Test on your phone
 
@@ -87,9 +121,30 @@ To use DevTools on an Android phone (for example Network → Offline), connect i
 - `npm run build` - Build for production.
 - `npm start` - Run the production build (after building).
 - `npm run lint` - Check code with ESLint.
+- `npx tsc --noEmit` - Type-check without building.
 
-## Main files
+## Project structure
 
-- `app/page.tsx` - Home page.
-- `app/layout.tsx` - Shared layout and metadata.
-- `app/globals.css` - Global styles.
+- `app/` - Routes: `page.tsx` (candidate list and drawer), `candidates/[id]/page.tsx` (full page for a candidate, and the create form at `/candidates/new`), `layout.tsx` (shared providers and metadata).
+- `components/candidate-list/` - List header with Add candidate, filters, table, mobile cards, pagination.
+- `components/candidate-detail/` - Drawer, full page, header, tabs, overview cards, notes.
+- `components/candidate-form/` - The candidate form shared by edit and create, and the create form.
+- `components/shared/` - App header, badges, and the empty, error, and success states.
+- `hooks/` - Data hooks that own every API call (`useCandidateTable`, `useCandidateFeed`, `useCandidateDetail`, `useCandidateNotes`, `useCreateCandidate`).
+- `context/` - `candidate-drafts` (unsaved work across views) and `candidate-updates` (tells the list to refetch after a save).
+- `lib/api/` - One typed function per endpoint, the shared fetch helper, and runtime response validators.
+- `lib/utils/` - Formatting, form conversion and validation, URL helpers.
+- `types/` - Candidate and note types matching the API.
+- `public/ui-ux/` - Design screenshots used as visual references.
+
+## Known limitations
+
+- **No authentication.** Anyone with the URL can view and change candidates; the course API has none.
+- **Shared mock API.** The backend is shared by every company context in the course, so other students' changes (and test candidates) appear in the list.
+- **No candidate deletion or note editing.** The app can create and edit candidates and add and delete notes, but not delete a candidate or edit a note.
+- **Notes have no author.** The API stores only the text and date, so cards show those.
+- **New candidates may not be on the current page.** After a create, the list refetches; where the new row lands depends on the API's sort order and the active filters (new candidates are always Received / Pending review).
+- **Unsaved work lives in memory.** Drafts survive switching between drawer and full page, but not a page reload or closing the tab.
+- **Client-side rules stricter than the API.** Phone numbers must have 7–15 digits and Years of Experience must be 0–60; the API itself accepts any value.
+- **Both list views load on first visit.** The table and the mobile cards are both rendered (one hidden by CSS), so the first page of candidates is requested twice. See "Future enhancements" in [plan.md](plan.md).
+- **Not built yet:** the pipeline summary (stat cards and stage bar) in `components/future/`.

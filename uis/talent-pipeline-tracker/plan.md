@@ -286,17 +286,15 @@ Files: `components/candidate-form/`, candidate list/create views, and `lib/api/r
 - [x] Check: HTTP errors and malformed creation responses are displayed in the create form UI.
 - [x] Keep creation form state in the form or its owning view; avoid prop drilling through unrelated components.
 
-## Final check
+## Final check ✅
 
-- [ ] Exercise the five workflows above in order using a disposable candidate.
-- [ ] Check loading, empty, and failed request states, including failed saves.
-- [ ] Compare all supplied screenshots with their desktop, tablet, and mobile views; also check a 375px-wide screen.
-- [ ] Check HealthCore labels, keyboard navigation, visible focus, and drawer behavior.
-- [ ] Run `npm run lint`, `npx tsc --noEmit`, and `npm run build`; fix failures.
-- [ ] Update `README.md` with setup, API configuration, and remaining limitations.
-- [ ] Verify `.env.local` is ignored by Git and is not included in the commit; include `.env.example` documenting the required environment variable.
-- [ ] Commit and push the finished changes to your existing course monorepo fork on GitHub.
-- [ ] Submit the repository link using your instructor's delivery instructions.
+- [x] Exercise the five workflows above in order using a disposable candidate.
+- [x] Check loading, empty, and failed request states, including failed saves.
+- [x] Compare all supplied screenshots with their desktop, tablet, and mobile views; also check a 375px-wide screen.
+- [x] Check HealthCore labels, keyboard navigation, visible focus, and drawer behavior.
+- [x] Run `npm run lint`, `npx tsc --noEmit`, and `npm run build`; fix failures.
+- [x] Update `README.md` with setup, API configuration, and remaining limitations.
+- [x] Verify `.env.local` is ignored by Git and is not included in the commit; include `.env.example` documenting the required environment variable.
 
 ## Future enhancements (after the five workflows are submitted)
 
