@@ -382,6 +382,26 @@ Each event below lists its golden rule, its `properties` allowlist, its PII hand
 - **PII / sanitisation:** No PII. Only section names are sent, taken from the frontend's route configuration and restricted to snake_case, so no URL, free text or screen content can be included. The user is identified only by the pseudonymised `userId` in the envelope.
 - **Processing:** batch (daily). Deciding which sections to improve, simplify or retire is a product decision made over weeks.
 
+### `order_form_abandoned`
+
+- **Class / Category:** identified · Navigation
+- **Description:** Fires once, from the frontend, when a user who opened an inbound or outbound order form leaves it without a successful submission (navigates away, closes the tab, or the session expires). On tab close the event is sent with the browser's beacon API so it is not lost.
+- **Golden rule:** We capture `order_form_abandoned` because we need to know where staff give up on inbound and outbound order forms without submitting them, which allows us to simplify the forms where staff give up most.
+
+| Property               | Type    | Required | Allowlist | PII | Notes                                                                                        |
+| ---------------------- | ------- | -------- | --------- | --- | -------------------------------------------------------------------------------------------- |
+| `order_type`           | string  | yes      | yes       | no  | `inbound` or `outbound`                                                                      |
+| `exit_reason`          | string  | yes      | yes       | no  | `navigated_away`, `tab_closed` or `session_expired`                                          |
+| `fields_completed`     | integer | yes      | yes       | no  | Number of form fields filled in before leaving, ≥ 0                                          |
+| `last_field`           | string  | no       | yes       | no  | Last field the user touched: `product_id`, `quantity`, `vendor_id` or `department`. Absent if none |
+| `had_validation_error` | boolean | yes      | yes       | no  | `true` if the user left after a rejected submission (`order_validation_failed`)              |
+| `time_on_form_seconds` | integer | yes      | yes       | no  | Seconds between opening the form and leaving it, ≥ 0                                         |
+| `clinic_id`            | string  | yes      | yes       | no  | Format `<country>-<region>-<nn>`, e.g. `us-tx-01`, `uk-lon-01`                               |
+| `country`              | string  | yes      | yes       | no  | `US` or `UK`                                                                                 |
+
+- **PII / sanitisation:** No PII. Only field names and counts are sent, never the values typed into the form, which could contain anything. The user is identified only by the pseudonymised `userId` in the envelope.
+- **Processing:** batch (daily). Simplifying order forms is a product decision made over weeks.
+
 ## 7. High-frequency strategy
 
 _Throttle and debounce rules for high-frequency events._

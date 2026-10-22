@@ -423,6 +423,40 @@
           }
         }
       ]
+    },
+    "order_form_abandoned": {
+      "description": "Identified · Navigation. Emitted by the frontend when a user leaves an order form without a successful submission. Never carries typed values. Processing: batch.",
+      "allOf": [
+        { "$ref": "#/definitions/eventEnvelope" },
+        {
+          "properties": {
+            "event_type": { "const": "order_form_abandoned" },
+            "properties": {
+              "type": "object",
+              "required": [
+                "order_type",
+                "exit_reason",
+                "fields_completed",
+                "had_validation_error",
+                "time_on_form_seconds",
+                "clinic_id",
+                "country"
+              ],
+              "properties": {
+                "order_type": { "type": "string", "enum": ["inbound", "outbound"] },
+                "exit_reason": { "type": "string", "enum": ["navigated_away", "tab_closed", "session_expired"] },
+                "fields_completed": { "type": "integer", "minimum": 0 },
+                "last_field": { "type": "string", "enum": ["product_id", "quantity", "vendor_id", "department"] },
+                "had_validation_error": { "type": "boolean" },
+                "time_on_form_seconds": { "type": "integer", "minimum": 0 },
+                "clinic_id": { "type": "string", "pattern": "^(us|uk)-[a-z]{2,3}-[0-9]{2}$" },
+                "country": { "type": "string", "enum": ["US", "UK"] }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
     }
   }
 }
