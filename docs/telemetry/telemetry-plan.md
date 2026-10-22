@@ -466,3 +466,13 @@ Applies to every event, including test data:
 - **Free content:** real URLs, request/response bodies, error messages, stack traces, typed form values.
 
 **Enforcement:** `"additionalProperties": false` on every `properties` object and closed `enum` lists in `event-schemas.json` reject any field outside the allowlist.
+
+### Out-of-scope infrastructure
+
+This plan defines the telemetry contract only (events, envelope, schemas, delivery rules). These are left for later projects:
+
+- **Pipelines and storage:** the stream and batch infrastructure that collects, validates and stores events.
+- **Dashboards and reports:** the network operations dashboard, Dr. Okonkwo's monthly executive report and the delivery channel for Claire's compliance alerts. They will consume these events but are not built here.
+- **Instrumentation code:** frontend and backend SDKs or helpers that emit the events.
+- **Infrastructure monitoring:** real-time outage and uptime alerting, which `api_latency_recorded` does not replace.
+- **Error-tracking tool:** full stack traces and debugging detail, with its own PHI scrubbing, which `frontend_error_caught` does not replace.
