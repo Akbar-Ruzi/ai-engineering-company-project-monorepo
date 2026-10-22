@@ -397,6 +397,32 @@
           }
         }
       ]
+    },
+    "section_viewed": {
+      "description": "Identified · Navigation. Emitted by the frontend when a logged-in user enters a backoffice section. Section names come from the route configuration. Processing: batch.",
+      "allOf": [
+        { "$ref": "#/definitions/eventEnvelope" },
+        {
+          "properties": {
+            "event_type": { "const": "section_viewed" },
+            "properties": {
+              "type": "object",
+              "required": [
+                "section",
+                "clinic_id",
+                "country"
+              ],
+              "properties": {
+                "section": { "type": "string", "pattern": "^[a-z]+(_[a-z]+)*$" },
+                "previous_section": { "type": "string", "pattern": "^[a-z]+(_[a-z]+)*$" },
+                "clinic_id": { "type": "string", "pattern": "^(us|uk)-[a-z]{2,3}-[0-9]{2}$" },
+                "country": { "type": "string", "enum": ["US", "UK"] }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
     }
   }
 }

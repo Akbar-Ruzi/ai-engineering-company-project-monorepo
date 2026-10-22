@@ -366,6 +366,22 @@ Each event below lists its golden rule, its `properties` allowlist, its PII hand
 - **PII / sanitisation:** No PII. The error message and the stack trace are never sent, because messages often contain data shown on screen, which could include PHI. Only the class name and a fingerprint hash are sent, which is enough to group and count errors. Full debugging detail belongs to a dedicated error-tracking tool with scrubbing, which is out of scope (see section 8).
 - **Processing:** batch (daily). Deciding which errors to fix first is a prioritisation decision made over days. Floods of the same error are handled in section 7.
 
+### `section_viewed`
+
+- **Class / Category:** identified · Navigation
+- **Description:** Fires once, from the frontend, when a logged-in user enters a backoffice section. It does not fire on re-renders or on actions inside the section.
+- **Golden rule:** We capture `section_viewed` because we need to know which backoffice sections staff use most and least, which allows us to decide which sections to improve, simplify or retire.
+
+| Property           | Type   | Required | Allowlist | PII | Notes                                                                                      |
+| ------------------ | ------ | -------- | --------- | --- | ------------------------------------------------------------------------------------------ |
+| `section`          | string | yes      | yes       | no  | Section name in snake_case, e.g. `inventory`, `inbound_orders`, `reports`                  |
+| `previous_section` | string | no       | yes       | no  | Section the user came from, same format. Absent on the first section after login           |
+| `clinic_id`        | string | yes      | yes       | no  | Format `<country>-<region>-<nn>`, e.g. `us-tx-01`, `uk-lon-01`                             |
+| `country`          | string | yes      | yes       | no  | `US` or `UK`                                                                               |
+
+- **PII / sanitisation:** No PII. Only section names are sent, taken from the frontend's route configuration and restricted to snake_case, so no URL, free text or screen content can be included. The user is identified only by the pseudonymised `userId` in the envelope.
+- **Processing:** batch (daily). Deciding which sections to improve, simplify or retire is a product decision made over weeks.
+
 ## 7. High-frequency strategy
 
 _Throttle and debounce rules for high-frequency events._
