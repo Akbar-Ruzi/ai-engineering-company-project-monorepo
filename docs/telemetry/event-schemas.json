@@ -339,6 +339,33 @@
           }
         }
       ]
+    },
+    "page_load_recorded": {
+      "description": "Identified · Performance. Emitted by the frontend each time a backoffice screen finishes loading. screen is the route template, never the real URL. High volume, sampled (section 7). Processing: batch.",
+      "allOf": [
+        { "$ref": "#/definitions/eventEnvelope" },
+        {
+          "properties": {
+            "event_type": { "const": "page_load_recorded" },
+            "properties": {
+              "type": "object",
+              "required": [
+                "screen",
+                "load_type",
+                "load_ms"
+              ],
+              "properties": {
+                "screen": { "type": "string", "pattern": "^/[^?#]*$" },
+                "load_type": { "type": "string", "enum": ["full", "in_app"] },
+                "load_ms": { "type": "integer", "minimum": 0 },
+                "clinic_id": { "type": "string", "pattern": "^(us|uk)-[a-z]{2,3}-[0-9]{2}$" },
+                "country": { "type": "string", "enum": ["US", "UK"] }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
     }
   }
 }

@@ -330,6 +330,23 @@ Each event below lists its golden rule, its `properties` allowlist, its PII hand
 - **PII / sanitisation:** No PII. Only the route template is sent, because a real path or query string can contain IDs or free text. Request and response bodies and headers (which carry tokens) are never captured. The user is identified only by the pseudonymised `userId` in the envelope.
 - **Processing:** batch (daily). Choosing which endpoints to optimise is a planning decision made over days or weeks. Real-time outage alerting belongs to infrastructure monitoring, which is out of scope (see section 8).
 
+### `page_load_recorded`
+
+- **Class / Category:** identified · Performance
+- **Description:** Fires once, from the frontend, each time a backoffice screen finishes loading and becomes usable. It measures what the user waits for in the browser, separately from server time in `api_latency_recorded`. High volume: see section 7 for sampling.
+- **Golden rule:** We capture `page_load_recorded` because we need to know which backoffice screens load slowly in the browser, separately from slow APIs, which allows us to optimise the slowest screens first.
+
+| Property    | Type    | Required | Allowlist | PII | Notes                                                                                   |
+| ----------- | ------- | -------- | --------- | --- | --------------------------------------------------------------------------------------- |
+| `screen`    | string  | yes      | yes       | no  | Route template, e.g. `/inventory/orders/new`. Never the real URL or query string        |
+| `load_type` | string  | yes      | yes       | no  | `full` (first page load in the browser) or `in_app` (switching screens inside the app)  |
+| `load_ms`   | integer | yes      | yes       | no  | Time until the screen is usable, in milliseconds, ≥ 0                                   |
+| `clinic_id` | string  | no       | yes       | no  | The user's clinic. Absent on the login screen, before anyone is logged in               |
+| `country`   | string  | no       | yes       | no  | `US` or `UK`. Absent together with `clinic_id`                                          |
+
+- **PII / sanitisation:** No PII. Only the route template is sent. No browser fingerprint (browser version, screen size, IP address) is captured, because the decision does not need it. The user is identified only by the pseudonymised `userId` in the envelope.
+- **Processing:** batch (daily). Choosing which screens to optimise is a planning decision made over days or weeks.
+
 ## 7. High-frequency strategy
 
 _Throttle and debounce rules for high-frequency events._
