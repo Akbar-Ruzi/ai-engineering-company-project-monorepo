@@ -275,6 +275,7 @@ Each event below lists its golden rule, its `properties` allowlist, its PII hand
 | `product_id`   | string | no       | yes       | no  | Internal product ID, only when the submitted product exists (absent if it caused the error) |
 
 - **PII / sanitisation:** No PII. The event carries only error codes and field names, never the values the user typed: a rejected form can contain anything, including patient details entered in the wrong field. The staff user is identified only by the pseudonymised `userId` in the envelope.
+- **Exception to the BRIEFING minimum:** `product_category` and `quantity` are not included, and `product_id` is optional, because the order was rejected and these values may be missing or invalid (often they are the cause of the error). Sending them would mean sending what the user typed.
 - **Processing:** batch (daily). Changing forms, rules or training is decided over weeks, and the user already sees the error on screen, so no one else needs to act within minutes.
 
 ### `login_failed`
