@@ -414,6 +414,32 @@ Rules that stop repeated or very frequent events from flooding alerts or storage
 - **Not suppressed:** a different product, or the same product at another clinic, always fires.
 - **Why it's safe:** the first alert has already triggered the restock decision; repeats within 15 minutes add no new information.
 
+### `login_failed`: alert rule for repeated failures
+
+- **No events are dropped:** every failed attempt is stored, because it may be needed as evidence in a security review. Only the alerts are limited.
+- **Alert 1, one account under attack:** when `consecutive_failures` reaches 5 for the same `userId`, alert Claire (compliance) so the account can be locked or reset.
+- **Alert 2, username guessing:** when 20 or more events with `account_known = false` arrive across the network within 10 minutes, alert Claire. This is network-wide because `clinic_id` is not sent for unknown accounts.
+- **Alert limit:** at most one alert per account (alert 1) or one network-wide alert (alert 2) every 15 minutes, so an ongoing attack does not flood Claire.
+- **Why these numbers:** one or two typos are normal; five failures in a row, or a burst of unknown usernames, is the pattern that needs action within minutes.
+
+### `direct_stock_edit_rejected`: alert rule for bursts by the same user
+
+- **No events are dropped:** every attempt is stored and processed in the daily batch, because the training and permissions decision is based on totals per clinic.
+- **Rule:** the backend guard that rejects the edit also counts rejections per `userId`. When the same user reaches 5 rejected attempts within 10 minutes, the guard sends one alert to Claire (compliance). The events themselves still go to the daily batch.
+- **Alert limit:** at most one alert per user every 60 minutes.
+- **Why:** a single attempt is usually a staff member who does not know the order process. Repeated attempts in a short time, especially with `attempt_source = api`, look like someone deliberately trying to get around traceability, which compliance should know about the same day.
+
+### High-volume events: sampling and dedupe
+
+These events can fire many times per user per hour. Each rule keeps the data needed for its decision while cutting volume. The frontend events (`page_load_recorded`, `frontend_error_caught`, `section_viewed`) are queued in the browser and sent together every 30 seconds, and on tab close with the beacon API, so they do not add one network request each.
+
+| Event                   | Rule                                                                                                                                         | Why it is safe                                                                                                                       |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `api_latency_recorded`  | Random 10% sample of requests, decided per `requestId`. Health-check routes (e.g. `/api/health`) are never recorded.                          | A uniform random sample keeps latency percentiles per endpoint accurate. Counts are multiplied by 10. Health checks are not user traffic. |
+| `page_load_recorded`    | No sampling. All loads are recorded.                                                                                                         | Volume is low (one event per screen a user opens) and slow screens may be rare, so sampling could hide them.                           |
+| `frontend_error_caught` | Dedupe: at most one event per `error_fingerprint` per `sessionId` every 5 minutes.                                                           | An error inside a render loop can fire thousands of times. The decision needs how many clinics and sessions are affected, not how many times one browser repeated it. |
+| `section_viewed`        | No sampling. Fires only when the section changes, so a refresh or re-entering the same section in a row is not counted again.               | Volume is already low, and usage counts per clinic must be exact to decide which sections to retire.                                  |
+
 ## 8. Risks and exclusions
 
 _Events considered and discarded, and data that will not be captured (PHI, credentials, out-of-scope infrastructure)._
