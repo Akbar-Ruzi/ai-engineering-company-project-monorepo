@@ -77,7 +77,7 @@ These 5 metrics are required by `healthcore-BRIEFING.md` and are labeled **manda
 This section maps the journey of a staff user from logging in to completing an inbound or outbound order, and marks every point where an event is emitted.
 
 ```text
-Login → Open inventory → (Direct stock edit attempt) → Submit order → Validation → Order saved → Stock recalculated
+Login → Open inventory → (Direct stock edit attempt) → Open order form → (Leave without submitting) → Submit order → Validation → Order saved → Stock recalculated
 ```
 
 | # | Step                       | What can happen                                                                  | Event fired                                        | Emitted by | Class      |
@@ -90,8 +90,9 @@ Login → Open inventory → (Direct stock edit attempt) → Submit order → Va
 | 6 | Order saved                | The order is saved successfully and stock is updated                             | `inbound_order_created` / `outbound_order_created` | Backend    | mandatory  |
 | 7 | Stock recalculated         | Stock crosses below the configured minimum                                       | `stock_threshold_triggered`                        | Backend    | mandatory  |
 | 8 | Every API call in the flow | The response time is measured                                                    | `api_latency_recorded`                             | Backend    | identified |
+| 9 | Order form open            | The user leaves the form without submitting (navigates away, closes the tab, or the session expires) | `order_form_abandoned`              | Frontend   | identified |
 
-Each order submission ends in exactly one outcome: `order_validation_failed` (nothing saved) or `inbound_order_created` / `outbound_order_created` (saved). A user who fixes the form and resubmits produces one event per attempt.
+Each opened order form ends in exactly one outcome: `order_form_abandoned` (left without submitting), `order_validation_failed` (rejected, nothing saved), or `inbound_order_created` / `outbound_order_created` (saved). A user who fixes the form and resubmits produces one event per attempt.
 
 ## 4. Broad opportunity catalogue
 
