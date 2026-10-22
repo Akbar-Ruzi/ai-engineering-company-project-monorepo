@@ -454,3 +454,15 @@ What this plan deliberately does not capture, and why.
 | `api_request_failed`      | Duplicates `api_latency_recorded`, which already carries `status_code`.                                                                      |
 | `product_viewed`          | Too fine-grained to change a decision. Section-level use from `section_viewed` is enough to decide what to improve or retire.                |
 | `supply_used_for_patient` | Forbidden. Linking a supply to a patient is PHI under HIPAA and UK GDPR. Consumption is recorded per `department` in `outbound_order_created`. |
+
+### Data never captured
+
+Applies to every event, including test data:
+
+- **Patient data / PHI** (names, record numbers, diagnoses, notes): forbidden by HIPAA and UK GDPR.
+- **Credentials:** passwords, typed usernames, session tokens, auth headers.
+- **Staff names and emails:** staff appear only as a pseudonymised `userId`.
+- **IP addresses and browser fingerprints:** no decision needs them.
+- **Free content:** real URLs, request/response bodies, error messages, stack traces, typed form values.
+
+**Enforcement:** `"additionalProperties": false` on every `properties` object and closed `enum` lists in `event-schemas.json` reject any field outside the allowlist.
