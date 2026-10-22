@@ -7,7 +7,18 @@
 
 ## 1. Executive summary
 
-_Why HealthCore needs telemetry now: the questions operations cannot answer today._
+HealthCore runs 12 outpatient clinics in the US (Texas, Florida, Georgia) and the UK (London, Manchester). The inventory system records every supply order, but today operations cannot answer basic questions across the network:
+
+- Which clinics are running short of critical supplies such as PPE or medication, and how often?
+- Which supplies are consumed fastest, by clinic and department, and which are bought from which vendors?
+- Which supplies will expire in the next 30 days before they become waste or a compliance risk?
+- Are staff trying to change stock directly, bypassing supply traceability?
+- Are accounts with access to clinic stock being targeted by repeated failed logins?
+- Where do staff struggle with the backoffice: slow screens, errors, abandoned order forms?
+
+Telemetry is needed now because the network operations dashboard, Dr. Okonkwo's monthly executive report and Claire's compliance alerts will all be built on this data. The event contract has to be agreed before any of them can be built.
+
+This plan defines **13 events**: the **5 mandatory** metrics from the BRIEFING and **8 identified** opportunities, across inventory, authentication, performance, errors and navigation. Every event has a hypothesis and a decision, a strict property allowlist and a JSON schema. Only the 2 events that need action within minutes (`stock_threshold_triggered`, `login_failed`) are streamed; the rest are processed daily. No event carries patient data: events describe supplies and stock, never patients.
 
 ## 2. Mandatory metrics
 
