@@ -169,6 +169,25 @@ Each event below lists its golden rule, its `properties` allowlist, its PII hand
 - **PII / sanitisation:** No PII. The event describes supplies and vendors only. No `department` is included, because a vendor delivery is not tied to a care activity. The staff user is identified only by the pseudonymised `userId` in the envelope.
 - **Processing:** batch (daily). Purchasing consolidation and vendor negotiation are weekly or monthly decisions, so no one needs to act on this event within minutes.
 
+### `outbound_order_created`
+
+- **Class / Category:** mandatory · Inventory
+- **Description:** Fires once when an outbound order (consumption of a supply during a department's care activity) is committed and the product's stock has been decremented.
+- **Golden rule:** We capture `outbound_order_created` because we need to know which supplies are consumed most and at what rate, by clinic and department, which allows us to adjust automatic replenishment of critical supplies per clinic.
+
+| Property           | Type    | Required | Allowlist | PII | Notes                                                               |
+| ------------------ | ------- | -------- | --------- | --- | ------------------------------------------------------------------- |
+| `clinic_id`        | string  | yes      | yes       | no  | Format `<country>-<region>-<nn>`, e.g. `us-tx-01`, `uk-lon-01`      |
+| `country`          | string  | yes      | yes       | no  | `US` or `UK`                                                        |
+| `product_id`       | string  | yes      | yes       | no  | Internal product ID, e.g. `prd_00412`                               |
+| `product_category` | string  | yes      | yes       | no  | `medication`, `ppe`, `consumable` or `equipment`                    |
+| `quantity`         | integer | yes      | yes       | no  | Units consumed, ≥ 1                                                 |
+| `department`       | string  | yes      | yes       | no  | `primary_care`, `specialty_care` or `chronic_care`                  |
+| `order_id`         | string  | yes      | yes       | no  | Internal outbound order ID, e.g. `ord_20261021_0012`                |
+
+- **PII / sanitisation:** No PII. Consumption is recorded by `department` only, never by patient. `department` is a fixed list of values, not free text, so a patient name or note cannot be typed into it; any other value is rejected by the schema. Adding a department requires a minor `schemaVersion` bump. The staff user is identified only by the pseudonymised `userId` in the envelope.
+- **Processing:** batch (daily). Replenishment rules are adjusted periodically from consumption trends. The urgent case, a clinic running short of a supply, is covered by `stock_threshold_triggered`, which is processed as a stream.
+
 ## 7. High-frequency strategy
 
 _Throttle and debounce rules for high-frequency events._

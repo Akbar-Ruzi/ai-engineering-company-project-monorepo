@@ -92,6 +92,39 @@
           }
         }
       ]
+    },
+    "outbound_order_created": {
+      "description": "Mandatory · Inventory. An outbound order (consumption by a department) is committed and stock is decremented. Processing: batch.",
+      "allOf": [
+        { "$ref": "#/definitions/eventEnvelope" },
+        {
+          "properties": {
+            "event_type": { "const": "outbound_order_created" },
+            "properties": {
+              "type": "object",
+              "required": [
+                "clinic_id",
+                "country",
+                "product_id",
+                "product_category",
+                "quantity",
+                "department",
+                "order_id"
+              ],
+              "properties": {
+                "clinic_id": { "type": "string", "pattern": "^(us|uk)-[a-z]{2,3}-[0-9]{2}$" },
+                "country": { "type": "string", "enum": ["US", "UK"] },
+                "product_id": { "type": "string", "minLength": 1 },
+                "product_category": { "type": "string", "enum": ["medication", "ppe", "consumable", "equipment"] },
+                "quantity": { "type": "integer", "minimum": 1 },
+                "department": { "type": "string", "enum": ["primary_care", "specialty_care", "chronic_care"] },
+                "order_id": { "type": "string", "minLength": 1 }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
     }
   }
 }
