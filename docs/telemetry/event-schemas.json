@@ -160,6 +160,37 @@
           }
         }
       ]
+    },
+    "direct_stock_edit_rejected": {
+      "description": "Mandatory · Inventory. A staff user tries to change stock directly (not through an order) and the backend rejects it. Processing: batch.",
+      "allOf": [
+        { "$ref": "#/definitions/eventEnvelope" },
+        {
+          "properties": {
+            "event_type": { "const": "direct_stock_edit_rejected" },
+            "properties": {
+              "type": "object",
+              "required": [
+                "clinic_id",
+                "country",
+                "product_id",
+                "product_category",
+                "quantity",
+                "attempt_source"
+              ],
+              "properties": {
+                "clinic_id": { "type": "string", "pattern": "^(us|uk)-[a-z]{2,3}-[0-9]{2}$" },
+                "country": { "type": "string", "enum": ["US", "UK"] },
+                "product_id": { "type": "string", "minLength": 1 },
+                "product_category": { "type": "string", "enum": ["medication", "ppe", "consumable", "equipment"] },
+                "quantity": { "type": "integer", "not": { "const": 0 }, "description": "Attempted signed stock change: positive adds, negative removes." },
+                "attempt_source": { "type": "string", "enum": ["ui", "api"] }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
     }
   }
 }

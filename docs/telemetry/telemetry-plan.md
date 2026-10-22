@@ -208,6 +208,24 @@ Each event below lists its golden rule, its `properties` allowlist, its PII hand
 - **PII / sanitisation:** No PII. The event describes stock levels only. `department` uses the same fixed list as `outbound_order_created`, so no free text can get in. The staff user is identified only by the pseudonymised `userId` in the envelope.
 - **Processing:** stream. A clinic running out of PPE or medication affects care the same day, so Clinical Operations must act within minutes to restock or move supplies between clinics. Repeated alerts for the same product at the same clinic are debounced (see section 7).
 
+### `direct_stock_edit_rejected`
+
+- **Class / Category:** mandatory · Inventory
+- **Description:** Fires once when a staff user tries to change a product's stock directly (not through an `InboundOrder` or `OutboundOrder`) and the backend guard rejects the change. Stock is not modified.
+- **Golden rule:** We capture `direct_stock_edit_rejected` because we need to know whether staff are trying to bypass supply traceability controls, and at which clinics, which allows us to reinforce training or tighten permissions at the clinic where it happens most.
+
+| Property           | Type    | Required | Allowlist | PII | Notes                                                                                   |
+| ------------------ | ------- | -------- | --------- | --- | --------------------------------------------------------------------------------------- |
+| `clinic_id`        | string  | yes      | yes       | no  | Format `<country>-<region>-<nn>`, e.g. `us-tx-01`, `uk-lon-01`                          |
+| `country`          | string  | yes      | yes       | no  | `US` or `UK`                                                                            |
+| `product_id`       | string  | yes      | yes       | no  | Internal product ID, e.g. `prd_00412`                                                   |
+| `product_category` | string  | yes      | yes       | no  | `medication`, `ppe`, `consumable` or `equipment`                                        |
+| `quantity`         | integer | yes      | yes       | no  | Attempted stock change, signed and never 0: `+10` to add, `-5` to remove                |
+| `attempt_source`   | string  | yes      | yes       | no  | `ui` (a backoffice screen) or `api` (a direct API call, e.g. a script)                  |
+
+- **PII / sanitisation:** No PII. The staff user is identified only by the pseudonymised `userId` in the envelope. No `department` is included, because a direct edit is not a care activity. Investigating a specific user is done in the audit system, not through telemetry.
+- **Processing:** batch (daily). The decision, training or permissions, is based on patterns per clinic over weeks, and each attempt has already been blocked, so no harm is done in the meantime. `attempt_source` points to the fix: mostly `ui` suggests a training or screen problem, mostly `api` suggests a permissions problem. A burst of repeated attempts by the same user is handled as an alert rule in section 7, not by streaming every event.
+
 ## 7. High-frequency strategy
 
 _Throttle and debounce rules for high-frequency events._
