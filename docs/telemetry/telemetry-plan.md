@@ -226,6 +226,26 @@ Each event below lists its golden rule, its `properties` allowlist, its PII hand
 - **PII / sanitisation:** No PII. The staff user is identified only by the pseudonymised `userId` in the envelope. No `department` is included, because a direct edit is not a care activity. Investigating a specific user is done in the audit system, not through telemetry.
 - **Processing:** batch (daily). The decision, training or permissions, is based on patterns per clinic over weeks, and each attempt has already been blocked, so no harm is done in the meantime. `attempt_source` points to the fix: mostly `ui` suggests a training or screen problem, mostly `api` suggests a permissions problem. A burst of repeated attempts by the same user is handled as an alert rule in section 7, not by streaming every event.
 
+### `supply_expiry_flagged`
+
+- **Class / Category:** mandatory · Inventory
+- **Description:** Fires once when a product in stock at a clinic enters the 30-day window before its expiry date. Emitted by a scheduled daily job, not by a user action. It does not fire again every day while the product stays inside the window, so the job must record which products it has already flagged.
+- **Golden rule:** We capture `supply_expiry_flagged` because we need to know which supplies are about to expire before they become waste or a compliance risk, which allows us to prioritise their use or arrange controlled disposal before expiry.
+- **Envelope note:** No user is logged in, so `userId` is the service account `system:expiry-job` and `sessionId` is the job's run ID.
+
+| Property           | Type    | Required | Allowlist | PII | Notes                                                          |
+| ------------------ | ------- | -------- | --------- | --- | -------------------------------------------------------------- |
+| `clinic_id`        | string  | yes      | yes       | no  | Format `<country>-<region>-<nn>`, e.g. `us-tx-01`, `uk-lon-01` |
+| `country`          | string  | yes      | yes       | no  | `US` or `UK`                                                   |
+| `product_id`       | string  | yes      | yes       | no  | Internal product ID, e.g. `prd_00412`                          |
+| `product_category` | string  | yes      | yes       | no  | `medication`, `ppe`, `consumable` or `equipment`               |
+| `quantity`         | integer | yes      | yes       | no  | Units in stock that will expire, ≥ 1                           |
+| `expiry_date`      | string  | yes      | yes       | no  | Calendar date `YYYY-MM-DD`, e.g. `2026-11-20` (no time part)   |
+| `days_to_expiry`   | integer | yes      | yes       | no  | Days left when flagged, 0 to 30                                |
+
+- **PII / sanitisation:** No PII. The event describes stock and expiry dates only and has no human user. No `department` is included, because nothing has been consumed.
+- **Processing:** batch (daily). The job itself runs once a day and the 30-day window leaves weeks to act, so deciding whether to use the supply first or arrange disposal does not need minute-level delivery.
+
 ## 7. High-frequency strategy
 
 _Throttle and debounce rules for high-frequency events._

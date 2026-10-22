@@ -191,6 +191,39 @@
           }
         }
       ]
+    },
+    "supply_expiry_flagged": {
+      "description": "Mandatory · Inventory. A daily job flags a product in stock entering the 30-day window before expiry. Fires once per product entering the window. userId is system:expiry-job. Processing: batch.",
+      "allOf": [
+        { "$ref": "#/definitions/eventEnvelope" },
+        {
+          "properties": {
+            "event_type": { "const": "supply_expiry_flagged" },
+            "properties": {
+              "type": "object",
+              "required": [
+                "clinic_id",
+                "country",
+                "product_id",
+                "product_category",
+                "quantity",
+                "expiry_date",
+                "days_to_expiry"
+              ],
+              "properties": {
+                "clinic_id": { "type": "string", "pattern": "^(us|uk)-[a-z]{2,3}-[0-9]{2}$" },
+                "country": { "type": "string", "enum": ["US", "UK"] },
+                "product_id": { "type": "string", "minLength": 1 },
+                "product_category": { "type": "string", "enum": ["medication", "ppe", "consumable", "equipment"] },
+                "quantity": { "type": "integer", "minimum": 1 },
+                "expiry_date": { "type": "string", "format": "date" },
+                "days_to_expiry": { "type": "integer", "minimum": 0, "maximum": 30 }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
     }
   }
 }
