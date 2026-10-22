@@ -254,6 +254,33 @@
           }
         }
       ]
+    },
+    "login_failed": {
+      "description": "Identified · Authentication. The backend rejects a login attempt. userId is the pseudonymised account ID or anonymous; never carries the typed username, email or password. Processing: stream.",
+      "allOf": [
+        { "$ref": "#/definitions/eventEnvelope" },
+        {
+          "properties": {
+            "event_type": { "const": "login_failed" },
+            "properties": {
+              "type": "object",
+              "required": [
+                "failure_reason",
+                "consecutive_failures",
+                "account_known"
+              ],
+              "properties": {
+                "failure_reason": { "type": "string", "enum": ["invalid_credentials", "account_locked", "account_disabled"] },
+                "consecutive_failures": { "type": "integer", "minimum": 1 },
+                "account_known": { "type": "boolean" },
+                "clinic_id": { "type": "string", "pattern": "^(us|uk)-[a-z]{2,3}-[0-9]{2}$" },
+                "country": { "type": "string", "enum": ["US", "UK"] }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
     }
   }
 }

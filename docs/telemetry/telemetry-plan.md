@@ -277,6 +277,24 @@ Each event below lists its golden rule, its `properties` allowlist, its PII hand
 - **PII / sanitisation:** No PII. The event carries only error codes and field names, never the values the user typed: a rejected form can contain anything, including patient details entered in the wrong field. The staff user is identified only by the pseudonymised `userId` in the envelope.
 - **Processing:** batch (daily). Changing forms, rules or training is decided over weeks, and the user already sees the error on screen, so no one else needs to act within minutes.
 
+### `login_failed`
+
+- **Class / Category:** identified · Authentication
+- **Description:** Fires once when the backend rejects a login attempt. One event per failed attempt.
+- **Golden rule:** We capture `login_failed` because we need to know how often and where login attempts fail, and whether failures repeat for the same account, which allows us to alert Claire (compliance) to possible unauthorised access and lock or reset affected accounts.
+- **Envelope note:** No one is logged in yet, so `userId` is the pseudonymised ID of the account being tried if it exists, otherwise `anonymous`. `sessionId` is the pre-login browser session.
+
+| Property               | Type    | Required | Allowlist | PII | Notes                                                                                      |
+| ---------------------- | ------- | -------- | --------- | --- | ------------------------------------------------------------------------------------------ |
+| `failure_reason`       | string  | yes      | yes       | no  | `invalid_credentials`, `account_locked` or `account_disabled`                              |
+| `consecutive_failures` | integer | yes      | yes       | no  | Failed attempts in a row for this account, including this one, ≥ 1                         |
+| `account_known`        | boolean | yes      | yes       | no  | `true` if the username exists. Many failures on unknown accounts suggest username guessing |
+| `clinic_id`            | string  | no       | yes       | no  | The account's clinic, only when `account_known` is `true`. Format as in other events       |
+| `country`              | string  | no       | yes       | no  | `US` or `UK`, only when `account_known` is `true`                                          |
+
+- **PII / sanitisation:** The typed username, email and password are never sent, not even hashed. The account appears only as the pseudonymised `userId` in the envelope. No IP address is captured.
+- **Processing:** stream. Repeated failures can mean someone is trying to break into an account with access to clinic stock, so Claire must be able to lock the account within minutes. The alert rule for repeated failures is defined in section 7.
+
 ## 7. High-frequency strategy
 
 _Throttle and debounce rules for high-frequency events._
