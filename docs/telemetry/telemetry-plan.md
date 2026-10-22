@@ -188,6 +188,26 @@ Each event below lists its golden rule, its `properties` allowlist, its PII hand
 - **PII / sanitisation:** No PII. Consumption is recorded by `department` only, never by patient. `department` is a fixed list of values, not free text, so a patient name or note cannot be typed into it; any other value is rejected by the schema. Adding a department requires a minor `schemaVersion` bump. The staff user is identified only by the pseudonymised `userId` in the envelope.
 - **Processing:** batch (daily). Replenishment rules are adjusted periodically from consumption trends. The urgent case, a clinic running short of a supply, is covered by `stock_threshold_triggered`, which is processed as a stream.
 
+### `stock_threshold_triggered`
+
+- **Class / Category:** mandatory · Inventory
+- **Description:** Fires once when a product's stock at a clinic crosses from at or above its configured minimum to below it, after an outbound order is committed. It fires on the crossing only, not on every order while stock stays below the minimum.
+- **Golden rule:** We capture `stock_threshold_triggered` because we need to know how often each clinic runs short of a critical supply such as PPE or medication, which allows us to prioritise urgent restocking and escalate to Marcus (Clinical Operations).
+
+| Property           | Type    | Required | Allowlist | PII | Notes                                                              |
+| ------------------ | ------- | -------- | --------- | --- | ------------------------------------------------------------------ |
+| `clinic_id`        | string  | yes      | yes       | no  | Format `<country>-<region>-<nn>`, e.g. `us-tx-01`, `uk-lon-01`     |
+| `country`          | string  | yes      | yes       | no  | `US` or `UK`                                                       |
+| `product_id`       | string  | yes      | yes       | no  | Internal product ID, e.g. `prd_00412`                              |
+| `product_category` | string  | yes      | yes       | no  | `medication`, `ppe`, `consumable` or `equipment`                   |
+| `quantity`         | integer | yes      | yes       | no  | Units consumed by the outbound order that crossed the minimum, ≥ 1 |
+| `department`       | string  | yes      | yes       | no  | Department of that order: `primary_care`, `specialty_care` or `chronic_care` |
+| `current_stock`    | integer | yes      | yes       | no  | Stock after the order, ≥ 0                                         |
+| `min_threshold`    | integer | yes      | yes       | no  | Configured minimum for this product at this clinic, ≥ 1            |
+
+- **PII / sanitisation:** No PII. The event describes stock levels only. `department` uses the same fixed list as `outbound_order_created`, so no free text can get in. The staff user is identified only by the pseudonymised `userId` in the envelope.
+- **Processing:** stream. A clinic running out of PPE or medication affects care the same day, so Clinical Operations must act within minutes to restock or move supplies between clinics. Repeated alerts for the same product at the same clinic are debounced (see section 7).
+
 ## 7. High-frequency strategy
 
 _Throttle and debounce rules for high-frequency events._
