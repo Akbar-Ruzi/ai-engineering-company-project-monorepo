@@ -132,7 +132,7 @@ Every event carries the same 8 envelope fields, whatever its type. Only the cont
 
 **Rules:**
 
-- All 8 fields are required on every event, and no other top-level fields are allowed. Anything event-specific goes inside `properties`.
+- All 8 envelope fields are required on every event, and no other top-level fields are allowed. Anything event-specific goes inside `properties`.
 - The envelope never carries patient data or PHI. `userId` always identifies a staff member or a service account, never a patient.
 - The field names mix camelCase (`eventId`, `schemaVersion`) and snake_case (`event_type`) on purpose, to match the project README. They must be used exactly as written here and not renamed.
 
@@ -258,6 +258,24 @@ Each event below lists its golden rule, its `properties` allowlist, its PII hand
 
 - **PII / sanitisation:** No PII. The event describes stock and expiry dates only and has no human user. No `department` is included, because nothing has been consumed.
 - **Processing:** batch (daily). The job itself runs once a day and the 30-day window leaves weeks to act, so deciding whether to use the supply first or arrange disposal does not need minute-level delivery.
+
+### `order_validation_failed`
+
+- **Class / Category:** identified · Inventory
+- **Description:** Fires once when the backend rejects a submitted inbound or outbound order and nothing is saved. One event per submission, carrying the first validation error; a user who fixes the form and resubmits produces a new event per failed attempt.
+- **Golden rule:** We capture `order_validation_failed` because we need to know which order fields and rules reject staff submissions most often, by clinic and order type, which allows us to fix the form fields, validation rules or training that block staff most.
+
+| Property       | Type   | Required | Allowlist | PII | Notes                                                                                      |
+| -------------- | ------ | -------- | --------- | --- | ------------------------------------------------------------------------------------------ |
+| `clinic_id`    | string | yes      | yes       | no  | Format `<country>-<region>-<nn>`, e.g. `us-tx-01`, `uk-lon-01`                             |
+| `country`      | string | yes      | yes       | no  | `US` or `UK`                                                                               |
+| `order_type`   | string | yes      | yes       | no  | `inbound` or `outbound`                                                                    |
+| `error_code`   | string | yes      | yes       | no  | `missing_field`, `invalid_value`, `insufficient_stock` or `unknown_product`                |
+| `failed_field` | string | yes      | yes       | no  | `product_id`, `quantity`, `vendor_id` or `department`                                      |
+| `product_id`   | string | no       | yes       | no  | Internal product ID, only when the submitted product exists (absent if it caused the error) |
+
+- **PII / sanitisation:** No PII. The event carries only error codes and field names, never the values the user typed: a rejected form can contain anything, including patient details entered in the wrong field. The staff user is identified only by the pseudonymised `userId` in the envelope.
+- **Processing:** batch (daily). Changing forms, rules or training is decided over weeks, and the user already sees the error on screen, so no one else needs to act within minutes.
 
 ## 7. High-frequency strategy
 
