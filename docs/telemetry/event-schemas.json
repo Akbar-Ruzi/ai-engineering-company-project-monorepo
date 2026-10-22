@@ -281,6 +281,35 @@
           }
         }
       ]
+    },
+    "session_expired": {
+      "description": "Identified · Authentication. The backend first rejects a request because the session timed out while the user was still working. Processing: batch.",
+      "allOf": [
+        { "$ref": "#/definitions/eventEnvelope" },
+        {
+          "properties": {
+            "event_type": { "const": "session_expired" },
+            "properties": {
+              "type": "object",
+              "required": [
+                "clinic_id",
+                "country",
+                "idle_minutes",
+                "timeout_minutes",
+                "lost_order_submit"
+              ],
+              "properties": {
+                "clinic_id": { "type": "string", "pattern": "^(us|uk)-[a-z]{2,3}-[0-9]{2}$" },
+                "country": { "type": "string", "enum": ["US", "UK"] },
+                "idle_minutes": { "type": "integer", "minimum": 0 },
+                "timeout_minutes": { "type": "integer", "minimum": 1 },
+                "lost_order_submit": { "type": "boolean" }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
     }
   }
 }

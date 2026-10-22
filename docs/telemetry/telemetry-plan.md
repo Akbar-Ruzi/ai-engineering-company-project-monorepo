@@ -295,6 +295,23 @@ Each event below lists its golden rule, its `properties` allowlist, its PII hand
 - **PII / sanitisation:** The typed username, email and password are never sent, not even hashed. The account appears only as the pseudonymised `userId` in the envelope. No IP address is captured.
 - **Processing:** stream. Repeated failures can mean someone is trying to break into an account with access to clinic stock, so Claire must be able to lock the account within minutes. The alert rule for repeated failures is defined in section 7.
 
+### `session_expired`
+
+- **Class / Category:** identified · Authentication
+- **Description:** Fires once when the backend first rejects a request because the user's session has timed out, meaning the user was still working. Sessions that expire with no later request (the user left) do not fire.
+- **Golden rule:** We capture `session_expired` because we need to know how often sessions time out while staff are still working, especially in the middle of an order, which allows us to tune the session timeout so staff do not lose unsaved orders without weakening security.
+
+| Property            | Type    | Required | Allowlist | PII | Notes                                                                 |
+| ------------------- | ------- | -------- | --------- | --- | --------------------------------------------------------------------- |
+| `clinic_id`         | string  | yes      | yes       | no  | Format `<country>-<region>-<nn>`, e.g. `us-tx-01`, `uk-lon-01`        |
+| `country`           | string  | yes      | yes       | no  | `US` or `UK`                                                          |
+| `idle_minutes`      | integer | yes      | yes       | no  | Minutes since the user's last activity, ≥ 0                           |
+| `timeout_minutes`   | integer | yes      | yes       | no  | Session timeout setting in force at that moment, ≥ 1                  |
+| `lost_order_submit` | boolean | yes      | yes       | no  | `true` if the rejected request was an order submission (work was lost) |
+
+- **PII / sanitisation:** No PII. The user is identified only by the pseudonymised `userId` in the envelope. No form content is sent, only the `lost_order_submit` flag.
+- **Processing:** batch (daily). Tuning the session timeout is a settings decision made over weeks, and a single expired session does not need anyone to react within minutes.
+
 ## 7. High-frequency strategy
 
 _Throttle and debounce rules for high-frequency events._
