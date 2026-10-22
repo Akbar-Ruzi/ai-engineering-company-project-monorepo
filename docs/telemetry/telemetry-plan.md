@@ -312,6 +312,24 @@ Each event below lists its golden rule, its `properties` allowlist, its PII hand
 - **PII / sanitisation:** No PII. The user is identified only by the pseudonymised `userId` in the envelope. No form content is sent, only the `lost_order_submit` flag.
 - **Processing:** batch (daily). Tuning the session timeout is a settings decision made over weeks, and a single expired session does not need anyone to react within minutes.
 
+### `api_latency_recorded`
+
+- **Class / Category:** identified · Performance
+- **Description:** Fires once for every API request the backend completes, measured in the request middleware so every endpoint is covered without per-endpoint code. High volume: see section 7 for sampling.
+- **Golden rule:** We capture `api_latency_recorded` because we need to know which API endpoints are slowest, and at which clinics, which allows us to prioritise fixing the slowest endpoints first.
+
+| Property      | Type    | Required | Allowlist | PII | Notes                                                                          |
+| ------------- | ------- | -------- | --------- | --- | ------------------------------------------------------------------------------ |
+| `endpoint`    | string  | yes      | yes       | no  | Route template, e.g. `/api/orders/{id}`. Never the real URL or query string    |
+| `http_method` | string  | yes      | yes       | no  | `GET`, `POST`, `PUT`, `PATCH` or `DELETE`                                      |
+| `status_code` | integer | yes      | yes       | no  | HTTP status returned, 100–599                                                  |
+| `duration_ms` | integer | yes      | yes       | no  | Time from request received to response sent, in milliseconds, ≥ 0             |
+| `clinic_id`   | string  | no       | yes       | no  | The user's clinic. Absent for requests without a logged-in user (e.g. login)   |
+| `country`     | string  | no       | yes       | no  | `US` or `UK`. Absent together with `clinic_id`                                 |
+
+- **PII / sanitisation:** No PII. Only the route template is sent, because a real path or query string can contain IDs or free text. Request and response bodies and headers (which carry tokens) are never captured. The user is identified only by the pseudonymised `userId` in the envelope.
+- **Processing:** batch (daily). Choosing which endpoints to optimise is a planning decision made over days or weeks. Real-time outage alerting belongs to infrastructure monitoring, which is out of scope (see section 8).
+
 ## 7. High-frequency strategy
 
 _Throttle and debounce rules for high-frequency events._
