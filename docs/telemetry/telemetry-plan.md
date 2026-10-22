@@ -102,6 +102,19 @@ This catalogue lists every event in the plan, grouped by category and labeled **
 | `section_viewed`             | Navigation     | identified | A user opens a backoffice section                           | Decide which sections to improve, simplify or retire        |
 | `order_form_abandoned`       | Navigation     | identified | A user opens an order form and leaves without submitting it | Simplify the order forms where staff give up most           |
 
+### Golden rules for identified events
+
+The golden rules for the 5 mandatory events are in section 2. Every identified event completes the same sentence; an event that could not complete it would have been discarded.
+
+- We capture `order_validation_failed` because we need to know which order fields and rules reject staff submissions most often, by clinic and order type, which allows us to fix the form fields, validation rules or training that block staff most.
+- We capture `login_failed` because we need to know how often and where login attempts fail, and whether failures repeat for the same account, which allows us to alert Claire (compliance) to possible unauthorised access and lock or reset affected accounts.
+- We capture `session_expired` because we need to know how often sessions time out while staff are still working, especially in the middle of an order, which allows us to tune the session timeout so staff do not lose unsaved orders without weakening security.
+- We capture `api_latency_recorded` because we need to know which API endpoints are slowest, and at which clinics, which allows us to prioritise fixing the slowest endpoints first.
+- We capture `page_load_recorded` because we need to know which backoffice screens load slowly in the browser, separately from slow APIs, which allows us to optimise the slowest screens first.
+- We capture `frontend_error_caught` because we need to know which uncaught browser errors happen and how many clinics they affect, which allows us to fix first the errors that affect the most clinics.
+- We capture `section_viewed` because we need to know which backoffice sections staff use most and least, which allows us to decide which sections to improve, simplify or retire.
+- We capture `order_form_abandoned` because we need to know where staff give up on inbound and outbound order forms without submitting them, which allows us to simplify the forms where staff give up most.
+
 ## 5. Event Envelope
 
 Every event carries the same 8 envelope fields, whatever its type. Only the content of `properties` changes from one event to another, and it is defined per event in section 6.
