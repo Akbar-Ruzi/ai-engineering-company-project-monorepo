@@ -366,6 +366,37 @@
           }
         }
       ]
+    },
+    "frontend_error_caught": {
+      "description": "Identified · Errors. The frontend global error handler catches an unhandled error. Never carries the error message or stack trace, only a fingerprint. Processing: batch.",
+      "allOf": [
+        { "$ref": "#/definitions/eventEnvelope" },
+        {
+          "properties": {
+            "event_type": { "const": "frontend_error_caught" },
+            "properties": {
+              "type": "object",
+              "required": [
+                "error_type",
+                "error_fingerprint",
+                "source",
+                "screen",
+                "app_version"
+              ],
+              "properties": {
+                "error_type": { "type": "string", "pattern": "^[A-Za-z]{1,50}$" },
+                "error_fingerprint": { "type": "string", "pattern": "^[0-9a-f]{16}$" },
+                "source": { "type": "string", "enum": ["window_error", "unhandled_rejection", "error_boundary"] },
+                "screen": { "type": "string", "pattern": "^/[^?#]*$" },
+                "app_version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+                "clinic_id": { "type": "string", "pattern": "^(us|uk)-[a-z]{2,3}-[0-9]{2}$" },
+                "country": { "type": "string", "enum": ["US", "UK"] }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
     }
   }
 }

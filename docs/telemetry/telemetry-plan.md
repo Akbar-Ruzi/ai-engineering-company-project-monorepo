@@ -347,6 +347,25 @@ Each event below lists its golden rule, its `properties` allowlist, its PII hand
 - **PII / sanitisation:** No PII. Only the route template is sent. No browser fingerprint (browser version, screen size, IP address) is captured, because the decision does not need it. The user is identified only by the pseudonymised `userId` in the envelope.
 - **Processing:** batch (daily). Choosing which screens to optimise is a planning decision made over days or weeks.
 
+### `frontend_error_caught`
+
+- **Class / Category:** identified · Errors
+- **Description:** Fires once, from the frontend, when the browser's global error handler catches an error that no code handled (a crash or a broken screen).
+- **Golden rule:** We capture `frontend_error_caught` because we need to know which uncaught browser errors happen and how many clinics they affect, which allows us to fix first the errors that affect the most clinics.
+
+| Property            | Type   | Required | Allowlist | PII | Notes                                                                                     |
+| ------------------- | ------ | -------- | --------- | --- | ----------------------------------------------------------------------------------------- |
+| `error_type`        | string | yes      | yes       | no  | Error class name only, e.g. `TypeError`, `NetworkError`                                   |
+| `error_fingerprint` | string | yes      | yes       | no  | 16-character hex hash of the normalised stack trace; identical errors share it            |
+| `source`            | string | yes      | yes       | no  | `window_error`, `unhandled_rejection` or `error_boundary` (which handler caught it)       |
+| `screen`            | string | yes      | yes       | no  | Route template where it happened, e.g. `/inventory/orders/new`                            |
+| `app_version`       | string | yes      | yes       | no  | Frontend release, semver e.g. `2.4.1`. Shows whether an error stops after a fix ships     |
+| `clinic_id`         | string | no       | yes       | no  | The user's clinic. Absent on the login screen, before anyone is logged in                 |
+| `country`           | string | no       | yes       | no  | `US` or `UK`. Absent together with `clinic_id`                                            |
+
+- **PII / sanitisation:** No PII. The error message and the stack trace are never sent, because messages often contain data shown on screen, which could include PHI. Only the class name and a fingerprint hash are sent, which is enough to group and count errors. Full debugging detail belongs to a dedicated error-tracking tool with scrubbing, which is out of scope (see section 8).
+- **Processing:** batch (daily). Deciding which errors to fix first is a prioritisation decision made over days. Floods of the same error are handled in section 7.
+
 ## 7. High-frequency strategy
 
 _Throttle and debounce rules for high-frequency events._
