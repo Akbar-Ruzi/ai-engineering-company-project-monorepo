@@ -405,7 +405,14 @@ Each event below lists its golden rule, its `properties` allowlist, its PII hand
 
 ## 7. High-frequency strategy
 
-_Throttle and debounce rules for high-frequency events._
+Rules that stop repeated or very frequent events from flooding alerts or storage.
+
+### `stock_threshold_triggered`: debounce
+
+- **Problem:** stock that hovers around the minimum (small restock, then consumption) crosses it again and again, sending Clinical Operations several alerts for the same shortage.
+- **Rule:** debounce by `clinic_id` + `product_id` with a 15-minute window. The first event is emitted; later events with the same key inside the window are dropped.
+- **Not suppressed:** a different product, or the same product at another clinic, always fires.
+- **Why it's safe:** the first alert has already triggered the restock decision; repeats within 15 minutes add no new information.
 
 ## 8. Risks and exclusions
 
