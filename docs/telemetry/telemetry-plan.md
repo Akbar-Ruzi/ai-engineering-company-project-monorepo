@@ -442,4 +442,15 @@ These events can fire many times per user per hour. Each rule keeps the data nee
 
 ## 8. Risks and exclusions
 
-_Events considered and discarded, and data that will not be captured (PHI, credentials, out-of-scope infrastructure)._
+What this plan deliberately does not capture, and why.
+
+### Events considered and discarded
+
+| Event                     | Why it was discarded                                                                                                                         |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `login_succeeded`         | No decision depends on it. Who logged in and when belongs in the authentication audit log, and `section_viewed` already shows activity per clinic. |
+| `button_clicked`          | Generic click tracking is a "just in case" event: very high volume and no hypothesis. `section_viewed` and `order_form_abandoned` answer the real questions. |
+| `form_field_changed`      | Very high volume, and close to recording what staff type, which could include PHI. `order_form_abandoned` already gives the last field touched. |
+| `api_request_failed`      | Duplicates `api_latency_recorded`, which already carries `status_code`.                                                                      |
+| `product_viewed`          | Too fine-grained to change a decision. Section-level use from `section_viewed` is enough to decide what to improve or retire.                |
+| `supply_used_for_patient` | Forbidden. Linking a supply to a patient is PHI under HIPAA and UK GDPR. Consumption is recorded per `department` in `outbound_order_created`. |
